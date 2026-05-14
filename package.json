@@ -1,0 +1,11 @@
+{
+  "name": "cfma-taska",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CFMA TASKA single-page work calendar, task, email, and Gmail briefing tool.",
+  "scripts": {
+    "check": "node --check gmail-analysis-core.js && node --check gmail-scanner-apps-script.js && node -e \"const fs=require('fs'); const html=fs.readFileSync('surveyors-toolbox.html','utf8'); const scripts=[...html.matchAll(/<script(?:\\\\s[^>]*)?>([\\\\s\\\\S]*?)<\\\\/script>/gi)].map(m=>m[1]).filter(s=>s.trim()); for (const s of scripts) new Function(s); console.log('inline scripts parsed OK:', scripts.length);\"",
+    "test": "node gmail-analysis-tests.js",
+    "verify": "npm run check && npm test"
+  }
+}

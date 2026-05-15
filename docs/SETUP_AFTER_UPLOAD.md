@@ -39,7 +39,15 @@ Folder: /root
 4. Click `Team Sync`.
 5. Enter the Supabase project URL, anon/public key, workspace id, and your name.
 
+If `cfma-public-config.js` has the Supabase project URL, publishable key, and workspace id filled in, users only need to enter their display name when they click `Team Sync`.
+
 Important: the current Supabase schema is fine for a private prototype. Before public real-world use, it should be locked down with Supabase Auth and stricter Row Level Security.
+
+## Login
+
+Run `supabase/schema.sql`, then follow `docs/LOGIN_SETUP.md` to create the first owner login.
+
+After the first owner exists, use `Add User` in the app to create new users and their logins.
 
 ## Gmail
 

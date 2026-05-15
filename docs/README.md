@@ -6,6 +6,6 @@ Read these two files:
 
 - [UPLOAD_TO_GITHUB.md](UPLOAD_TO_GITHUB.md) - exact files and folders to upload.
 - [SETUP_AFTER_UPLOAD.md](SETUP_AFTER_UPLOAD.md) - what to configure after the app is on GitHub.
+- [LOGIN_SETUP.md](LOGIN_SETUP.md) - how to create the first owner login and new user logins.
 
 Short answer: upload the app files listed in `UPLOAD_TO_GITHUB.md`, and do not upload private folders like `Backups/`, `Job Emails/`, or `Useful Documents/`.
-

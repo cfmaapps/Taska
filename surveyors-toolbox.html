@@ -81,6 +81,120 @@
       white-space: nowrap;
     }
 
+    header #current-user-label {
+      font-size: 0.68rem;
+      color: #9fb3c8;
+      white-space: nowrap;
+    }
+
+    body.auth-locked {
+      padding: 18px;
+      align-items: center;
+      justify-content: center;
+      overflow: auto;
+    }
+
+    body.auth-locked #right-sidebar,
+    body.auth-locked .right-sidebar,
+    body.auth-locked > header,
+    body.auth-locked > .layout {
+      display: none;
+    }
+
+    .login-screen {
+      display: none;
+      width: 100%;
+      min-height: calc(100vh - 36px);
+      align-items: center;
+      justify-content: center;
+    }
+
+    body.auth-locked .login-screen {
+      display: flex;
+    }
+
+    .login-card {
+      width: min(390px, 100%);
+      background: #101827;
+      border: 1px solid #2e3d55;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 18px 45px rgba(0,0,0,0.32);
+    }
+
+    .login-card h1 {
+      color: #f0a500;
+      font-size: 1.1rem;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+    }
+
+    .login-card p {
+      color: #9fb3c8;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      margin-bottom: 18px;
+    }
+
+    .login-card label {
+      display: block;
+      color: #b9c7d8;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin: 12px 0 6px;
+      text-transform: uppercase;
+    }
+
+    .login-card input {
+      width: 100%;
+      background: #162030;
+      border: 1px solid #2e3d55;
+      border-radius: 7px;
+      color: #e8edf2;
+      font: inherit;
+      outline: none;
+      padding: 10px 11px;
+    }
+
+    .login-card input:focus {
+      border-color: #f0a500;
+      box-shadow: 0 0 0 2px rgba(240,165,0,0.12);
+    }
+
+    .login-card button {
+      width: 100%;
+      margin-top: 16px;
+      background: #f0a500;
+      border: 0;
+      border-radius: 7px;
+      color: #172033;
+      cursor: pointer;
+      font-weight: 800;
+      padding: 10px 12px;
+    }
+
+    .login-card button:disabled {
+      cursor: wait;
+      opacity: 0.65;
+    }
+
+    .login-status {
+      color: #9fb3c8;
+      font-size: 0.74rem;
+      line-height: 1.45;
+      margin-top: 12px;
+      min-height: 18px;
+    }
+
+    .login-status.error {
+      color: #ffb1b1;
+    }
+
+    .login-status.ok {
+      color: #9de6b1;
+    }
+
     /* ── Layout ── */
     .layout {
       display: grid;
@@ -3054,7 +3168,20 @@
     }
   </style>
 </head>
-<body>
+<body class="auth-locked">
+
+  <div class="login-screen" id="login-screen">
+    <form class="login-card" onsubmit="handleLoginSubmit(event)">
+      <h1>CFMA JOB</h1>
+      <p>Sign in to CFMA TASKA to load your work calendar and team sync.</p>
+      <label for="login-username">Username</label>
+      <input id="login-username" autocomplete="username" spellcheck="false">
+      <label for="login-password">Password</label>
+      <input id="login-password" type="password" autocomplete="current-password">
+      <button id="login-submit" type="submit">Sign In</button>
+      <div class="login-status" id="login-status"></div>
+    </form>
+  </div>
 
   <!-- ── Right Sidebar: Weather + Documents + Useful Links ── -->
   <div id="right-sidebar">
@@ -3208,12 +3335,14 @@
       <button onclick="exportNotes()">💾 Save</button>
       <button onclick="configureSupabaseSync()">Team Sync</button>
       <button onclick="createOrganisationUser()">Add User</button>
+      <button onclick="logoutSupabaseUser()">Logout</button>
       <label>
         📂 Load
         <input type="file" accept=".json" onchange="importNotes(event)" style="display:none">
       </label>
       <button onclick="printNotes()">🖨️ Print</button>
     </div>
+    <div id="current-user-label"></div>
     <div id="last-saved-label"></div>
   </header>
 
@@ -3457,6 +3586,7 @@
   </footer>
 
   <script src="gmail-analysis-core.js"></script>
+  <script src="cfma-public-config.js"></script>
   <script>
     // ── Dropdown ──────────────────────────────────────────
     function toggleDropdown(id) {
@@ -4056,6 +4186,9 @@
     const SUPABASE_USER_ID_KEY = 'timewrap-supabase-user-id';
     const SUPABASE_USER_NAME_KEY = 'timewrap-supabase-user-name';
     const SUPABASE_LAST_SYNC_KEY = 'timewrap-supabase-last-sync';
+    const SUPABASE_SESSION_TOKEN_KEY = 'cfma-taska-session-token';
+    const SUPABASE_LOGIN_USERNAME_KEY = 'cfma-taska-login-username';
+    const SUPABASE_LOGIN_ROLE_KEY = 'cfma-taska-login-role';
     const SUPABASE_SYNC_INTERVAL_MS = 3 * 60 * 1000;
     const OUTLOOK_MATCH_STOP_WORDS = new Set([
       'and', 'the', 'for', 'with', 'from', 'that', 'this', 'your', 'you', 'are', 'our',
@@ -9230,18 +9363,58 @@
       silentBackupTimer = setTimeout(autoSaveToServer, 10000);
     }
 
-    function supabaseConfig() {
+    function supabaseDeploymentDefaults() {
+      const raw = window.CFMA_TASKA_CONFIG || {};
+      const supabase = raw.supabase || raw;
       return {
-        url: (localStorage.getItem(SUPABASE_URL_KEY) || '').replace(/\/+$/, ''),
-        anonKey: localStorage.getItem(SUPABASE_ANON_KEY) || '',
-        workspaceId: localStorage.getItem(SUPABASE_WORKSPACE_KEY) || '',
+        url: ((supabase.url || supabase.supabaseUrl || '') + '').replace(/\/+$/, ''),
+        anonKey: ((supabase.publishableKey || supabase.anonKey || supabase.publicAnonKey || '') + '').trim(),
+        workspaceId: ((supabase.workspaceId || supabase.workspace || '') + '').trim(),
+        autoLoad: supabase.autoLoad !== false
+      };
+    }
+
+    function applySupabaseDeploymentDefaults() {
+      const defaults = supabaseDeploymentDefaults();
+      if (!defaults.autoLoad) return;
+      if (defaults.url && !localStorage.getItem(SUPABASE_URL_KEY)) {
+        localStorage.setItem(SUPABASE_URL_KEY, defaults.url);
+      }
+      if (defaults.anonKey && !localStorage.getItem(SUPABASE_ANON_KEY)) {
+        localStorage.setItem(SUPABASE_ANON_KEY, defaults.anonKey);
+      }
+      if (defaults.workspaceId && !localStorage.getItem(SUPABASE_WORKSPACE_KEY)) {
+        localStorage.setItem(SUPABASE_WORKSPACE_KEY, defaults.workspaceId);
+      }
+    }
+
+    function supabaseConfig() {
+      const defaults = supabaseDeploymentDefaults();
+      return {
+        url: (localStorage.getItem(SUPABASE_URL_KEY) || defaults.url || '').replace(/\/+$/, ''),
+        anonKey: localStorage.getItem(SUPABASE_ANON_KEY) || defaults.anonKey || '',
+        workspaceId: localStorage.getItem(SUPABASE_WORKSPACE_KEY) || defaults.workspaceId || '',
         userId: localStorage.getItem(SUPABASE_USER_ID_KEY) || '',
         userName: localStorage.getItem(SUPABASE_USER_NAME_KEY) || ''
       };
     }
 
+    function supabaseLoginRequired() {
+      const cfg = supabaseConfig();
+      return !!(cfg.url && cfg.anonKey && cfg.workspaceId);
+    }
+
+    function supabaseLoginSession() {
+      return {
+        token: localStorage.getItem(SUPABASE_SESSION_TOKEN_KEY) || '',
+        username: localStorage.getItem(SUPABASE_LOGIN_USERNAME_KEY) || '',
+        role: localStorage.getItem(SUPABASE_LOGIN_ROLE_KEY) || ''
+      };
+    }
+
     function supabaseConfigured() {
       const cfg = supabaseConfig();
+      if (supabaseLoginRequired() && !supabaseLoginSession().token) return false;
       return !!(cfg.url && cfg.anonKey && cfg.workspaceId && cfg.userId && cfg.userName);
     }
 
@@ -9258,6 +9431,157 @@
 
     function supabaseEndpoint(path) {
       return `${supabaseConfig().url}/rest/v1/${path}`;
+    }
+
+    async function supabaseRpc(functionName, payload = {}) {
+      const resp = await fetch(supabaseEndpoint(`rpc/${functionName}`), {
+        method: 'POST',
+        headers: supabaseHeaders(),
+        body: JSON.stringify(payload)
+      });
+      const text = await resp.text();
+      let data = null;
+      if (text) {
+        try { data = JSON.parse(text); } catch(e) { data = { error: text }; }
+      }
+      if (!resp.ok) {
+        const detail = data && (data.message || data.error || data.details);
+        throw new Error(detail || `Supabase returned ${resp.status}`);
+      }
+      return Array.isArray(data) && data.length === 1 ? data[0] : data;
+    }
+
+    function setLoginStatus(message, kind = '') {
+      const el = document.getElementById('login-status');
+      if (!el) return;
+      el.textContent = message || '';
+      el.className = `login-status ${kind}`.trim();
+    }
+
+    function updateCurrentUserLabel() {
+      const el = document.getElementById('current-user-label');
+      if (!el) return;
+      const cfg = supabaseConfig();
+      const session = supabaseLoginSession();
+      el.textContent = cfg.userName ? `${cfg.userName}${session.role ? ` | ${session.role}` : ''}` : '';
+    }
+
+    function clearSupabaseLogin() {
+      [
+        SUPABASE_SESSION_TOKEN_KEY,
+        SUPABASE_LOGIN_USERNAME_KEY,
+        SUPABASE_LOGIN_ROLE_KEY,
+        SUPABASE_USER_ID_KEY,
+        SUPABASE_USER_NAME_KEY
+      ].forEach(key => localStorage.removeItem(key));
+    }
+
+    function applySupabaseLoginResult(result) {
+      if (!result || !result.ok) throw new Error((result && result.error) || 'Login failed.');
+      localStorage.setItem(SUPABASE_SESSION_TOKEN_KEY, result.sessionToken || result.session_token || '');
+      localStorage.setItem(SUPABASE_LOGIN_USERNAME_KEY, result.username || '');
+      localStorage.setItem(SUPABASE_LOGIN_ROLE_KEY, result.role || 'member');
+      localStorage.setItem(SUPABASE_USER_ID_KEY, result.userId || result.user_id || '');
+      localStorage.setItem(SUPABASE_USER_NAME_KEY, result.userName || result.user_name || result.username || '');
+      updateCurrentUserLabel();
+    }
+
+    function unlockAppAfterLogin() {
+      document.body.classList.remove('auth-locked');
+      setLoginStatus('', '');
+      updateCurrentUserLabel();
+      startSupabaseSyncTimer();
+      syncSupabaseSnapshot('login');
+    }
+
+    function lockAppForLogin(message = '') {
+      stopSupabaseSyncTimer();
+      document.body.classList.add('auth-locked');
+      updateCurrentUserLabel();
+      if (message) setLoginStatus(message, message.toLowerCase().includes('missing') ? 'error' : '');
+      setTimeout(() => document.getElementById('login-username')?.focus(), 50);
+    }
+
+    async function handleLoginSubmit(event) {
+      event.preventDefault();
+      applySupabaseDeploymentDefaults();
+      const cfg = supabaseConfig();
+      const username = (document.getElementById('login-username')?.value || '').trim();
+      const password = document.getElementById('login-password')?.value || '';
+      const btn = document.getElementById('login-submit');
+
+      if (!cfg.url || !cfg.anonKey || !cfg.workspaceId) {
+        setLoginStatus('Supabase URL, publishable key, and workspace id must be set in cfma-public-config.js first.', 'error');
+        return;
+      }
+      if (!username || !password) {
+        setLoginStatus('Enter your username and password.', 'error');
+        return;
+      }
+
+      if (btn) btn.disabled = true;
+      setLoginStatus('Signing in...', '');
+      try {
+        const result = await supabaseRpc('cfma_taska_login', {
+          p_workspace_id: cfg.workspaceId,
+          p_username: username,
+          p_password: password
+        });
+        applySupabaseLoginResult(result);
+        const passwordEl = document.getElementById('login-password');
+        if (passwordEl) passwordEl.value = '';
+        unlockAppAfterLogin();
+      } catch(e) {
+        clearSupabaseLogin();
+        lockAppForLogin(e.message || 'Could not sign in.');
+        setLoginStatus(e.message || 'Could not sign in.', 'error');
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    async function initSupabaseLoginGate() {
+      applySupabaseDeploymentDefaults();
+      const cfg = supabaseConfig();
+      if (!cfg.url || !cfg.anonKey || !cfg.workspaceId) {
+        document.body.classList.remove('auth-locked');
+        updateCurrentUserLabel();
+        return;
+      }
+
+      const session = supabaseLoginSession();
+      if (!session.token) {
+        lockAppForLogin('Sign in to continue.');
+        return;
+      }
+
+      try {
+        const result = await supabaseRpc('cfma_taska_current_user', {
+          p_workspace_id: cfg.workspaceId,
+          p_session_token: session.token
+        });
+        applySupabaseLoginResult(Object.assign({}, result, { sessionToken: session.token }));
+        unlockAppAfterLogin();
+      } catch(e) {
+        clearSupabaseLogin();
+        lockAppForLogin('Your session expired. Sign in again.');
+      }
+    }
+
+    async function logoutSupabaseUser() {
+      const cfg = supabaseConfig();
+      const session = supabaseLoginSession();
+      if (cfg.url && cfg.anonKey && cfg.workspaceId && session.token) {
+        try {
+          await supabaseRpc('cfma_taska_logout', {
+            p_workspace_id: cfg.workspaceId,
+            p_session_token: session.token
+          });
+        } catch(e) {}
+      }
+      clearSupabaseLogin();
+      lockAppForLogin('Signed out.');
+      renderTaskCalendar();
     }
 
     async function upsertOrganisation() {
@@ -9300,7 +9624,11 @@
 
     async function createOrganisationUser() {
       if (!supabaseConfigured()) {
-        configureSupabaseSync();
+        if (supabaseLoginRequired()) {
+          lockAppForLogin('Sign in as an admin before creating users.');
+        } else {
+          configureSupabaseSync();
+        }
         if (!supabaseConfigured()) return;
       }
       const cfg = supabaseConfig();
@@ -9313,6 +9641,37 @@
       }
       const email = prompt('Email address for this user (optional)', '') || '';
       const role = (prompt('Role for this user', 'member') || 'member').trim() || 'member';
+
+      if (supabaseLoginRequired()) {
+        const username = prompt('Login username for this user', cleanName.toLowerCase().replace(/[^a-z0-9._-]+/g, '.').replace(/^\.+|\.+$/g, ''));
+        if (username === null) return;
+        const cleanUsername = username.trim().toLowerCase();
+        const password = prompt('Temporary password for this user');
+        if (password === null) return;
+        if (!cleanUsername || !password.trim()) {
+          alert('Enter a username and temporary password.');
+          return;
+        }
+        try {
+          const result = await supabaseRpc('cfma_taska_create_login', {
+            p_workspace_id: cfg.workspaceId,
+            p_session_token: supabaseLoginSession().token,
+            p_username: cleanUsername,
+            p_password: password,
+            p_user_name: cleanName,
+            p_email: email.trim(),
+            p_role: role
+          });
+          if (!result || !result.ok) throw new Error((result && result.error) || 'Could not create login.');
+          await loadSupabaseOrgUsers();
+          await loadSupabaseTeamSnapshots(true);
+          alert(`Created login for ${cleanName}.\n\nUsername: ${cleanUsername}\nRole: ${result.role || role}\n\nGive them the app URL and the temporary password you entered.`);
+        } catch(e) {
+          alert(`Could not create login. ${e.message || 'Check your admin login and Supabase setup.'}`);
+        }
+        return;
+      }
+
       const newUserId = uid();
       const inviteCode = Math.random().toString(36).slice(2, 8).toUpperCase();
       const payload = {
@@ -9358,10 +9717,28 @@
     }
 
     function configureSupabaseSync() {
+      applySupabaseDeploymentDefaults();
       const current = supabaseConfig();
-      const url = prompt('Paste your Supabase project URL.\n\nLeave blank to disconnect team sync.', current.url);
-      if (url === null) return;
-      const cleanUrl = url.trim().replace(/\/+$/, '');
+      if (supabaseLoginRequired()) {
+        if (!supabaseLoginSession().token) {
+          lockAppForLogin('Sign in to use Team Sync.');
+          return;
+        }
+        alert(`Team Sync is already loaded for workspace "${current.workspaceId}" as ${current.userName || 'this user'}.`);
+        return;
+      }
+      const defaults = supabaseDeploymentDefaults();
+      const hasDeploymentConnection = !!(defaults.url && defaults.anonKey && defaults.workspaceId);
+      let cleanUrl = current.url;
+      let anonKey = current.anonKey;
+      let workspaceId = current.workspaceId;
+
+      if (!hasDeploymentConnection) {
+        const url = prompt('Paste your Supabase project URL.\n\nLeave blank to disconnect team sync.', current.url);
+        if (url === null) return;
+        cleanUrl = url.trim().replace(/\/+$/, '');
+      }
+
       if (!cleanUrl) {
         [SUPABASE_URL_KEY, SUPABASE_ANON_KEY, SUPABASE_WORKSPACE_KEY, SUPABASE_USER_NAME_KEY].forEach(key => localStorage.removeItem(key));
         supabaseTeamSnapshots = [];
@@ -9372,15 +9749,22 @@
         return;
       }
 
-      const anonKey = prompt('Paste the Supabase anon/public API key.', current.anonKey);
-      if (anonKey === null) return;
-      const workspaceId = prompt('Workspace/team id. Use the same value for everyone on this shared work calendar.', current.workspaceId || 'cfma-team');
-      if (workspaceId === null) return;
+      if (!hasDeploymentConnection) {
+        const enteredAnonKey = prompt('Paste the Supabase anon/public API key.', anonKey);
+        if (enteredAnonKey === null) return;
+        anonKey = enteredAnonKey.trim();
+        const enteredWorkspaceId = prompt('Workspace/team id. Use the same value for everyone on this shared work calendar.', workspaceId || 'cfma-team');
+        if (enteredWorkspaceId === null) return;
+        workspaceId = enteredWorkspaceId.trim();
+      }
+
       const userName = prompt('Your display name for the shared calendar.', current.userName || '');
       if (userName === null) return;
 
       if (!cleanUrl || !anonKey.trim() || !workspaceId.trim() || !userName.trim()) {
-        alert('Team Sync needs a Supabase URL, anon key, workspace id, and display name.');
+        alert(hasDeploymentConnection
+          ? 'Team Sync needs your display name before it can start.'
+          : 'Team Sync needs a Supabase URL, anon key, workspace id, and display name.');
         return;
       }
 
@@ -10333,7 +10717,7 @@
     loadGmailCalendarItems();
     loadGmailDebugRecords();
     loadOutlookAiState();
-    startSupabaseSyncTimer();
+    initSupabaseLoginGate();
     setWorkTab('jobs');
     renderTaskCalendar();
     initIcsCalendar();

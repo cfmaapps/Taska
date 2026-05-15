@@ -6,6 +6,7 @@ The visible in-app title is **CFMA JOB**.
 It currently supports:
 
 - Tasks To Do and your work calendar
+- Supabase-backed username/password login
 - Logged work blocks with hours
 - Outlook local scan through the PowerShell helper
 - Gmail date extraction through Google Apps Script
@@ -41,9 +42,10 @@ npm run verify
 
 1. Create a Supabase project.
 2. Run `supabase/schema.sql` in the Supabase SQL editor.
-3. Host the static app.
-4. In the app, click `Team Sync`.
-5. Paste:
+3. Create the first owner login using `docs/LOGIN_SETUP.md`.
+4. Host the static app.
+5. In the app, click `Team Sync`.
+6. Paste:
    - Supabase project URL
    - Supabase anon/public key
    - shared workspace id, for example `cfma`
@@ -51,7 +53,7 @@ npm run verify
 
 Each user syncs their own snapshot. Other users in the same workspace appear under **Shared Work Calendars**.
 
-To create a user from the organisation, click `Add User`. This creates a row in `timewrap_org_users` and returns an invite code/user id for manual onboarding.
+To create a user from the organisation, sign in as an owner/admin and click `Add User`. This creates both an organisation user and a login account.
 
 ## Gmail Setup
 
@@ -72,6 +74,7 @@ The included Supabase policies are intentionally permissive for a private protot
 ## Main Files
 
 - `surveyors-toolbox.html` - main app
+- `cfma-public-config.js` - public deployment defaults for Team Sync
 - `server.ps1` - local helper server
 - `gmail-analysis-core.js` - deterministic Gmail analysis
 - `gmail-analysis-tests.js` - fixtures/tests

@@ -85,51 +85,56 @@ drop policy if exists "cfma_taska_snapshots_update" on public.timewrap_snapshots
 
 create policy "cfma_taska_orgs_select"
 on public.timewrap_organizations for select
-to anon
+to anon, authenticated
 using (true);
 
 create policy "cfma_taska_orgs_insert"
 on public.timewrap_organizations for insert
-to anon
+to anon, authenticated
 with check (true);
 
 create policy "cfma_taska_orgs_update"
 on public.timewrap_organizations for update
-to anon
+to anon, authenticated
 using (true)
 with check (true);
 
 create policy "cfma_taska_users_select"
 on public.timewrap_org_users for select
-to anon
+to anon, authenticated
 using (true);
 
 create policy "cfma_taska_users_insert"
 on public.timewrap_org_users for insert
-to anon
+to anon, authenticated
 with check (true);
 
 create policy "cfma_taska_users_update"
 on public.timewrap_org_users for update
-to anon
+to anon, authenticated
 using (true)
 with check (true);
 
 create policy "cfma_taska_snapshots_select"
 on public.timewrap_snapshots for select
-to anon
+to anon, authenticated
 using (true);
 
 create policy "cfma_taska_snapshots_insert"
 on public.timewrap_snapshots for insert
-to anon
+to anon, authenticated
 with check (true);
 
 create policy "cfma_taska_snapshots_update"
 on public.timewrap_snapshots for update
-to anon
+to anon, authenticated
 using (true)
 with check (true);
+
+grant usage on schema public to anon, authenticated;
+grant select, insert, update on public.timewrap_organizations to anon, authenticated;
+grant select, insert, update on public.timewrap_org_users to anon, authenticated;
+grant select, insert, update on public.timewrap_snapshots to anon, authenticated;
 
 create or replace function public.cfma_taska_hash_token(p_token text)
 returns text

@@ -1472,6 +1472,7 @@ while ($listener.IsListening) {
     $res.Headers.Add('Access-Control-Allow-Origin', '*')
     $res.Headers.Add('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
     $res.Headers.Add('Access-Control-Allow-Headers', 'Content-Type')
+    $res.Headers.Add('Access-Control-Allow-Private-Network', 'true')
 
     if ($req.HttpMethod -eq 'OPTIONS') {
         $res.StatusCode = 204
@@ -1924,6 +1925,7 @@ while ($listener.IsListening) {
             $outlook = Get-RunningOutlookApplication
             if ($null -eq $outlook) {
                 Write-JsonResponse $res 503 @{ ok = $false; error = 'Open Outlook first, then scan again.' }
+                Write-Host "  [Outlook] Outlook desktop COM app not found. Open classic Outlook, then scan again." -ForegroundColor Yellow
                 continue
             }
 
@@ -1931,6 +1933,7 @@ while ($listener.IsListening) {
             try {
                 $namespace = $outlook.Session
             } catch {
+                Write-Host "  [Outlook] Mail session could not be accessed: $($_.Exception.Message)" -ForegroundColor Yellow
                 throw "Outlook is open, but its mail session could not be accessed. $($_.Exception.Message)"
             }
 
@@ -1952,6 +1955,7 @@ while ($listener.IsListening) {
             }
 
             if ($messages.Count -eq 0 -and $scanErrors.Count -gt 0) {
+                Write-Host "  [Outlook] Folder read errors: $($scanErrors -join ' ')" -ForegroundColor Yellow
                 throw "Could not read Outlook folders. $($scanErrors -join ' ')"
             }
 

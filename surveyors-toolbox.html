@@ -3631,7 +3631,7 @@
         return 'The local server did not answer in time. Restart Start Server.bat, make sure Outlook is open, then try again.';
       }
       if (error && error.message === 'Failed to fetch') {
-        return 'Could not reach the local server. Restart Start Server.bat and try again.';
+        return 'Could not reach the local server. Restart Start Server.bat, then open http://localhost:8080/ for Outlook scanning. If you are using the GitHub URL, upload the latest server.ps1 first.';
       }
       return (error && error.message) || fallback;
     }
@@ -9491,7 +9491,7 @@
       setLoginStatus('', '');
       updateCurrentUserLabel();
       startSupabaseSyncTimer();
-      syncSupabaseSnapshot('login');
+      loadSupabaseOwnSnapshot().finally(() => syncSupabaseSnapshot('login'));
     }
 
     function lockAppForLogin(message = '') {
@@ -9826,6 +9826,125 @@
         if (label) label.textContent = `Team sync failed: ${e.message || 'check setup'}`;
       } finally {
         supabaseSyncBusy = false;
+      }
+    }
+
+    function hasLocalWorkData() {
+      const hasWeekEntries = (weeks || []).some(week =>
+        WEEK_DAYS.some(day => Array.isArray(week[day]) && week[day].length)
+      );
+      const hasNotes = !!(document.getElementById('sidebar-notes')?.value || localStorage.getItem('ljm-sidebar-notes') || '').trim();
+      return !!(
+        (jobs || []).length ||
+        hasWeekEntries ||
+        (codingTasks || []).length ||
+        (customLinks || []).length ||
+        (gmailCalendarItems || []).length ||
+        (manualMeetings || []).length ||
+        hasNotes
+      );
+    }
+
+    function applyAppBackupPayload(data, options = {}) {
+      if (!data) return false;
+
+      if (Array.isArray(data)) {
+        jobs = data;
+      } else {
+        jobs = (data.jobs || []).map(j => ({
+          ...j,
+          tasks: (j.tasks || []).map(t => ({
+            ...t,
+            emailId: t.emailId || '',
+            emailIds: Array.isArray(t.emailIds) ? t.emailIds : (t.emailId ? [t.emailId] : []),
+            dueDate: t.dueDate || '',
+            todoDays: t.todoDays || '',
+            completedHours: t.completedHours || '',
+            completedDate: t.completedDate || ''
+          })),
+          emails: Array.isArray(j.emails) ? j.emails : [],
+          priority: j.priority || '',
+        }));
+
+        if (Array.isArray(data.weeks)) {
+          weeks = data.weeks;
+          fixWeekDates(weeks);
+          localStorage.setItem('ljm-weeks', JSON.stringify(weeks));
+          renderWeek();
+        } else if (data.week) {
+          const week = { weekStart: data.weekStart || null };
+          WEEK_DAYS.forEach(d => { week[d] = Array.isArray(data.week[d]) ? data.week[d] : []; });
+          weeks = [week];
+          localStorage.setItem('ljm-weeks', JSON.stringify(weeks));
+          renderWeek();
+        }
+
+        if (Array.isArray(data.customLinks)) {
+          customLinks = data.customLinks;
+          localStorage.setItem(CUSTOM_LINKS_KEY, JSON.stringify(customLinks));
+          renderCustomLinks();
+        }
+        if (Array.isArray(data.codingTasks)) {
+          codingTasks = data.codingTasks;
+          localStorage.setItem(CODING_TASKS_KEY, JSON.stringify(codingTasks));
+          renderCodingTasks();
+        }
+        if (Array.isArray(data.gmailCalendarItems)) {
+          gmailCalendarItems = data.gmailCalendarItems.map(normalizeGmailCalendarItem);
+          localStorage.setItem(GMAIL_CALENDAR_ITEMS_KEY, JSON.stringify(gmailCalendarItems));
+        }
+        if (Array.isArray(data.manualMeetings)) {
+          manualMeetings = data.manualMeetings;
+          localStorage.setItem(MANUAL_MEETINGS_KEY, JSON.stringify(manualMeetings));
+          renderAllMeetings();
+        }
+        if (data.sidebarNotes !== undefined) {
+          localStorage.setItem('ljm-sidebar-notes', data.sidebarNotes);
+          const el = document.getElementById('sidebar-notes');
+          if (el) el.value = data.sidebarNotes;
+        }
+      }
+
+      normalizeJobsList();
+      localStorage.setItem('ljm-jobs', JSON.stringify(jobs));
+      renderJobs();
+      renderCompletedTasks();
+      renderDormantJobs();
+      renderTaskCalendar();
+
+      if (options.syncedAt) localStorage.setItem(SUPABASE_LAST_SYNC_KEY, options.syncedAt);
+      if (options.savedLabel) localStorage.setItem('lastSaved', options.savedLabel);
+      updateLastSavedLabel();
+      return true;
+    }
+
+    async function loadSupabaseOwnSnapshot() {
+      if (!supabaseConfigured()) return false;
+      const cfg = supabaseConfig();
+      try {
+        const query = `timewrap_snapshots?workspace_id=eq.${encodeURIComponent(cfg.workspaceId)}&user_id=eq.${encodeURIComponent(cfg.userId)}&select=workspace_id,user_id,user_name,state,updated_at&limit=1`;
+        const resp = await fetch(supabaseEndpoint(query), {
+          method: 'GET',
+          headers: supabaseHeaders()
+        });
+        if (!resp.ok) throw new Error(`Supabase returned ${resp.status}`);
+        const rows = await resp.json();
+        const row = Array.isArray(rows) ? rows[0] : null;
+        if (!row || !row.state) return false;
+
+        const cloudTime = Date.parse(row.updated_at || '');
+        const lastLocalSync = Date.parse(localStorage.getItem(SUPABASE_LAST_SYNC_KEY) || '');
+        const shouldApply = !hasLocalWorkData() || (cloudTime && (!lastLocalSync || cloudTime > lastLocalSync + 2000));
+        if (!shouldApply) return false;
+
+        const savedLabel = row.updated_at
+          ? new Date(row.updated_at).toLocaleString('en-NZ', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
+          : '';
+        return applyAppBackupPayload(row.state, { syncedAt: row.updated_at || '', savedLabel });
+      } catch(e) {
+        const label = document.getElementById('last-saved-label');
+        if (label) label.textContent = `Own snapshot load failed: ${e.message || 'check setup'}`;
+        return false;
       }
     }
 

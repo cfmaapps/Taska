@@ -3402,6 +3402,7 @@
           <div class="calendar-view-tabs">
             <button class="calendar-view-tab active" id="calendar-view-jobs" onclick="setCalendarView('jobs')">Your Work</button>
             <button class="calendar-view-tab" id="calendar-view-gmail" onclick="setCalendarView('gmail')">Gmail</button>
+            <button class="calendar-view-tab" id="calendar-view-team" onclick="setCalendarView('team')">Team</button>
           </div>
           <button class="task-calendar-close" onclick="toggleTaskCalendar(false)" title="Close">Close</button>
         </div>
@@ -4186,7 +4187,9 @@
     let openEmailPanelJobId = null;
     let emailMenuEl = null;
     let taskCalendarOpen = true;
-    let calendarViewTab = localStorage.getItem('ljm-calendar-view-tab') || 'jobs';
+    let calendarViewTab = ['jobs', 'gmail', 'team'].includes(localStorage.getItem('ljm-calendar-view-tab'))
+      ? localStorage.getItem('ljm-calendar-view-tab')
+      : 'jobs';
     let unscheduledTasksOpen = false;
     let activeWorkTab = 'jobs';
     let calendarDragTask = null;
@@ -5635,7 +5638,7 @@
     }
 
     function setCalendarView(tab) {
-      calendarViewTab = tab === 'gmail' ? 'gmail' : 'jobs';
+      calendarViewTab = ['jobs', 'gmail', 'team'].includes(tab) ? tab : 'jobs';
       localStorage.setItem('ljm-calendar-view-tab', calendarViewTab);
       hideCalendarJobDetails();
       renderTaskCalendar();
@@ -5644,10 +5647,18 @@
     function updateCalendarViewTabs() {
       const jobsBtn = document.getElementById('calendar-view-jobs');
       const gmailBtn = document.getElementById('calendar-view-gmail');
+      const teamBtn = document.getElementById('calendar-view-team');
       if (jobsBtn) jobsBtn.classList.toggle('active', calendarViewTab === 'jobs');
       if (gmailBtn) {
         gmailBtn.classList.toggle('active', calendarViewTab === 'gmail');
         gmailBtn.textContent = `Gmail${gmailCalendarItems.length ? ' ' + gmailCalendarItems.length : ''}`;
+      }
+      if (teamBtn) {
+        const otherSnapshots = supabaseConfigured()
+          ? (supabaseTeamSnapshots || []).filter(row => row && row.user_id !== supabaseConfig().userId && row.state).length
+          : 0;
+        teamBtn.classList.toggle('active', calendarViewTab === 'team');
+        teamBtn.textContent = `Team${otherSnapshots ? ' ' + otherSnapshots : ''}`;
       }
     }
 
@@ -8680,6 +8691,20 @@
       return `<div class="team-calendar-section"><div class="team-calendar-heading">Shared Work Calendars ${refresh}</div><div class="calendar-empty-week">${escHtml(status)}</div>${people}</div>`;
     }
 
+    function renderTeamCalendarView(body) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todayStr = toLocalDateStr(today);
+      const firstMonday = getMonday(today);
+
+      if (!supabaseConfigured()) {
+        body.innerHTML = '<div class="calendar-empty-week">Sign in to see the team summary and shared work calendars.</div>';
+        return;
+      }
+
+      body.innerHTML = renderTeamSummary() + renderTeamWorkCalendars(firstMonday, todayStr);
+    }
+
     function getWeekLogEntryByRef(sourceLogRef) {
       const ref = String(sourceLogRef || '');
       if (!ref) return null;
@@ -8845,6 +8870,10 @@
         renderGmailCalendar(body);
         return;
       }
+      if (calendarViewTab === 'team') {
+        renderTeamCalendarView(body);
+        return;
+      }
 
       const tasks = collectCalendarTasks();
       const today = new Date();
@@ -8858,7 +8887,7 @@
         weeks.push(renderCalendarWeek(weekStart, tasks, collectCalendarMeetingsForWeek(weekStart), todayStr));
       }
 
-      body.innerHTML = weeks.join('') + renderTeamSummary() + renderTeamWorkCalendars(firstMonday, todayStr);
+      body.innerHTML = weeks.join('');
     }
 
     function gmailCalendarStartDate(item) {

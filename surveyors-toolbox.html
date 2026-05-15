@@ -2443,6 +2443,52 @@
       margin: 14px 0 7px;
     }
 
+    .team-summary-grid {
+      display: grid;
+      gap: 7px;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      margin: 8px 0 12px;
+    }
+
+    .team-member-card {
+      background: rgba(22, 32, 48, 0.82);
+      border: 1px solid #2e3d55;
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+
+    .team-member-name {
+      color: #e8edf2;
+      font-size: 0.76rem;
+      font-weight: 800;
+      margin-bottom: 3px;
+    }
+
+    .team-member-meta {
+      color: #7fa7cc;
+      font-size: 0.67rem;
+      line-height: 1.35;
+    }
+
+    .team-member-status {
+      display: inline-block;
+      border-radius: 999px;
+      font-size: 0.62rem;
+      font-weight: 800;
+      margin-top: 6px;
+      padding: 2px 7px;
+    }
+
+    .team-member-status.synced {
+      background: rgba(39, 174, 96, 0.16);
+      color: #8ee5ad;
+    }
+
+    .team-member-status.waiting {
+      background: rgba(240, 165, 0, 0.13);
+      color: #f0c46d;
+    }
+
     .gmail-actions {
       display: flex;
       flex-wrap: wrap;
@@ -8574,6 +8620,41 @@
         </div>`;
     }
 
+    function renderTeamSummary() {
+      if (!supabaseConfigured()) return '';
+      const cfg = supabaseConfig();
+      const snapshotByUser = new Map((supabaseTeamSnapshots || [])
+        .filter(row => row && row.user_id)
+        .map(row => [String(row.user_id), row]));
+      const members = (supabaseOrgUsers || [])
+        .filter(user => user && user.user_id)
+        .slice()
+        .sort((a, b) => String(a.user_name || '').localeCompare(String(b.user_name || '')));
+
+      const refresh = `<button class="email-scan-action" style="margin-left:8px" onclick="refreshTeamCalendars()">Refresh Team</button>`;
+      if (!members.length) {
+        return `<div class="team-calendar-section"><div class="team-calendar-heading">Team Summary ${refresh}</div><div class="calendar-empty-week">No team members loaded yet. Click Refresh Team.</div></div>`;
+      }
+
+      const cards = members.map(member => {
+        const snapshot = snapshotByUser.get(String(member.user_id));
+        const isCurrent = String(member.user_id) === String(cfg.userId);
+        const synced = !!(snapshot && snapshot.state);
+        const status = synced ? `Synced ${outlookScanDateLabel(snapshot.updated_at)}` : 'No calendar sync yet';
+        const classes = synced ? 'synced' : 'waiting';
+        const role = member.role ? `Role: ${member.role}` : 'Role: member';
+        const email = member.email ? ` | ${member.email}` : '';
+        return `
+          <div class="team-member-card">
+            <div class="team-member-name">${escHtml(member.user_name || member.username || 'Team member')}${isCurrent ? ' (you)' : ''}</div>
+            <div class="team-member-meta">${escHtml(role)}${escHtml(email)}</div>
+            <span class="team-member-status ${classes}">${escHtml(status)}</span>
+          </div>`;
+      }).join('');
+
+      return `<div class="team-calendar-section"><div class="team-calendar-heading">Team Summary ${refresh}</div><div class="team-summary-grid">${cards}</div></div>`;
+    }
+
     function renderTeamWorkCalendars(firstMonday, todayStr) {
       if (!supabaseConfigured()) return '';
       const cfg = supabaseConfig();
@@ -8777,7 +8858,7 @@
         weeks.push(renderCalendarWeek(weekStart, tasks, collectCalendarMeetingsForWeek(weekStart), todayStr));
       }
 
-      body.innerHTML = weeks.join('') + renderTeamWorkCalendars(firstMonday, todayStr);
+      body.innerHTML = weeks.join('') + renderTeamSummary() + renderTeamWorkCalendars(firstMonday, todayStr);
     }
 
     function gmailCalendarStartDate(item) {
@@ -10015,14 +10096,16 @@
         alert('Sign in first so Team Sync can load shared calendars.');
         return;
       }
+      await loadSupabaseOrgUsers();
       await syncSupabaseSnapshot('manual-refresh');
       await loadSupabaseTeamSnapshots(true);
       const cfg = supabaseConfig();
       const others = (supabaseTeamSnapshots || []).filter(row => row && row.user_id !== cfg.userId && row.state);
       const names = others.map(row => row.user_name || 'Team member').join(', ');
+      const memberCount = (supabaseOrgUsers || []).length;
       alert(others.length
-        ? `Loaded ${others.length} shared calendar${others.length === 1 ? '' : 's'}: ${names}`
-        : 'No other shared calendars found yet. Ben needs to log in and make at least one edit so his snapshot saves to Supabase.');
+        ? `Loaded ${others.length} shared calendar${others.length === 1 ? '' : 's'}: ${names}\n\nTeam members loaded: ${memberCount}`
+        : `No other shared calendars found yet.\n\nTeam members loaded: ${memberCount}\n\nBen will still show in Team Summary if his login exists, but he needs to log in and make at least one edit before his calendar appears.`);
     }
 
     function updateLastSavedLabel() {

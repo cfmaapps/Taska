@@ -8580,8 +8580,12 @@
       const snapshots = (supabaseTeamSnapshots || [])
         .filter(row => row && row.user_id !== cfg.userId && row.state)
         .slice(0, 12);
+      const allCount = (supabaseTeamSnapshots || []).length;
+      const updated = localStorage.getItem(SUPABASE_LAST_SYNC_KEY);
+      const status = `${snapshots.length} other calendar${snapshots.length === 1 ? '' : 's'} loaded${allCount ? ` from ${allCount} team snapshot${allCount === 1 ? '' : 's'}` : ''}${updated ? ` | refreshed ${outlookScanDateLabel(updated)}` : ''}`;
+      const refresh = `<button class="email-scan-action" style="margin-left:8px" onclick="refreshTeamCalendars()">Refresh Team</button>`;
       if (!snapshots.length) {
-        return '<div class="team-calendar-section"><div class="team-calendar-heading">Shared Work Calendars</div><div class="calendar-empty-week">No other team calendars synced yet.</div></div>';
+        return `<div class="team-calendar-section"><div class="team-calendar-heading">Shared Work Calendars ${refresh}</div><div class="calendar-empty-week">No other team calendars synced yet. ${escHtml(status)}</div></div>`;
       }
       const people = snapshots.map(row => {
         const state = row.state || {};
@@ -8592,7 +8596,7 @@
         const updated = row.updated_at ? ` - synced ${outlookScanDateLabel(row.updated_at)}` : '';
         return `<div class="team-calendar-person">${escHtml(row.user_name || 'Team member')}${escHtml(updated)}</div>${weekRows.join('')}`;
       }).join('');
-      return `<div class="team-calendar-section"><div class="team-calendar-heading">Shared Work Calendars</div>${people}</div>`;
+      return `<div class="team-calendar-section"><div class="team-calendar-heading">Shared Work Calendars ${refresh}</div><div class="calendar-empty-week">${escHtml(status)}</div>${people}</div>`;
     }
 
     function getWeekLogEntryByRef(sourceLogRef) {
@@ -10004,6 +10008,21 @@
         const label = document.getElementById('last-saved-label');
         if (label) label.textContent = `Team calendar load failed: ${e.message || 'check setup'}`;
       }
+    }
+
+    async function refreshTeamCalendars() {
+      if (!supabaseConfigured()) {
+        alert('Sign in first so Team Sync can load shared calendars.');
+        return;
+      }
+      await syncSupabaseSnapshot('manual-refresh');
+      await loadSupabaseTeamSnapshots(true);
+      const cfg = supabaseConfig();
+      const others = (supabaseTeamSnapshots || []).filter(row => row && row.user_id !== cfg.userId && row.state);
+      const names = others.map(row => row.user_name || 'Team member').join(', ');
+      alert(others.length
+        ? `Loaded ${others.length} shared calendar${others.length === 1 ? '' : 's'}: ${names}`
+        : 'No other shared calendars found yet. Ben needs to log in and make at least one edit so his snapshot saves to Supabase.');
     }
 
     function updateLastSavedLabel() {

@@ -4256,7 +4256,9 @@
       'job', 'task', 'email', 'site', 'plan', 'plans', 'survey', 'update', 'please',
       'thanks', 'regards', 'hello', 'about', 'attached', 'attachment'
     ]);
+    const TASK_CALENDAR_PAST_WEEK_COUNT = 12;
     const TASK_CALENDAR_WEEK_COUNT = 16;
+    const TEAM_CALENDAR_WEEK_COUNT = 8;
     const TASK_CALENDAR_DAYS = [
       { label: 'Mon', offset: 0 },
       { label: 'Tue', offset: 1 },
@@ -8682,9 +8684,9 @@
       const people = snapshots.map(row => {
         const state = row.state || {};
         const weekRows = [];
-        for (let i = 0; i < 4; i++) {
-          weekRows.push(renderReadonlySnapshotWeek(addCalendarDays(firstMonday, i * 7), state, todayStr));
-        }
+        calendarVisibleWeekStarts(firstMonday, TEAM_CALENDAR_WEEK_COUNT).forEach(weekStart => {
+          weekRows.push(renderReadonlySnapshotWeek(weekStart, state, todayStr));
+        });
         const updated = row.updated_at ? ` - synced ${outlookScanDateLabel(row.updated_at)}` : '';
         return `<div class="team-calendar-person">${escHtml(row.user_name || 'Team member')}${escHtml(updated)}</div>${weekRows.join('')}`;
       }).join('');
@@ -8703,6 +8705,14 @@
       }
 
       body.innerHTML = renderTeamSummary() + renderTeamWorkCalendars(firstMonday, todayStr);
+    }
+
+    function calendarVisibleWeekStarts(firstMonday, futureWeekCount = TASK_CALENDAR_WEEK_COUNT) {
+      const starts = [];
+      for (let i = -TASK_CALENDAR_PAST_WEEK_COUNT; i < futureWeekCount; i++) {
+        starts.push(addCalendarDays(firstMonday, i * 7));
+      }
+      return starts;
     }
 
     function getWeekLogEntryByRef(sourceLogRef) {
@@ -8882,8 +8892,7 @@
       const firstMonday = getMonday(today);
       const weeks = [];
 
-      for (let i = 0; i < TASK_CALENDAR_WEEK_COUNT; i++) {
-        const weekStart = addCalendarDays(firstMonday, i * 7);
+      for (const weekStart of calendarVisibleWeekStarts(firstMonday)) {
         weeks.push(renderCalendarWeek(weekStart, tasks, collectCalendarMeetingsForWeek(weekStart), todayStr));
       }
 
@@ -8923,8 +8932,7 @@
       const firstMonday = getMonday(today);
       const weeks = [];
 
-      for (let i = 0; i < TASK_CALENDAR_WEEK_COUNT; i++) {
-        const weekStart = addCalendarDays(firstMonday, i * 7);
+      for (const weekStart of calendarVisibleWeekStarts(firstMonday)) {
         weeks.push(renderGmailCalendarWeek(weekStart, collectGmailCalendarItemsForWeek(weekStart), todayStr));
       }
 

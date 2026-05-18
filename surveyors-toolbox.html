@@ -1007,6 +1007,185 @@
       color: #e8edf2;
     }
 
+    .task-date-btn {
+      align-items: center;
+      background: #162030;
+      border: 1px solid #2a3a50;
+      border-radius: 6px;
+      color: #a8c4e0;
+      cursor: pointer;
+      display: inline-flex;
+      font-family: inherit;
+      font-size: 0.7rem;
+      font-weight: 700;
+      gap: 6px;
+      justify-content: space-between;
+      min-width: 0;
+      overflow: hidden;
+      padding: 5px 8px;
+      text-align: left;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .task-schedule-row .task-date-btn {
+      grid-column: 2 / 4;
+    }
+
+    .task-date-btn:hover,
+    .task-date-btn.active {
+      border-color: #4a90c4;
+      color: #e8edf2;
+    }
+
+    .task-date-btn.missing {
+      border-color: rgba(240, 165, 0, 0.42);
+      color: #f0c040;
+    }
+
+    .task-date-picker {
+      background: #1e2d42;
+      border: 1px solid #4a90c4;
+      border-radius: 9px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.55);
+      color: #e8edf2;
+      padding: 9px;
+      position: fixed;
+      width: 276px;
+      z-index: 760;
+    }
+
+    .task-date-picker-head {
+      align-items: center;
+      display: flex;
+      gap: 8px;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .task-date-picker-title {
+      color: #e8edf2;
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .task-date-picker-nav,
+    .task-date-picker-close {
+      align-items: center;
+      background: #162030;
+      border: 1px solid #2e3d55;
+      border-radius: 6px;
+      color: #8da8c2;
+      cursor: pointer;
+      display: inline-flex;
+      font-family: inherit;
+      font-size: 0.76rem;
+      font-weight: 800;
+      height: 26px;
+      justify-content: center;
+      padding: 0;
+      width: 26px;
+    }
+
+    .task-date-picker-nav:hover,
+    .task-date-picker-close:hover {
+      border-color: #f0a500;
+      color: #f0c040;
+    }
+
+    .task-date-picker-weekdays,
+    .task-date-picker-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 3px;
+    }
+
+    .task-date-picker-weekdays {
+      color: #5d7fa0;
+      font-size: 0.58rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .task-date-day {
+      background: #162030;
+      border: 1px solid #26364d;
+      border-radius: 6px;
+      color: #a8c4e0;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.7rem;
+      height: 28px;
+      padding: 0;
+    }
+
+    .task-date-day:hover {
+      border-color: #4a90c4;
+      color: #e8edf2;
+    }
+
+    .task-date-day.today {
+      border-color: rgba(240, 165, 0, 0.55);
+      color: #f0c040;
+    }
+
+    .task-date-day.selected {
+      background: #f0a500;
+      border-color: #f0a500;
+      color: #172033;
+      font-weight: 900;
+    }
+
+    .task-date-day.in-range {
+      background: #203d5d;
+      border-color: #4a90c4;
+      color: #e8edf2;
+    }
+
+    .task-date-day.disabled {
+      color: #3a5a7a;
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    .task-date-empty {
+      height: 28px;
+    }
+
+    .task-date-picker-hint {
+      color: #7f9bb8;
+      font-size: 0.65rem;
+      line-height: 1.35;
+      margin-top: 8px;
+    }
+
+    .task-date-picker-actions {
+      display: flex;
+      gap: 6px;
+      justify-content: flex-end;
+      margin-top: 8px;
+    }
+
+    .task-date-picker-actions button {
+      background: #162030;
+      border: 1px solid #2e3d55;
+      border-radius: 6px;
+      color: #a8c4e0;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 5px 8px;
+    }
+
+    .task-date-picker-actions button:hover {
+      border-color: #4a90c4;
+      color: #e8edf2;
+    }
+
     .task-schedule-row input.date-invalid,
     .unscheduled-fields input.date-invalid {
       border-color: #fc8a6a;
@@ -2094,7 +2273,7 @@
       align-items: center;
       display: grid;
       gap: 8px;
-      grid-template-columns: minmax(140px, 1fr) 96px auto;
+      grid-template-columns: minmax(160px, 1fr) auto;
     }
 
     .unscheduled-fields input {
@@ -3983,6 +4162,10 @@
         emailMenuEl = null;
       }
 
+      if (taskDatePickerEl && !taskDatePickerEl.contains(e.target) && !e.target.closest('.task-date-btn')) {
+        hideTaskDatePicker(true);
+      }
+
       if (addJobFormEl && !addJobFormEl.contains(e.target) && e.target.id !== 'add-job-btn') {
         addJobFormEl.remove();
         addJobFormEl = null;
@@ -4327,6 +4510,8 @@
     let activeWorkTab = 'jobs';
     let calendarDragTask = null;
     let calendarDragLog = null;
+    let taskDatePickerEl = null;
+    let taskDatePickerState = null;
     let activeJobEditId = null;
     let jobOrderFrozen = false;
     let frozenJobOrder = [];
@@ -4592,6 +4777,7 @@
       if (el.classList.contains('job-num-input')) spec.type = 'jobNum';
       else if (el.classList.contains('job-desc-input')) spec.type = 'jobDesc';
       else if (el.classList.contains('task-text')) spec.type = 'taskText';
+      else if (el.classList.contains('task-date-btn')) spec.type = 'taskDate';
       else if (el.matches('.task-schedule-row .task-due-input')) spec.type = 'dueDate';
       else if (el.matches('.task-schedule-row input[type="number"]')) spec.type = 'todoDays';
       else return null;
@@ -4609,6 +4795,7 @@
       if (spec.type === 'jobNum') target = card.querySelector('.job-num-input');
       if (spec.type === 'jobDesc') target = card.querySelector('.job-desc-input');
       if (spec.type === 'taskText') target = card.querySelector(`[data-task-idx="${spec.taskIdx}"] .task-text`);
+      if (spec.type === 'taskDate') target = card.querySelector(`[data-task-idx="${spec.taskIdx}"] .task-date-btn`);
       if (spec.type === 'dueDate') target = card.querySelector(`[data-task-idx="${spec.taskIdx}"] .task-schedule-row .task-due-input`);
       if (spec.type === 'todoDays') target = card.querySelector(`[data-task-idx="${spec.taskIdx}"] .task-schedule-row input[type="number"]`);
       if (!target) return;
@@ -5383,13 +5570,8 @@
                 <button class="todo-del" onclick="deleteTask('${job.id}',${i})" title="Remove">✕</button>
               </div>
               <div class="task-schedule-row">
-                <input type="text" class="task-due-input" inputmode="numeric" placeholder="dd/mm"
-                  value="${escHtml(formatTaskDateInput(t.dueDate || ''))}"
-                  onblur="commitTaskDueDateInput('${job.id}',${i},this)"
-                  onkeydown="handleTaskDueDateKey(event,'${job.id}',${i},this)"
-                  title="Due date, e.g. 14/5 or 14/5/2027">
-                <input type="number" min="1" step="1" placeholder="Days" value="${escHtml(t.todoDays || '')}"
-                  oninput="updateTaskSchedule('${job.id}',${i},'todoDays',this.value)" title="Time to do in days">
+                <button type="button" class="task-date-btn ${taskMissingDueDate(t) || taskMissingTodoDays(t) ? 'missing' : ''}"
+                  onclick="showTaskDatePicker('${job.id}',${i},this)" title="Pick task start and end dates">${escHtml(taskDateButtonLabel(t))}</button>
               </div>
             </div>`;
         }).join('');
@@ -5465,6 +5647,239 @@
       if (field === 'dueDate') renderJobsPreservingFocus();
       if (taskCalendarOpen) renderTaskCalendar();
       refreshUnscheduledTasksView();
+    }
+
+    function businessDaysInclusive(startDate, endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      start.setHours(0, 0, 0, 0);
+      end.setHours(0, 0, 0, 0);
+      if (end < start) return businessDaysInclusive(end, start);
+      let count = 0;
+      const cursor = new Date(start);
+      while (cursor <= end) {
+        if (isBusinessDay(cursor)) count++;
+        cursor.setDate(cursor.getDate() + 1);
+      }
+      return Math.max(1, count);
+    }
+
+    function taskDateRange(task) {
+      const dueRaw = parseTaskDate(task && task.dueDate);
+      if (!dueRaw) return null;
+      const due = toBusinessDay(dueRaw);
+      const days = taskLeadDays(task);
+      return {
+        start: subtractBusinessDays(due, days - 1),
+        end: due,
+        days
+      };
+    }
+
+    function taskDateButtonLabel(task) {
+      const range = taskDateRange(task);
+      if (!range) return 'Pick dates';
+      const startStr = toLocalDateStr(range.start);
+      const endStr = toLocalDateStr(range.end);
+      const startLabel = formatTaskDateInput(startStr);
+      const endLabel = formatTaskDateInput(endStr);
+      if (startStr === endStr) return `${endLabel} (1 day)`;
+      return `${startLabel} - ${endLabel} (${range.days} days)`;
+    }
+
+    function refreshAfterTaskDatePickerChange() {
+      renderJobsPreservingFocus();
+      if (taskCalendarOpen) renderTaskCalendar();
+      refreshUnscheduledTasksView();
+    }
+
+    function setTaskDateRange(jobId, idx, startStr, endStr) {
+      const job = jobs.find(j => j.id === jobId);
+      const task = job && job.tasks ? job.tasks[idx] : null;
+      const start = parseTaskDate(startStr);
+      const end = parseTaskDate(endStr);
+      if (!job || !task || !start || !end) return false;
+
+      let rangeStart = start;
+      let rangeEnd = end;
+      if (rangeEnd < rangeStart) {
+        rangeStart = end;
+        rangeEnd = start;
+      }
+
+      if (!isBusinessDay(rangeStart) || !isBusinessDay(rangeEnd)) return false;
+      freezeJobOrderForEdit(jobId);
+      task.dueDate = toLocalDateStr(rangeEnd);
+      task.todoDays = String(businessDaysInclusive(rangeStart, rangeEnd));
+      job.updatedAt = Date.now();
+      saveToStorage();
+      if (taskCalendarOpen) renderTaskCalendar();
+      return true;
+    }
+
+    function clearTaskDateRange(jobId, idx) {
+      const job = jobs.find(j => j.id === jobId);
+      const task = job && job.tasks ? job.tasks[idx] : null;
+      if (!job || !task) return;
+      freezeJobOrderForEdit(jobId);
+      task.dueDate = '';
+      task.todoDays = '';
+      job.updatedAt = Date.now();
+      saveToStorage();
+      hideTaskDatePicker(false);
+      refreshAfterTaskDatePickerChange();
+    }
+
+    function taskDatePickerMonthLabel(date) {
+      return date.toLocaleString('en-NZ', { month: 'long', year: 'numeric' });
+    }
+
+    function taskDatePickerMonth(delta) {
+      if (!taskDatePickerState) return;
+      const d = new Date(taskDatePickerState.monthDate);
+      d.setDate(1);
+      d.setMonth(d.getMonth() + delta);
+      taskDatePickerState.monthDate = d;
+      renderTaskDatePicker();
+    }
+
+    function positionTaskDatePicker() {
+      if (!taskDatePickerEl || !taskDatePickerState || !taskDatePickerState.anchorEl) return;
+      const rect = taskDatePickerState.anchorEl.getBoundingClientRect();
+      const width = taskDatePickerEl.offsetWidth || 276;
+      const height = taskDatePickerEl.offsetHeight || 320;
+      let left = rect.left;
+      if (left + width > window.innerWidth - 10) left = window.innerWidth - width - 10;
+      if (left < 10) left = 10;
+      let top = rect.bottom + 6;
+      if (top + height > window.innerHeight - 10) top = rect.top - height - 6;
+      if (top < 10) top = 10;
+      taskDatePickerEl.style.left = `${left}px`;
+      taskDatePickerEl.style.top = `${top}px`;
+    }
+
+    function hideTaskDatePicker(renderAfterDirty = false) {
+      const state = taskDatePickerState;
+      if (taskDatePickerEl) {
+        taskDatePickerEl.remove();
+        taskDatePickerEl = null;
+      }
+      document.querySelectorAll('.task-date-btn.active').forEach(btn => btn.classList.remove('active'));
+      taskDatePickerState = null;
+      if (renderAfterDirty && state && state.dirty) refreshAfterTaskDatePickerChange();
+    }
+
+    function showTaskDatePicker(jobId, idx, btn) {
+      const samePicker = taskDatePickerState &&
+        taskDatePickerState.jobId === jobId &&
+        taskDatePickerState.taskIdx === idx;
+      hideTaskDatePicker(true);
+      if (samePicker) return;
+
+      const job = jobs.find(j => j.id === jobId);
+      const task = job && job.tasks ? job.tasks[idx] : null;
+      if (!task || !btn) return;
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const range = taskDateRange(task);
+      taskDatePickerState = {
+        jobId,
+        taskIdx: idx,
+        anchorEl: btn,
+        monthDate: new Date(today.getFullYear(), today.getMonth(), 1),
+        pendingStart: '',
+        startDateStr: range ? toLocalDateStr(range.start) : '',
+        endDateStr: range ? toLocalDateStr(range.end) : '',
+        dirty: false
+      };
+      btn.classList.add('active');
+      renderTaskDatePicker();
+    }
+
+    function selectTaskDatePickerDate(dateStr) {
+      if (!taskDatePickerState) return;
+      const state = taskDatePickerState;
+      if (!state.pendingStart) {
+        state.pendingStart = dateStr;
+        state.startDateStr = dateStr;
+        state.endDateStr = dateStr;
+        state.dirty = setTaskDateRange(state.jobId, state.taskIdx, dateStr, dateStr) || state.dirty;
+        renderTaskDatePicker();
+        return;
+      }
+
+      const first = parseTaskDate(state.pendingStart);
+      const second = parseTaskDate(dateStr);
+      const startStr = first && second && second < first ? dateStr : state.pendingStart;
+      const endStr = first && second && second < first ? state.pendingStart : dateStr;
+      state.startDateStr = startStr;
+      state.endDateStr = endStr;
+      state.pendingStart = '';
+      setTaskDateRange(state.jobId, state.taskIdx, startStr, endStr);
+      hideTaskDatePicker(false);
+      refreshAfterTaskDatePickerChange();
+    }
+
+    function renderTaskDatePicker() {
+      if (!taskDatePickerState) return;
+      if (!taskDatePickerEl) {
+        taskDatePickerEl = document.createElement('div');
+        taskDatePickerEl.className = 'task-date-picker';
+        taskDatePickerEl.addEventListener('click', e => e.stopPropagation());
+        document.body.appendChild(taskDatePickerEl);
+      }
+
+      const monthDate = taskDatePickerState.monthDate;
+      const year = monthDate.getFullYear();
+      const month = monthDate.getMonth();
+      const first = new Date(year, month, 1);
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const leading = (first.getDay() + 6) % 7;
+      const todayStr = toLocalDateStr(new Date());
+      const selectedStart = parseTaskDate(taskDatePickerState.startDateStr);
+      const selectedEnd = parseTaskDate(taskDatePickerState.endDateStr);
+      const rangeStart = selectedStart && selectedEnd && selectedEnd < selectedStart ? selectedEnd : selectedStart;
+      const rangeEnd = selectedStart && selectedEnd && selectedEnd < selectedStart ? selectedStart : selectedEnd;
+      const cells = [];
+
+      for (let i = 0; i < leading; i++) cells.push('<div class="task-date-empty"></div>');
+      for (let day = 1; day <= daysInMonth; day++) {
+        const d = new Date(year, month, day);
+        d.setHours(0, 0, 0, 0);
+        const dateStr = toLocalDateStr(d);
+        const disabled = !isBusinessDay(d);
+        const inRange = rangeStart && rangeEnd && d > rangeStart && d < rangeEnd;
+        const selected = dateStr === taskDatePickerState.startDateStr || dateStr === taskDatePickerState.endDateStr;
+        const classes = [
+          'task-date-day',
+          dateStr === todayStr ? 'today' : '',
+          selected ? 'selected' : '',
+          inRange ? 'in-range' : '',
+          disabled ? 'disabled' : ''
+        ].filter(Boolean).join(' ');
+        cells.push(`<button type="button" class="${classes}" ${disabled ? 'disabled title="Weekends are not shown on the work calendar"' : `onclick="selectTaskDatePickerDate('${dateStr}')"`}>${day}</button>`);
+      }
+
+      const hint = taskDatePickerState.pendingStart
+        ? 'Click a second workday to make a range, or Done to keep it as one day.'
+        : 'Click one workday for a one-day task. Click another workday to set the end date.';
+
+      taskDatePickerEl.innerHTML = `
+        <div class="task-date-picker-head">
+          <button type="button" class="task-date-picker-nav" onclick="taskDatePickerMonth(-1)" title="Previous month">&lt;</button>
+          <div class="task-date-picker-title">${escHtml(taskDatePickerMonthLabel(monthDate))}</div>
+          <button type="button" class="task-date-picker-nav" onclick="taskDatePickerMonth(1)" title="Next month">&gt;</button>
+          <button type="button" class="task-date-picker-close" onclick="hideTaskDatePicker(true)" title="Close">x</button>
+        </div>
+        <div class="task-date-picker-weekdays"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+        <div class="task-date-picker-grid">${cells.join('')}</div>
+        <div class="task-date-picker-hint">${escHtml(hint)}</div>
+        <div class="task-date-picker-actions">
+          <button type="button" onclick="clearTaskDateRange('${taskDatePickerState.jobId}',${taskDatePickerState.taskIdx})">Clear</button>
+          <button type="button" onclick="hideTaskDatePicker(true)">Done</button>
+        </div>`;
+      positionTaskDatePicker();
     }
 
     function formatTaskDateInput(value) {
@@ -5854,17 +6269,14 @@
       setUnscheduledButtonCount(items.length);
 
       if (!items.length) {
-        body.innerHTML = '<div class="unscheduled-empty">All active open tasks have a due date and days-to-do value.</div>';
+        body.innerHTML = '<div class="unscheduled-empty">All active open tasks have a task date range.</div>';
         return;
       }
 
       const rows = items.map(({ job, task, taskIdx, missingDue, missingDays }) => {
         const missingLabel = missingDue && missingDays
-          ? 'Missing date + days'
-          : missingDue ? 'Missing date' : 'Missing days';
-        const dueValue = missingDue ? '' : formatTaskDateInput(task.dueDate || '');
-        const n = parseInt(task.todoDays, 10);
-        const daysValue = missingDays || isNaN(n) ? '' : String(n);
+          ? 'Missing dates'
+          : missingDue ? 'Missing date' : 'Missing range';
         return `
           <div class="unscheduled-card" style="--job-color:${escHtml(job.color || '#4a90c4')};">
             <div class="unscheduled-head">
@@ -5875,18 +6287,13 @@
               <div class="unscheduled-missing">${escHtml(missingLabel)}</div>
             </div>
             <div class="unscheduled-fields">
-              <input type="text" class="task-due-input" inputmode="numeric" placeholder="dd/mm" value="${escHtml(dueValue)}"
-                onblur="commitTaskDueDateInput('${job.id}',${taskIdx},this)"
-                onkeydown="handleTaskDueDateKey(event,'${job.id}',${taskIdx},this)"
-                title="Due date, e.g. 14/5 or 14/5/2027">
-              <input type="number" min="1" step="1" placeholder="Days" value="${escHtml(daysValue)}"
-                onchange="updateTaskSchedule('${job.id}',${taskIdx},'todoDays',this.value)" title="Time to do in business days">
+              <button type="button" class="task-date-btn missing" onclick="showTaskDatePicker('${job.id}',${taskIdx},this)" title="Pick task start and end dates">${escHtml(taskDateButtonLabel(task))}</button>
               <button class="email-scan-action" onclick="focusUnscheduledJobTask('${job.id}',${taskIdx})">Open</button>
             </div>
           </div>`;
       }).join('');
 
-      body.innerHTML = `<div class="unscheduled-summary">${items.length} active open task${items.length === 1 ? '' : 's'} need a due date or days-to-do value.</div>${rows}`;
+      body.innerHTML = `<div class="unscheduled-summary">${items.length} active open task${items.length === 1 ? '' : 's'} need a task date range.</div>${rows}`;
     }
 
     function toggleUnscheduledTasks(forceOpen) {
@@ -9417,11 +9824,14 @@
 
     function calendarTaskScheduleLabel(task) {
       const parts = [];
-      if (task.dueDate) {
-        const due = parseTaskDate(task.dueDate);
-        parts.push(due ? `Due ${shortDateLabel(due)}` : `Due ${task.dueDate}`);
+      const range = taskDateRange(task);
+      if (range) {
+        const startStr = toLocalDateStr(range.start);
+        const endStr = toLocalDateStr(range.end);
+        parts.push(startStr === endStr
+          ? `Work ${shortDateLabel(range.end)}`
+          : `Work ${shortDateLabel(range.start)} - ${shortDateLabel(range.end)}`);
       }
-      if (task.todoDays) parts.push(`${task.todoDays} day${String(task.todoDays) === '1' ? '' : 's'}`);
       if (task.done && task.completedHours) parts.push(`Spent ${formatTaskHours(task.completedHours)}h`);
       return parts.join(' · ');
     }

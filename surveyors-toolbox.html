@@ -546,6 +546,120 @@
       padding: 11px 14px 14px;
     }
 
+    .job-card.compact {
+      padding: 0;
+    }
+
+    .job-card.expanded {
+      padding: 0;
+    }
+
+    .job-summary-row {
+      align-items: center;
+      cursor: pointer;
+      display: grid;
+      gap: 8px;
+      grid-template-columns: 26px minmax(120px, 0.95fr) minmax(140px, 1.35fr) auto;
+      min-height: 42px;
+      padding: 7px 10px;
+    }
+
+    .job-summary-row:hover {
+      background: rgba(22, 32, 48, 0.36);
+    }
+
+    .job-expand-btn {
+      align-items: center;
+      background: #162030;
+      border: 1px solid #2e3d55;
+      border-radius: 6px;
+      color: #8da8c2;
+      cursor: pointer;
+      display: inline-flex;
+      font-family: inherit;
+      font-size: 0.72rem;
+      font-weight: 800;
+      height: 24px;
+      justify-content: center;
+      line-height: 1;
+      padding: 0;
+      width: 24px;
+    }
+
+    .job-summary-row:hover .job-expand-btn,
+    .job-expand-btn:hover {
+      border-color: #f0a500;
+      color: #f0c040;
+    }
+
+    .job-summary-title {
+      color: #e8edf2;
+      font-size: 0.76rem;
+      font-weight: 800;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .job-summary-number {
+      color: #f0a500;
+      margin-right: 5px;
+    }
+
+    .job-summary-next {
+      color: #a8c4e0;
+      font-size: 0.72rem;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .job-summary-next.empty {
+      color: #5d7fa0;
+      font-style: italic;
+    }
+
+    .job-summary-meta {
+      align-items: center;
+      display: inline-flex;
+      gap: 5px;
+      justify-content: flex-end;
+      min-width: 0;
+    }
+
+    .job-summary-pill {
+      background: #162030;
+      border: 1px solid #2e3d55;
+      border-radius: 999px;
+      color: #8da8c2;
+      font-size: 0.62rem;
+      font-weight: 800;
+      line-height: 1;
+      padding: 4px 7px;
+      white-space: nowrap;
+    }
+
+    .job-summary-pill.priority {
+      border-color: rgba(240, 165, 0, 0.42);
+      color: #f0c040;
+    }
+
+    .job-summary-pill.email {
+      border-color: rgba(74, 144, 196, 0.42);
+      color: #5d9ac8;
+    }
+
+    .job-full-body {
+      padding: 0 14px 14px;
+    }
+
+    .job-card.expanded .job-summary-row {
+      border-bottom: 1px solid #2e3d55;
+      margin-bottom: 10px;
+    }
+
     .job-header {
       display: flex;
       gap: 6px;
@@ -694,6 +808,10 @@
     .job-card-status.error {
       border-color: rgba(252, 138, 106, 0.45);
       color: #fc8a6a;
+    }
+
+    .job-card.compact .job-card-status {
+      margin: 0 10px 8px;
     }
 
     .job-email-panel {
@@ -3197,6 +3315,19 @@
         grid-template-columns: 1fr;
       }
 
+      .job-summary-row {
+        grid-template-columns: 24px minmax(0, 1fr);
+      }
+
+      .job-summary-next,
+      .job-summary-meta {
+        grid-column: 2;
+      }
+
+      .job-summary-meta {
+        justify-content: flex-start;
+      }
+
       .email-scan-form,
       .gmail-scan-form {
         grid-template-columns: 1fr;
@@ -3882,6 +4013,7 @@
       const job = jobs.find(j => j.id === jobId);
       if (!job) return;
       setJobDormantRecord(job);
+      forgetExpandedJob(jobId);
       saveToStorage();
       renderJobs();
       renderDormantJobs();
@@ -3893,6 +4025,7 @@
       if (!job) return;
       job.dormant = false;
       job.dormantAt = null;
+      setJobExpanded(jobId, true, false);
       saveToStorage();
       renderJobs();
       renderDormantJobs();
@@ -4197,6 +4330,8 @@
     let activeJobEditId = null;
     let jobOrderFrozen = false;
     let frozenJobOrder = [];
+    const EXPANDED_JOBS_KEY = 'cfma-taska-expanded-jobs';
+    let expandedJobIds = new Set();
     let calendarJobPopupEl = null;
     let calendarJobPopupJobId = null;
     let calendarLogPopupEl = null;
@@ -4227,6 +4362,7 @@
     let supabaseDebounceTimer = null;
     let supabaseSyncBusy = false;
     let startupOutlookScanHandled = false;
+    let startupOpenFolderHandled = false;
     let emailSentDateScanInFlight = new Set();
     let emailSentDateScanTried = new Set();
     let emailSentDateRefreshTimer = null;
@@ -4281,6 +4417,12 @@
       '#b83280', '#6c8f2d', '#c44569', '#00897b', '#7b61ff'
     ];
 
+    try {
+      expandedJobIds = new Set(JSON.parse(localStorage.getItem(EXPANDED_JOBS_KEY) || '[]'));
+    } catch(e) {
+      expandedJobIds = new Set();
+    }
+
     function randomJobColor() {
       return JOB_COLOR_PALETTE[Math.floor(Math.random() * JOB_COLOR_PALETTE.length)];
     }
@@ -4322,6 +4464,18 @@
         setWorkTab('email');
         setTimeout(() => scanOutlookEmails(scanOutlook === 'twoWeeks'), 500);
       }
+
+      const openFolder = params.get('openFolder');
+      if (
+        isLocalAppHost() &&
+        openFolder &&
+        !startupOpenFolderHandled &&
+        !document.body.classList.contains('auth-locked')
+      ) {
+        startupOpenFolderHandled = true;
+        setWorkTab('jobs');
+        setTimeout(() => openJobFolderByNumber(openFolder), 500);
+      }
     }
 
     function jobNextDueTime(job) {
@@ -4333,6 +4487,89 @@
         next = Math.min(next, toBusinessDay(due).getTime());
       });
       return next;
+    }
+
+    function saveExpandedJobState() {
+      try {
+        localStorage.setItem(EXPANDED_JOBS_KEY, JSON.stringify([...expandedJobIds]));
+      } catch(e) {}
+    }
+
+    function setJobExpanded(jobId, expanded, shouldRender = true) {
+      if (!jobId) return;
+      if (expanded) expandedJobIds.add(jobId);
+      else {
+        expandedJobIds.delete(jobId);
+        if (openEmailPanelJobId === jobId) openEmailPanelJobId = null;
+      }
+      saveExpandedJobState();
+      if (shouldRender) renderJobs();
+    }
+
+    function toggleJobExpanded(jobId) {
+      setJobExpanded(jobId, !expandedJobIds.has(jobId));
+    }
+
+    function forgetExpandedJob(jobId) {
+      if (!expandedJobIds.has(jobId)) return;
+      expandedJobIds.delete(jobId);
+      saveExpandedJobState();
+    }
+
+    function jobOpenTaskEntries(job) {
+      return (job.tasks || [])
+        .map((task, idx) => ({ task, idx }))
+        .filter(entry => entry.task && !entry.task.done);
+    }
+
+    function jobNextTaskInfo(job) {
+      const open = jobOpenTaskEntries(job);
+      open.sort((a, b) => {
+        const ad = parseTaskDate(a.task.dueDate);
+        const bd = parseTaskDate(b.task.dueDate);
+        const at = ad ? toBusinessDay(ad).getTime() : Infinity;
+        const bt = bd ? toBusinessDay(bd).getTime() : Infinity;
+        if (at !== bt) return at - bt;
+        return a.idx - b.idx;
+      });
+      return {
+        next: open[0] || null,
+        openCount: open.length,
+        extraCount: Math.max(0, open.length - 1)
+      };
+    }
+
+    function jobSummaryTitle(job) {
+      const num = (job.jobNum || '').trim();
+      const desc = (job.desc || '').trim();
+      if (num && desc) return { number: num, text: desc };
+      if (num) return { number: num, text: 'No job name' };
+      return { number: 'No job #', text: desc || 'No job name' };
+    }
+
+    function renderJobSummaryRow(job, expanded, emailCount) {
+      const title = jobSummaryTitle(job);
+      const info = jobNextTaskInfo(job);
+      const nextTask = info.next && info.next.task;
+      const nextText = nextTask ? (nextTask.text || 'Untitled task') : 'No open tasks';
+      const due = nextTask && nextTask.dueDate ? parseTaskDate(nextTask.dueDate) : null;
+      const dueText = due ? ` due ${formatTaskDateInput(nextTask.dueDate)}` : '';
+      const priorityText = job.priority === 'today' ? 'ASAP' : job.priority === 'week' ? 'Urgent' : '';
+      const meta = [
+        priorityText ? `<span class="job-summary-pill priority">${escHtml(priorityText)}</span>` : '',
+        emailCount ? `<span class="job-summary-pill email">Mail ${emailCount}</span>` : '',
+        info.extraCount ? `<span class="job-summary-pill">+${info.extraCount} more</span>` : `<span class="job-summary-pill">${info.openCount} open</span>`
+      ].filter(Boolean).join('');
+
+      return `
+        <div class="job-summary-row" onclick="toggleJobExpanded('${job.id}')" title="${expanded ? 'Collapse job' : 'Expand job'}">
+          <button class="job-expand-btn" onclick="event.stopPropagation();toggleJobExpanded('${job.id}')" title="${expanded ? 'Collapse job' : 'Expand job'}">${expanded ? 'v' : '&gt;'}</button>
+          <div class="job-summary-title">
+            <span class="job-summary-number">${escHtml(title.number)}</span>${escHtml(title.text)}
+          </div>
+          <div class="job-summary-next ${nextTask ? '' : 'empty'}">${nextTask ? 'Next: ' : ''}${escHtml(nextText)}${escHtml(dueText)}</div>
+          <div class="job-summary-meta">${meta}</div>
+        </div>`;
     }
 
     function currentRenderedJobOrder() {
@@ -4407,12 +4644,42 @@
       return `S:\\JOBS\\${parent}\\${n}`;
     }
 
+    async function openJobFolderByNumber(jobText) {
+      const path = jobFolderPath(jobText);
+      if (!path) {
+        alert('Enter a valid job number first.');
+        return;
+      }
+
+      try {
+        const resp = await fetch(localApiUrl(`/api/open-folder?job=${encodeURIComponent(jobText)}`));
+        if (!resp.ok) {
+          let message = 'Could not open folder.';
+          try {
+            const data = await resp.json();
+            if (data && data.error) message = data.error;
+          } catch(e) {}
+          throw new Error(message);
+        }
+      } catch(e) {
+        alert(localServerErrorMessage(e, 'Start Server.bat to open folders.'));
+      }
+    }
+
     async function openJobFolder(jobId, btn) {
       const card = document.querySelector(`[data-job="${jobId}"]`);
       const input = card ? card.querySelector('.job-num-input') : null;
       const jobText = input ? input.value.trim() : '';
       const path = jobFolderPath(jobText);
       if (!path || !btn) return;
+
+      if (!isLocalAppHost()) {
+        const target = localAppUrl({ workTab: 'jobs', openFolder: jobText });
+        flashJobStatus(jobId, 'Opening the folder through the local app...');
+        const opened = window.open(target, '_blank');
+        if (!opened) window.location.href = target;
+        return;
+      }
 
       const origText = btn.textContent;
       const origTitle = btn.title;
@@ -4622,6 +4889,7 @@
 
     function toggleJobEmails(jobId) {
       openEmailPanelJobId = openEmailPanelJobId === jobId ? null : jobId;
+      if (openEmailPanelJobId === jobId) setJobExpanded(jobId, true, false);
       renderJobs();
     }
 
@@ -4718,6 +4986,7 @@
       if (savedCount > 0) {
         job.updatedAt = Date.now();
         openEmailPanelJobId = jobId;
+        setJobExpanded(jobId, true, false);
         saveToStorage();
         renderJobs();
         flashJobStatus(jobId, `${savedCount} email${savedCount === 1 ? '' : 's'} saved.`);
@@ -4755,6 +5024,7 @@
       if (!email) return;
       job.tasks.push({ text: cleanEmailTaskText(email.name || email.fileName), done: false, emailId, emailIds: [emailId], dueDate: '', todoDays: '', completedHours: '', completedDate: '' });
       job.updatedAt = Date.now();
+      setJobExpanded(jobId, true, false);
       saveToStorage();
       renderJobs();
       const taskInputs = document.querySelectorAll(`[data-job="${jobId}"] .task-text`);
@@ -4958,7 +5228,9 @@
     }
 
     function addJob(jobNum = '', desc = '') {
-      jobs.push({ id: uid(), jobNum, desc, tasks: [], emails: [], color: randomJobColor(), priority: '', updatedAt: Date.now() });
+      const job = { id: uid(), jobNum, desc, tasks: [], emails: [], color: randomJobColor(), priority: '', updatedAt: Date.now() };
+      jobs.push(job);
+      setJobExpanded(job.id, true, false);
       jobSort = 'calendar';
       localStorage.setItem('ljm-job-sort', jobSort);
       saveToStorage();
@@ -4978,6 +5250,7 @@
 
     function deleteJob(id) {
       jobs = jobs.filter(j => j.id !== id);
+      forgetExpandedJob(id);
       saveToStorage();
       renderJobs();
       if (taskCalendarOpen) renderTaskCalendar();
@@ -4989,6 +5262,7 @@
         freezeJobOrderForEdit(jobId);
         job.tasks.push({ text: '', done: false, emailId, emailIds: emailId ? [emailId] : [], dueDate: '', todoDays: '', completedHours: '', completedDate: '' });
         job.updatedAt = Date.now();
+        setJobExpanded(jobId, true, false);
         saveToStorage();
         renderJobs();
         const taskInputs = document.querySelectorAll(`[data-job="${jobId}"] .task-text`);
@@ -5053,13 +5327,22 @@
         scanJobEmailSentDates(job);
         const card = document.createElement('div');
         const priorityClass = job.priority === 'today' ? 'priority-today' : job.priority === 'week' ? 'priority-week' : '';
-        card.className = `job-card ${priorityClass}`.trim();
+        const emailCount = (job.emails || []).length;
+        const expanded = expandedJobIds.has(job.id) || openEmailPanelJobId === job.id;
+        card.className = `job-card ${priorityClass} ${expanded ? 'expanded' : 'compact'}`.trim();
         card.dataset.job = job.id;
         card.style.setProperty('--job-color', job.color);
         card.addEventListener('focusin', () => handleJobEditFocus(job.id));
 
+        const summary = renderJobSummaryRow(job, expanded, emailCount);
+        if (!expanded) {
+          card.innerHTML = summary;
+          wireJobEmailDrop(card, job.id);
+          container.appendChild(card);
+          return;
+        }
+
         const folderPath = jobFolderPath(job.jobNum);
-        const emailCount = (job.emails || []).length;
         const emailPanel = openEmailPanelJobId === job.id ? renderJobEmailPanel(job) : '';
         const header = `
           <div class="job-header">
@@ -5119,7 +5402,7 @@
             <button class="delete-job-btn" onclick="deleteJob('${job.id}')">✕ Remove job</button>
           </div>`;
 
-        card.innerHTML = header + footer;
+        card.innerHTML = summary + `<div class="job-full-body">${header + footer}</div>`;
         wireJobEmailDrop(card, job.id);
         container.appendChild(card);
       });
@@ -5612,6 +5895,7 @@
     }
 
     function focusUnscheduledJobTask(jobId, taskIdx) {
+      setJobExpanded(jobId, true, false);
       const findCard = () => Array.from(document.querySelectorAll('#jobs-container .job-card'))
         .find(card => card.dataset.job === jobId);
       const focusTask = () => {
@@ -7324,6 +7608,7 @@
     async function openSavedOutlookEmail(jobId, emailId, btn) {
       await openJobEmail(jobId, emailId, btn);
       openEmailPanelJobId = jobId;
+      setJobExpanded(jobId, true, false);
       renderJobs();
       setTimeout(() => {
         const card = document.querySelector(`[data-job="${jobId}"]`);
@@ -8375,6 +8660,7 @@
         normalizeJobRecord(job);
         const savedEmails = await saveOutlookGroupEmails(job, group);
         job.emails.push(...savedEmails);
+        setJobExpanded(job.id, true, false);
 
         if (mode === 'task') {
           syncTaskEmailIds(task, [...taskEmailIds(task), ...savedEmails.map(email => email.id)]);
@@ -8382,6 +8668,7 @@
           const text = (document.getElementById(`${groupId}-new-task`)?.value || group.subject || 'Email follow up').trim();
           const ids = savedEmails.map(email => email.id);
           job.tasks.push({ text, done: false, emailId: ids[0] || '', emailIds: ids, dueDate: '', todoDays: '', completedHours: '', completedDate: '' });
+          setJobExpanded(job.id, true, false);
         }
 
         job.updatedAt = Date.now();
@@ -8626,7 +8913,7 @@
         return `<div class="calendar-log-bar" style="grid-column:${colStart} / ${colStart + 1}; cursor:default;" title="${escHtml(entry.label)}"><span class="calendar-log-time">${escHtml(formatWeekLogHours(entry.time))}</span><span class="calendar-meeting-label">${escHtml(entry.label)}</span></div>`;
       }).join('');
       return `
-        <div class="calendar-week">
+        <div class="calendar-week"${calendarCurrentWeekAttr(weekStart)}>
           <div class="calendar-week-label">Week of ${shortDateLabel(weekStart)} - ${shortDateLabel(weekEnd)}</div>
           <div class="calendar-day-head">${dayHeads}</div>
           <div class="calendar-bars" data-team-week="${weekStartStr}">${taskBars + logBars || '<div class="calendar-empty-week">No shared work this week.</div>'}</div>
@@ -8694,6 +8981,7 @@
     }
 
     function renderTeamCalendarView(body) {
+      const previousScrollTop = body ? body.scrollTop : 0;
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const todayStr = toLocalDateStr(today);
@@ -8705,6 +8993,7 @@
       }
 
       body.innerHTML = renderTeamSummary() + renderTeamWorkCalendars(firstMonday, todayStr);
+      restoreOrScrollCalendarToCurrent(body, previousScrollTop);
     }
 
     function calendarVisibleWeekStarts(firstMonday, futureWeekCount = TASK_CALENDAR_WEEK_COUNT) {
@@ -8713,6 +9002,31 @@
         starts.push(addCalendarDays(firstMonday, i * 7));
       }
       return starts;
+    }
+
+    function calendarCurrentWeekAttr(weekStart) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return toLocalDateStr(weekStart) === toLocalDateStr(getMonday(today))
+        ? ' data-current-week="true"'
+        : '';
+    }
+
+    function restoreOrScrollCalendarToCurrent(body, previousScrollTop = 0) {
+      if (!body) return;
+      const schedule = window.requestAnimationFrame || (fn => setTimeout(fn, 0));
+      schedule(() => {
+        if (previousScrollTop > 8) {
+          body.scrollTop = Math.min(previousScrollTop, Math.max(0, body.scrollHeight - body.clientHeight));
+          return;
+        }
+
+        const currentWeek = body.querySelector('[data-current-week="true"]');
+        if (!currentWeek) return;
+        const bodyRect = body.getBoundingClientRect();
+        const weekRect = currentWeek.getBoundingClientRect();
+        body.scrollTop = Math.max(0, body.scrollTop + weekRect.top - bodyRect.top - 8);
+      });
     }
 
     function getWeekLogEntryByRef(sourceLogRef) {
@@ -8874,6 +9188,7 @@
     function renderTaskCalendar() {
       const body = document.getElementById('task-calendar-body');
       if (!body) return;
+      const previousScrollTop = body.scrollTop || 0;
       updateCalendarViewTabs();
 
       if (calendarViewTab === 'gmail') {
@@ -8897,6 +9212,7 @@
       }
 
       body.innerHTML = weeks.join('');
+      restoreOrScrollCalendarToCurrent(body, previousScrollTop);
     }
 
     function gmailCalendarStartDate(item) {
@@ -8926,6 +9242,7 @@
     }
 
     function renderGmailCalendar(body) {
+      const previousScrollTop = body ? body.scrollTop : 0;
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const todayStr = toLocalDateStr(today);
@@ -8937,6 +9254,7 @@
       }
 
       body.innerHTML = weeks.join('');
+      restoreOrScrollCalendarToCurrent(body, previousScrollTop);
     }
 
     function hideGmailCalendarEditor() {
@@ -9382,7 +9700,7 @@
 
       const bars = pastDayOverlays + (itemBars || '<div class="calendar-empty-week">No Gmail dates this week.</div>');
       return `
-        <div class="calendar-week">
+        <div class="calendar-week"${calendarCurrentWeekAttr(weekStart)}>
           <div class="calendar-week-label">${label}</div>
           <div class="calendar-day-head" style="${gmailGridStyle}">${dayHeads}</div>
           <div class="calendar-bars" style="${gmailGridStyle}" ondragover="handleGmailCalendarDragOver(event)" ondragleave="handleCalendarDragLeave(event)" ondrop="handleGmailCalendarDrop(event,'${toLocalDateStr(weekStart)}')">${bars}</div>
@@ -9468,7 +9786,7 @@
       const bars = pastDayOverlays + (taskBars + logBars + meetingBars || '<div class="calendar-empty-week">No scheduled tasks, logs, or meetings.</div>');
 
       return `
-        <div class="calendar-week">
+        <div class="calendar-week"${calendarCurrentWeekAttr(weekStart)}>
           <div class="calendar-week-label">${label}</div>
           <div class="calendar-day-head">${dayHeads}</div>
           <div class="calendar-bars" ondragover="handleCalendarDragOver(event)" ondragleave="handleCalendarDragLeave(event)" ondrop="handleCalendarDrop(event,'${weekStartStr}')">${bars}</div>

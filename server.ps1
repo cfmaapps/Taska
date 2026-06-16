@@ -3,10 +3,95 @@ $appRoot = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInv
 $appRoot = [System.IO.Path]::GetFullPath($appRoot)
 $root = [System.IO.Path]::GetFullPath((Split-Path -Parent $appRoot))
 $appUrlSegment = 'Timewrap'
+$localDataRoot = if (-not [string]::IsNullOrWhiteSpace($env:TASKA_LOCAL_DATA_ROOT)) {
+    [string]$env:TASKA_LOCAL_DATA_ROOT
+} else {
+    Join-Path $root 'Taska Local Data'
+}
+$localDataRoot = [System.IO.Path]::GetFullPath($localDataRoot)
+$localDataFolders = @('Backups', 'Job Emails', 'RM Sessions', 'Useful Documents')
+$localDataFiles = @('.timewrap-secrets.json', 'cfma-secret-config.js')
 $AttachmentScanMaxBytes = 6 * 1024 * 1024
 $AttachmentScanMaxChars = 12000
 $AttachmentScanMaxPerMessage = 8
 $OutlookScanMaxItemsPerFolder = 120
+
+if (-not (Test-Path $localDataRoot -PathType Container)) {
+    New-Item -ItemType Directory -Path $localDataRoot -Force | Out-Null
+}
+
+function Get-UniqueLocalDataPath {
+    param([string]$Path)
+
+    if (-not (Test-Path -LiteralPath $Path)) { return $Path }
+
+    $parent = Split-Path -Parent $Path
+    $name = [System.IO.Path]::GetFileNameWithoutExtension($Path)
+    $ext = [System.IO.Path]::GetExtension($Path)
+    $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+    $candidate = Join-Path $parent "$name-from-repo-$stamp$ext"
+    $i = 2
+    while (Test-Path -LiteralPath $candidate) {
+        $candidate = Join-Path $parent "$name-from-repo-$stamp-$i$ext"
+        $i++
+    }
+    return $candidate
+}
+
+function Move-RepoLocalDataItem {
+    param([string]$Name)
+
+    $source = [System.IO.Path]::GetFullPath((Join-Path $appRoot $Name))
+    $target = [System.IO.Path]::GetFullPath((Join-Path $localDataRoot $Name))
+    $appPrefix = $appRoot.TrimEnd('\') + '\'
+    $dataPrefix = $localDataRoot.TrimEnd('\') + '\'
+    if (-not $source.StartsWith($appPrefix, [System.StringComparison]::OrdinalIgnoreCase)) { return }
+    if (-not $target.StartsWith($dataPrefix, [System.StringComparison]::OrdinalIgnoreCase)) { return }
+
+    if (Test-Path -LiteralPath $source -PathType Container) {
+        if (-not (Test-Path -LiteralPath $target -PathType Container)) {
+            New-Item -ItemType Directory -Path $target -Force | Out-Null
+        }
+        foreach ($item in Get-ChildItem -LiteralPath $source -Force) {
+            $destination = Join-Path $target $item.Name
+            if ((-not $item.PSIsContainer) -and (Test-Path -LiteralPath $destination -PathType Leaf)) {
+                $existing = Get-Item -LiteralPath $destination
+                if ($item.LastWriteTime -gt $existing.LastWriteTime) {
+                    Move-Item -LiteralPath $destination -Destination (Get-UniqueLocalDataPath $destination)
+                } else {
+                    $destination = Get-UniqueLocalDataPath $destination
+                }
+            } elseif (Test-Path -LiteralPath $destination) {
+                $destination = Get-UniqueLocalDataPath $destination
+            }
+            Move-Item -LiteralPath $item.FullName -Destination $destination
+        }
+        if ((Get-ChildItem -LiteralPath $source -Force | Measure-Object).Count -eq 0) {
+            Remove-Item -LiteralPath $source
+        }
+    } elseif (Test-Path -LiteralPath $source -PathType Leaf) {
+        $targetParent = Split-Path -Parent $target
+        if (-not (Test-Path -LiteralPath $targetParent -PathType Container)) {
+            New-Item -ItemType Directory -Path $targetParent -Force | Out-Null
+        }
+        $destination = $target
+        if (Test-Path -LiteralPath $destination -PathType Leaf) {
+            $sourceItem = Get-Item -LiteralPath $source
+            $existing = Get-Item -LiteralPath $destination
+            if ($sourceItem.LastWriteTime -gt $existing.LastWriteTime) {
+                Move-Item -LiteralPath $destination -Destination (Get-UniqueLocalDataPath $destination)
+            } else {
+                $destination = Get-UniqueLocalDataPath $destination
+            }
+        } elseif (Test-Path -LiteralPath $destination) {
+            $destination = Get-UniqueLocalDataPath $destination
+        }
+        Move-Item -LiteralPath $source -Destination $destination
+    }
+}
+
+foreach ($folder in $localDataFolders) { Move-RepoLocalDataItem $folder }
+foreach ($file in $localDataFiles) { Move-RepoLocalDataItem $file }
 
 $listener = New-Object System.Net.HttpListener
 $listener.Prefixes.Add("http://localhost:$port/")
@@ -101,7 +186,7 @@ function Get-UniqueFilePath {
     return $candidate
 }
 
-function Get-AppFilePath {
+function Normalize-AppRelativePath {
     param([string]$RelativePath)
 
     $relative = if ($null -eq $RelativePath) { '' } else { [string]$RelativePath }
@@ -115,13 +200,51 @@ function Get-AppFilePath {
         $relative = $relative.Substring($segmentPrefix.Length)
     }
 
-    $fullPath = [System.IO.Path]::GetFullPath((Join-Path $appRoot $relative))
-    $appPrefix = $appRoot.TrimEnd('\') + '\'
-    if (($fullPath -ne $appRoot) -and (-not $fullPath.StartsWith($appPrefix, [System.StringComparison]::OrdinalIgnoreCase))) {
+    return $relative
+}
+
+function Test-LocalDataPath {
+    param([string]$RelativePath)
+
+    if ([string]::IsNullOrWhiteSpace($RelativePath)) { return $false }
+
+    $parts = $RelativePath.Split('\')
+    $first = $parts[0]
+    foreach ($folder in $localDataFolders) {
+        if ($first.Equals($folder, [System.StringComparison]::OrdinalIgnoreCase)) { return $true }
+    }
+    foreach ($file in $localDataFiles) {
+        if ($RelativePath.Equals($file, [System.StringComparison]::OrdinalIgnoreCase)) { return $true }
+    }
+    return $false
+}
+
+function Resolve-SafeChildPath {
+    param(
+        [string]$BasePath,
+        [string]$RelativePath
+    )
+
+    $fullPath = if ([string]::IsNullOrWhiteSpace($RelativePath)) {
+        [System.IO.Path]::GetFullPath($BasePath)
+    } else {
+        [System.IO.Path]::GetFullPath((Join-Path $BasePath $RelativePath))
+    }
+    $base = [System.IO.Path]::GetFullPath($BasePath)
+    $basePrefix = $base.TrimEnd('\') + '\'
+    if (($fullPath -ne $base) -and (-not $fullPath.StartsWith($basePrefix, [System.StringComparison]::OrdinalIgnoreCase))) {
         return $null
     }
 
     return $fullPath
+}
+
+function Get-AppFilePath {
+    param([string]$RelativePath)
+
+    $relative = Normalize-AppRelativePath $RelativePath
+    $basePath = if (Test-LocalDataPath $relative) { $localDataRoot } else { $appRoot }
+    return (Resolve-SafeChildPath -BasePath $basePath -RelativePath $relative)
 }
 
 function Get-AppRelativePath {
@@ -1601,6 +1724,7 @@ Write-Host ""
 Write-Host "  Open this in your browser:" -ForegroundColor White
 Write-Host "  http://localhost:$port/" -ForegroundColor Yellow
 Write-Host "  App folder: $appRoot" -ForegroundColor DarkGray
+Write-Host "  Local data folder: $localDataRoot" -ForegroundColor DarkGray
 Write-Host ""
 Write-Host "  Keep this window open while using the toolbox." -ForegroundColor White
 Write-Host "  Press Ctrl+C to stop the server." -ForegroundColor White

@@ -32,6 +32,7 @@ Do not upload these:
 cfma-secret-config.js
 Backups/
 Job Emails/
+RM Sessions/
 Useful Documents/
 node_modules/
 *.log
@@ -40,6 +41,12 @@ node_modules/
 ```
 
 These are private, local, generated, or machine-specific files.
+
+When running locally, `server.ps1` keeps these folders outside the repo by default in:
+
+```text
+../Taska Local Data/
+```
 
 ## Easy Check
 

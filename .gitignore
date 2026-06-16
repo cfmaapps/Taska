@@ -1,0 +1,19 @@
+# Local/private data
+Backups/
+Job Emails/
+RM Sessions/
+Useful Documents/
+.timewrap-secrets.json
+cfma-secret-config.js
+
+# Environment and dependency folders
+.env
+.env.*
+node_modules/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+Thumbs.db
+desktop.ini

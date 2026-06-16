@@ -18,7 +18,8 @@ It currently supports:
 2. Open `http://localhost:8080/`.
 3. Keep the server window open for Outlook, Gmail proxy, local backups, and file-opening features.
 
-The app stores working data in browser `localStorage` and also writes local JSON backups through `server.ps1`.
+The app stores working data in browser `localStorage` and writes local JSON backups through `server.ps1`.
+Local/private files are kept outside the Git repo by default in the sibling `Taska Local Data/` folder.
 
 ## GitHub Hosting
 
@@ -29,7 +30,7 @@ For the exact upload list, start with `docs/UPLOAD_TO_GITHUB.md`.
 Before pushing:
 
 - Do not commit `.timewrap-secrets.json`.
-- Do not commit `Job Emails/`, `Backups/`, or private documents.
+- Do not commit `Job Emails/`, `Backups/`, `RM Sessions/`, or private documents.
 - Use the included `.gitignore`.
 
 Useful checks:

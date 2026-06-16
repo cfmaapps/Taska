@@ -136,6 +136,60 @@ function Get-AppRelativePath {
     return "$appUrlSegment\$relative"
 }
 
+function Get-SafePathSegment {
+    param([string]$Value)
+
+    $safe = if ([string]::IsNullOrWhiteSpace($Value)) { 'unknown' } else { [string]$Value }
+    $safe = [regex]::Replace($safe.Trim(), '[^A-Za-z0-9_.-]+', '_').Trim('_', '.')
+    if ([string]::IsNullOrWhiteSpace($safe)) { $safe = 'unknown' }
+    if ($safe.Length -gt 80) { $safe = $safe.Substring(0, 80) }
+    return $safe
+}
+
+function Get-RmSessionFolder {
+    param([string]$JobId)
+
+    $rmRoot = Get-AppFilePath 'RM Sessions'
+    if (-not (Test-Path $rmRoot -PathType Container)) {
+        New-Item -ItemType Directory -Path $rmRoot | Out-Null
+    }
+
+    $folder = Join-Path $rmRoot (Get-SafePathSegment $JobId)
+    if (-not (Test-Path $folder -PathType Container)) {
+        New-Item -ItemType Directory -Path $folder | Out-Null
+    }
+    return $folder
+}
+
+function Get-RmSessionFileName {
+    param([string]$RmReference)
+
+    $ref = Get-SafePathSegment $RmReference
+    if ($ref -eq 'unknown') { $ref = 'resource-consent' }
+    $stamp = (Get-Date).ToString('yyyyMMdd-HHmmss')
+    return "$ref-$stamp.json"
+}
+
+function Open-FolderWithExplorer {
+    param([string]$FolderPath)
+
+    if ([string]::IsNullOrWhiteSpace($FolderPath)) {
+        throw 'Folder path is empty.'
+    }
+
+    $explorerPath = Join-Path $env:WINDIR 'explorer.exe'
+    if (-not (Test-Path $explorerPath -PathType Leaf)) {
+        $explorerPath = 'explorer.exe'
+    }
+
+    $psi = [System.Diagnostics.ProcessStartInfo]::new()
+    $psi.FileName = $explorerPath
+    $psi.Arguments = "/n,`"$FolderPath`""
+    $psi.UseShellExecute = $false
+    $psi.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Normal
+    [void][System.Diagnostics.Process]::Start($psi)
+}
+
 function ConvertTo-IsoDate {
     param([object]$Value)
 
@@ -1451,6 +1505,93 @@ function Save-OutlookMessage {
     }
 }
 
+function Get-OutlookSelectionDirection {
+    param([object]$Item)
+
+    try {
+        $folderPath = [string]$Item.Parent.FolderPath
+        if ($folderPath -match '(?i)sent') { return 'sent' }
+    } catch {}
+
+    try {
+        $received = [datetime]$Item.ReceivedTime
+        if ($received.Year -ge 1902) { return 'inbox' }
+    } catch {}
+
+    try {
+        $sent = [datetime]$Item.SentOn
+        if ($sent.Year -ge 1902) { return 'sent' }
+    } catch {}
+
+    return 'inbox'
+}
+
+function Get-OutlookSelectedMessageRefs {
+    param([object]$Outlook)
+
+    $messages = New-Object System.Collections.ArrayList
+    $seen = @{}
+
+    $addItem = {
+        param([object]$Item)
+        if ($null -eq $Item) { return }
+        try {
+            if ([int]$Item.Class -ne 43) { return }
+            $entryId = [string]$Item.EntryID
+            if ([string]::IsNullOrWhiteSpace($entryId) -or $seen.ContainsKey($entryId)) { return }
+            $seen[$entryId] = $true
+
+            $storeId = ''
+            try { $storeId = [string]$Item.Parent.StoreID } catch {}
+            [void]$messages.Add([ordered]@{
+                entryId = $entryId
+                storeId = $storeId
+                direction = Get-OutlookSelectionDirection -Item $Item
+            })
+        } catch {}
+    }
+
+    $selection = $null
+    try {
+        $explorer = $Outlook.ActiveExplorer()
+        if ($null -ne $explorer) { $selection = $explorer.Selection }
+    } catch {}
+
+    if ($null -ne $selection) {
+        try {
+            for ($i = 1; $i -le [int]$selection.Count; $i++) {
+                $item = $null
+                try {
+                    $item = $selection.Item($i)
+                    & $addItem $item
+                } finally {
+                    if ($null -ne $item) {
+                        try { [void][System.Runtime.InteropServices.Marshal]::ReleaseComObject($item) } catch {}
+                    }
+                }
+            }
+        } catch {}
+        try { [void][System.Runtime.InteropServices.Marshal]::ReleaseComObject($selection) } catch {}
+    }
+
+    if ($messages.Count -eq 0) {
+        $inspectorItem = $null
+        try {
+            $inspector = $Outlook.ActiveInspector()
+            if ($null -ne $inspector) {
+                $inspectorItem = $inspector.CurrentItem
+                & $addItem $inspectorItem
+            }
+        } catch {} finally {
+            if ($null -ne $inspectorItem) {
+                try { [void][System.Runtime.InteropServices.Marshal]::ReleaseComObject($inspectorItem) } catch {}
+            }
+        }
+    }
+
+    return @($messages)
+}
+
 Write-Host "=============================================" -ForegroundColor Cyan
 Write-Host "  CFMA TASKA - Local Server" -ForegroundColor Cyan
 Write-Host "=============================================" -ForegroundColor Cyan
@@ -1482,6 +1623,182 @@ while ($listener.IsListening) {
     }
 
     $path = $req.Url.LocalPath.TrimStart('/')
+
+    if ($path -eq 'api/openai') {
+        try {
+            if ($req.HttpMethod -ne 'POST') {
+                Write-JsonResponse $res 405 @{ ok = $false; error = 'POST required.' }
+                continue
+            }
+
+            $payload = Read-JsonRequestBody -Request $req
+            if ($null -eq $payload) {
+                Write-JsonResponse $res 400 @{ ok = $false; error = 'Missing request body.' }
+                continue
+            }
+
+            $apiKey = ''
+            if ($payload.PSObject.Properties.Name -contains 'apiKey') {
+                $apiKey = ConvertTo-SafeAiText $payload.apiKey 300
+            }
+            if ([string]::IsNullOrWhiteSpace($apiKey)) {
+                $storedApi = Get-OpenAiApiKey
+                $apiKey = [string]$storedApi.key
+            }
+            if ([string]::IsNullOrWhiteSpace($apiKey) -or -not $apiKey.StartsWith('sk-')) {
+                Write-JsonResponse $res 503 @{ ok = $false; error = 'AI is not configured. Click AI Setup in Taska and save an OpenAI API key first.' }
+                continue
+            }
+
+            $messages = @($payload.messages)
+            if ($messages.Count -eq 0) {
+                Write-JsonResponse $res 400 @{ ok = $false; error = 'Missing messages.' }
+                continue
+            }
+
+            $maxTokens = 6000
+            if ($payload.PSObject.Properties.Name -contains 'maxTokens') {
+                [int]$parsedTokens = 0
+                if ([int]::TryParse([string]$payload.maxTokens, [ref]$parsedTokens) -and $parsedTokens -gt 0) {
+                    $maxTokens = [math]::Min($parsedTokens, 12000)
+                }
+            }
+
+            $model = Get-OpenAiModel
+            $requestBody = [ordered]@{
+                model = $model
+                input = $messages
+                max_output_tokens = $maxTokens
+                store = $false
+                text = [ordered]@{
+                    format = [ordered]@{ type = 'json_object' }
+                }
+            }
+            $json = $requestBody | ConvertTo-Json -Depth 20 -Compress
+            $headers = @{ Authorization = "Bearer $apiKey" }
+
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            $bodyBytes = [System.Text.Encoding]::UTF8.GetBytes($json)
+            $aiResponse = Invoke-RestMethod -Uri 'https://api.openai.com/v1/responses' -Method Post -Headers $headers -ContentType 'application/json; charset=utf-8' -Body $bodyBytes -TimeoutSec 180
+            $outputText = Get-OpenAiOutputText -Response $aiResponse
+            $stopReason = 'end_turn'
+            if ($aiResponse.PSObject.Properties.Name -contains 'status' -and [string]$aiResponse.status -eq 'incomplete') {
+                $stopReason = 'max_tokens'
+            }
+            if ($aiResponse.PSObject.Properties.Name -contains 'incomplete_details' -and $null -ne $aiResponse.incomplete_details) {
+                $reason = [string]$aiResponse.incomplete_details.reason
+                if (-not [string]::IsNullOrWhiteSpace($reason)) { $stopReason = $reason }
+            }
+
+            Write-JsonResponse $res 200 @{
+                ok = $true
+                text = $outputText
+                stopReason = $stopReason
+                model = $model
+                proxyVersion = 'timewrap-powershell-rm-2026-06-12'
+            }
+            Write-Host "  [AI] RM analyser OpenAI request completed" -ForegroundColor Green
+        } catch {
+            $detail = if ($_.ErrorDetails -and $_.ErrorDetails.Message) { $_.ErrorDetails.Message } elseif ($_.Exception) { $_.Exception.Message } else { [string]$_ }
+            Write-JsonResponse $res 500 @{ ok = $false; error = "AI request failed. $detail" }
+            Write-Host "  [AI] RM analyser OpenAI error: $_" -ForegroundColor Red
+        }
+        continue
+    }
+
+    if ($path -eq 'api/rm-session') {
+        try {
+            $jobId = [string]$req.QueryString['jobId']
+            if ($req.HttpMethod -eq 'GET') {
+                if ([string]::IsNullOrWhiteSpace($jobId)) {
+                    Write-JsonResponse $res 400 @{ ok = $false; error = 'Missing jobId.' }
+                    continue
+                }
+
+                $folder = Get-RmSessionFolder -JobId $jobId
+                $latest = Join-Path $folder 'latest.json'
+                if (-not (Test-Path $latest -PathType Leaf)) {
+                    Write-JsonResponse $res 404 @{ ok = $false; error = 'No linked RM session found for this job.' }
+                    continue
+                }
+
+                $raw = Get-Content -Path $latest -Raw -Encoding UTF8
+                Write-TextResponse $res 200 'application/json; charset=utf-8' $raw
+                Write-Host "  [RM] Loaded linked session for job $jobId" -ForegroundColor Cyan
+                continue
+            }
+
+            if ($req.HttpMethod -ne 'POST') {
+                Write-JsonResponse $res 405 @{ ok = $false; error = 'GET or POST required.' }
+                continue
+            }
+
+            $payload = Read-JsonRequestBody -Request $req
+            if ($null -eq $payload) {
+                Write-JsonResponse $res 400 @{ ok = $false; error = 'Missing request body.' }
+                continue
+            }
+
+            if ([string]::IsNullOrWhiteSpace($jobId) -and $payload.PSObject.Properties.Name -contains 'jobId') {
+                $jobId = ConvertTo-SafeAiText $payload.jobId 100
+            }
+            if ([string]::IsNullOrWhiteSpace($jobId)) {
+                Write-JsonResponse $res 400 @{ ok = $false; error = 'Missing jobId.' }
+                continue
+            }
+
+            $jobNum = ''
+            if ($payload.PSObject.Properties.Name -contains 'jobNum') { $jobNum = ConvertTo-SafeAiText $payload.jobNum 80 }
+            $jobName = ''
+            if ($payload.PSObject.Properties.Name -contains 'jobName') { $jobName = ConvertTo-SafeAiText $payload.jobName 180 }
+            $rmReference = 'resource-consent'
+            if ($payload.PSObject.Properties.Name -contains 'rmReference') {
+                $candidate = ConvertTo-SafeAiText $payload.rmReference 120
+                if (-not [string]::IsNullOrWhiteSpace($candidate)) { $rmReference = $candidate }
+            }
+            $session = $null
+            if ($payload.PSObject.Properties.Name -contains 'session') { $session = $payload.session }
+            if ($null -eq $session) {
+                Write-JsonResponse $res 400 @{ ok = $false; error = 'Missing RM session.' }
+                continue
+            }
+
+            $safeJobId = Get-SafePathSegment $jobId
+            $folder = Get-RmSessionFolder -JobId $jobId
+            $fileName = Get-RmSessionFileName -RmReference $rmReference
+            $filePath = Join-Path $folder $fileName
+            $latestPath = Join-Path $folder 'latest.json'
+            $savedAt = (Get-Date).ToUniversalTime().ToString('o')
+            $relativeFile = Get-AppRelativePath (Join-Path "RM Sessions\$safeJobId" $fileName)
+            $relativeLatest = Get-AppRelativePath (Join-Path "RM Sessions\$safeJobId" 'latest.json')
+
+            $envelope = [ordered]@{
+                ok = $true
+                app = 'cfma-taska-rm-session'
+                version = 1
+                jobId = $jobId
+                jobNum = $jobNum
+                jobName = $jobName
+                rmReference = $rmReference
+                savedAt = $savedAt
+                fileName = $fileName
+                relativePath = $relativeFile
+                latestPath = $relativeLatest
+                session = $session
+            }
+
+            $json = $envelope | ConvertTo-Json -Depth 100
+            Set-Content -Path $filePath -Value $json -Encoding UTF8
+            Set-Content -Path $latestPath -Value $json -Encoding UTF8
+            Write-TextResponse $res 200 'application/json; charset=utf-8' $json
+            Write-Host "  [RM] Saved linked session for job $jobId ($rmReference)" -ForegroundColor Green
+        } catch {
+            $detail = if ($_.Exception) { $_.Exception.Message } else { [string]$_ }
+            Write-JsonResponse $res 500 @{ ok = $false; error = "Could not save RM session. $detail" }
+            Write-Host "  [RM] Session error: $_" -ForegroundColor Red
+        }
+        continue
+    }
 
     # ── Projects API ───────────────────────────────────────────────────────────
     if ($path -eq 'api/projects') {
@@ -1523,7 +1840,7 @@ while ($listener.IsListening) {
                 continue
             }
 
-            Start-Process -FilePath explorer.exe -ArgumentList "`"$folderPath`""
+            Open-FolderWithExplorer -FolderPath $folderPath
             Write-JsonResponse $res 200 @{ ok = $true; path = $folderPath }
             Write-Host "  [Explorer] Opened $folderPath" -ForegroundColor Green
         } catch {
@@ -2033,6 +2350,74 @@ while ($listener.IsListening) {
                 if ($null -ne $obj) {
                     try { [void][System.Runtime.InteropServices.Marshal]::ReleaseComObject($obj) } catch {}
                 }
+            }
+        }
+        continue
+    }
+
+    if ($path -eq 'api/save-selected-outlook-emails') {
+        $outlook = $null
+        $namespace = $null
+        try {
+            if ($req.HttpMethod -ne 'POST') {
+                Write-JsonResponse $res 405 @{ ok = $false; error = 'POST required.' }
+                continue
+            }
+
+            $payload = Read-JsonRequestBody -Request $req
+            $jobText = if ($null -ne $payload) { [string]$payload.job } else { [string]$req.QueryString['job'] }
+            $jobNum = Get-JobNumber -JobText $jobText
+            if ($null -eq $jobNum) {
+                Write-JsonResponse $res 400 @{ ok = $false; error = 'Select a job with a valid job number first.' }
+                continue
+            }
+
+            $outlook = Get-RunningOutlookApplication
+            if ($null -eq $outlook) {
+                Write-JsonResponse $res 503 @{ ok = $false; error = 'Open classic Outlook first, then try again.' }
+                continue
+            }
+
+            $messageList = @(Get-OutlookSelectedMessageRefs -Outlook $outlook)
+            if ($messageList.Count -eq 0) {
+                Write-JsonResponse $res 400 @{ ok = $false; error = 'No selected Outlook emails found. Select the email in classic Outlook, then drag/drop again.' }
+                Write-Host "  [Outlook] No selected messages found for direct drop" -ForegroundColor Yellow
+                continue
+            }
+
+            $emailRoot = Get-AppFilePath 'Job Emails'
+            $jobEmailFolder = Join-Path $emailRoot ([string]$jobNum)
+            if (-not (Test-Path $jobEmailFolder)) {
+                New-Item -ItemType Directory -Path $jobEmailFolder | Out-Null
+            }
+
+            $namespace = $outlook.Session
+            $saved = @()
+            foreach ($message in $messageList) {
+                $mail = Save-OutlookMessage -Session $namespace -Message $message -Folder $jobEmailFolder
+                if ($null -ne $mail) {
+                    $mail['path'] = Get-AppRelativePath "Job Emails\$jobNum\$($mail.fileName)"
+                    $saved += $mail
+                }
+            }
+
+            if ($saved.Count -eq 0) {
+                Write-JsonResponse $res 500 @{ ok = $false; error = 'Could not save the selected Outlook emails.' }
+                continue
+            }
+
+            Write-JsonResponse $res 200 @{
+                ok = $true
+                emails = @($saved)
+            }
+            Write-Host "  [Outlook] Saved $($saved.Count) selected message(s) for job $jobNum" -ForegroundColor Green
+        } catch {
+            $detail = if ($_.Exception) { $_.Exception.Message } else { [string]$_ }
+            Write-JsonResponse $res 500 @{ ok = $false; error = "Could not save selected Outlook emails. $detail" }
+            Write-Host "  [Outlook] Selected save error: $_" -ForegroundColor Red
+        } finally {
+            if ($null -ne $namespace) {
+                try { [void][System.Runtime.InteropServices.Marshal]::ReleaseComObject($namespace) } catch {}
             }
         }
         continue

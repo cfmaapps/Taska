@@ -19,7 +19,7 @@ It currently supports:
 3. Keep the server window open for Outlook, Gmail proxy, local backups, and file-opening features.
 
 The app stores working data in browser `localStorage` and writes local JSON backups through `server.ps1`.
-Local/private files are kept outside the Git repo by default in the sibling `Taska Local Data/` folder.
+Local/private files are saved beside `Start Server.bat` by default and protected from Git by `.gitignore`.
 
 ## GitHub Hosting
 

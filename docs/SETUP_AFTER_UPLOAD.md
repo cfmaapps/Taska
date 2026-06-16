@@ -19,7 +19,7 @@ http://localhost:8080/
 
 Supabase handles shared users, autosave snapshots, jobs, tasks, and work calendars. The `.bat` only handles local desktop access that the browser and Supabase cannot access directly.
 
-Local/private folders such as `Backups/`, `Job Emails/`, `RM Sessions/`, and `Useful Documents/` are stored beside the repo in `../Taska Local Data/` by default, not inside the GitHub source folder.
+Local/private folders such as `Backups/`, `Job Emails/`, `RM Sessions/`, and `Useful Documents/` are stored beside `Start Server.bat` by default. They are ignored by Git through `.gitignore`, so GitHub Desktop should not try to push them.
 
 ## GitHub Pages
 

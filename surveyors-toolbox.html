@@ -2684,6 +2684,41 @@
       color: #e8edf2;
     }
 
+    .calendar-work-options {
+      align-items: center;
+      display: flex;
+      gap: 8px;
+      margin: 0 0 10px;
+    }
+
+    .calendar-work-option {
+      align-items: center;
+      background: #162030;
+      border: 1px solid #2e3d55;
+      border-radius: 8px;
+      color: #a8c4e0;
+      cursor: pointer;
+      display: flex;
+      gap: 8px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 8px 10px;
+    }
+
+    .calendar-work-option input {
+      accent-color: #f0a500;
+      cursor: pointer;
+      height: 14px;
+      width: 14px;
+    }
+
+    .calendar-work-option em {
+      color: #6f91b2;
+      font-size: 0.66rem;
+      font-style: normal;
+      font-weight: 700;
+    }
+
     .task-calendar-close {
       background: none;
       border: none;
@@ -3553,6 +3588,42 @@
       border-style: dashed;
       cursor: default;
       box-shadow: inset 0 0 0 999px rgba(0, 0, 0, 0.26);
+    }
+
+    .calendar-task-bar.assigned-by-you {
+      border-style: dashed;
+      cursor: default;
+      box-shadow: inset 0 0 0 999px rgba(15, 23, 34, 0.32);
+    }
+
+    .calendar-assigned-symbol {
+      align-items: center;
+      background: rgba(240, 165, 0, 0.18);
+      border: 1px solid rgba(240, 165, 0, 0.55);
+      border-radius: 999px;
+      color: #ffd079;
+      display: inline-flex;
+      flex: 0 0 auto;
+      font-size: 0.6rem;
+      font-weight: 900;
+      height: 16px;
+      justify-content: center;
+      line-height: 1;
+      width: 16px;
+    }
+
+    .calendar-assigned-by-you-label {
+      border-top: 1px dashed #2e3d55;
+      color: #f0a500;
+      font-size: 0.62rem;
+      font-weight: 900;
+      padding: 7px 10px 2px;
+      text-transform: uppercase;
+    }
+
+    .calendar-assigned-by-you-layer {
+      min-height: 30px;
+      padding-top: 4px;
     }
 
     .calendar-task-bar.calendar-highlight {
@@ -6020,8 +6091,12 @@
       return url.toString();
     }
 
+    function localSessionStartInstructions() {
+      return 'A browser cannot start Start Server.bat for you. Open your synced Taska folder, double-click Start Server.bat, wait for the black server window to stay open, then open http://localhost:8080/.';
+    }
+
     function localSessionUnavailableMessage(featureName = 'This feature') {
-      return `${featureName} isn't available without a local session. Start Server.bat, then open http://localhost:8080/.`;
+      return `${featureName} isn't available without a local session. ${localSessionStartInstructions()}`;
     }
 
     function aiApiKeyOwnerName() {
@@ -6042,7 +6117,7 @@
     }
 
     function askMoveSessionToLocal(featureName = 'This feature') {
-      return confirm(`${featureName} requires Start Server.bat and the local app session.\n\nWould you like to move this session to local now?`);
+      return confirm(`${featureName} requires Start Server.bat and the local app session.\n\n${localSessionStartInstructions()}\n\nIf Start Server.bat is already running, click OK to open the local session now. If it is not running yet, click Cancel and start it first.`);
     }
 
     function openLocalSession(params = {}) {
@@ -6077,7 +6152,7 @@
         return 'The local server did not answer in time. Restart Start Server.bat, make sure Outlook is open, then try again.';
       }
       if (error && error.message === 'Failed to fetch') {
-        return 'Could not reach the local server. Restart Start Server.bat, then open http://localhost:8080/ for Outlook scanning. If you are using the GitHub URL, upload the latest server.ps1 first.';
+        return `Could not reach the local server. ${localSessionStartInstructions()} If Start Server.bat is already running, close it and start it again.`;
       }
       return (error && error.message) || fallback;
     }
@@ -6694,6 +6769,8 @@
       ? localStorage.getItem('ljm-calendar-view-tab')
       : 'jobs';
     const GMAIL_CALENDAR_ENABLED = false;
+    const YOUR_WORK_ASSIGNED_VISIBLE_KEY = 'cfma-taska-your-work-assigned-visible';
+    let yourWorkAssignedVisible = localStorage.getItem(YOUR_WORK_ASSIGNED_VISIBLE_KEY) === '1';
     const TEAM_SELECTED_USER_KEY = 'cfma-taska-team-selected-user';
     let selectedTeamCalendarUserId = localStorage.getItem(TEAM_SELECTED_USER_KEY) || '';
     let calendarForcePreviousWeekTop = true;
@@ -6711,6 +6788,8 @@
     let frozenJobOrder = [];
     const EXPANDED_JOBS_KEY = 'cfma-taska-expanded-jobs';
     const RM_LINK_STORAGE_PREFIX = 'cfma-rm-link-';
+    const RM_SHARED_SESSION_STORAGE_PREFIX = 'cfma-rm-shared-session-';
+    const SHARED_RM_SESSIONS_KEY = 'cfma-taska-shared-rm-sessions';
     const DIVIDE_JOB_BASE_URL = 'https://www.divide.nz/tasman?job=';
     let expandedJobIds = new Set();
     let todayExpandedJobIds = new Set();
@@ -7008,10 +7087,11 @@
       const due = nextTask && nextTask.dueDate ? parseTaskDate(nextTask.dueDate) : null;
       const dueText = due ? ` due ${formatTaskDateInput(nextTask.dueDate)}` : '';
       const rmLink = jobRmLink(job);
+      const divideLink = jobDivideLink(job);
       const divideSummary = jobDivideSummary(job);
       const meta = [
-        rmLink && rmLink.rmReference ? `<span class="job-summary-pill" oncontextmenu="return showJobLinkMenu(event,'${job.id}','rm')" title="Right-click to replace RM link">RM ${escHtml(rmLink.rmReference)}</span>` : '',
-        job.divideUrl ? `<span class="job-summary-pill divide" oncontextmenu="return showJobLinkMenu(event,'${job.id}','divide')" title="${escHtml(divideSummary.title)}">${escHtml(divideSummary.label)}</span>` : '',
+        rmLink && rmLink.rmReference ? `<span class="job-summary-pill" oncontextmenu="return showJobLinkMenu(event,'${job.id}','rm')" title="${escHtml(rmLink.shared ? `Shared by ${rmLink.sharedFromUserName || 'team member'}. Right-click to replace RM link.` : 'Right-click to replace RM link')}">RM ${escHtml(rmLink.rmReference)}</span>` : '',
+        divideLink ? `<span class="job-summary-pill divide" oncontextmenu="return showJobLinkMenu(event,'${job.id}','divide')" title="${escHtml(divideSummary.title)}">${escHtml(divideSummary.label)}</span>` : '',
         emailCount ? `<span class="job-summary-pill email">Mail ${emailCount}</span>` : '',
         info.extraCount ? `<span class="job-summary-pill">+${info.extraCount} more</span>` : `<span class="job-summary-pill">${info.openCount} open</span>`
       ].filter(Boolean).join('');
@@ -7230,10 +7310,160 @@
       }
     }
 
-    function jobRmLink(job) {
+    function sharedRmToolStorageKey(jobId) {
+      return RM_SHARED_SESSION_STORAGE_PREFIX + String(jobId || '');
+    }
+
+    function safeClonePlainObject(value) {
+      if (!value || typeof value !== 'object') return null;
+      try { return JSON.parse(JSON.stringify(value)); } catch(e) { return null; }
+    }
+
+    function readSharedRmSessionRecords() {
+      try {
+        const raw = localStorage.getItem(SHARED_RM_SESSIONS_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed.filter(Boolean);
+        if (parsed && typeof parsed === 'object') return Object.values(parsed).filter(Boolean);
+      } catch(e) {}
+      return [];
+    }
+
+    function sharedRmSessionRecordKey(record) {
+      const jobNum = normalizedJobNumber(record && record.jobNum);
+      const rmReference = String(record && record.rmReference || '').trim().toLowerCase() || 'resource-consent';
+      return jobNum ? `${jobNum}::${rmReference}` : '';
+    }
+
+    function writeSharedRmSessionRecords(records) {
+      const byKey = new Map();
+      (records || []).forEach(record => {
+        if (!record || !record.session || typeof record.session !== 'object') return;
+        const clean = {
+          jobNum: String(record.jobNum || '').trim(),
+          jobName: String(record.jobName || '').trim(),
+          rmReference: String(record.rmReference || record.session.rmReference || 'resource-consent').trim() || 'resource-consent',
+          savedAt: record.savedAt || record.session.exported || new Date().toISOString(),
+          session: record.session
+        };
+        const key = sharedRmSessionRecordKey(clean);
+        if (!key) return;
+        const existing = byKey.get(key);
+        const existingTime = Date.parse(existing && existing.savedAt || '') || 0;
+        const cleanTime = Date.parse(clean.savedAt || '') || 0;
+        if (!existing || cleanTime >= existingTime) byKey.set(key, clean);
+      });
+      const cleaned = Array.from(byKey.values())
+        .sort((a, b) => (Date.parse(b.savedAt || '') || 0) - (Date.parse(a.savedAt || '') || 0))
+        .slice(0, 80);
+      try { localStorage.setItem(SHARED_RM_SESSIONS_KEY, JSON.stringify(cleaned)); } catch(e) {}
+      return cleaned;
+    }
+
+    function sharedRmSessionRecordsForBackup() {
+      return readSharedRmSessionRecords();
+    }
+
+    function applySharedRmSessionRecords(records) {
+      if (!Array.isArray(records) || !records.length) return;
+      writeSharedRmSessionRecords([...readSharedRmSessionRecords(), ...records]);
+    }
+
+    function rememberSharedRmSessionRecord(link, session) {
+      const sharedSession = safeClonePlainObject(session);
+      if (!link || !sharedSession) return null;
+      const record = {
+        jobNum: link.jobNum || '',
+        jobName: link.jobName || '',
+        rmReference: link.rmReference || sharedSession.rmReference || 'resource-consent',
+        savedAt: link.savedAt || sharedSession.exported || new Date().toISOString(),
+        session: sharedSession
+      };
+      writeSharedRmSessionRecords([...readSharedRmSessionRecords(), record]);
+      return record;
+    }
+
+    function teamSnapshotJobMatches(jobNum, predicate = null) {
+      const target = normalizedJobNumber(jobNum);
+      if (!target) return [];
+      const matches = [];
+      (supabaseTeamSnapshots || []).forEach(row => {
+        const state = row && row.state;
+        if (!state || !Array.isArray(state.jobs)) return;
+        state.jobs.forEach(sharedJob => {
+          if (!sharedJob || normalizedJobNumber(sharedJob.jobNum) !== target) return;
+          if (predicate && !predicate(sharedJob, row)) return;
+          matches.push({ row, job: sharedJob });
+        });
+      });
+      return matches;
+    }
+
+    function sharedOwnerLabel(row) {
+      return (row && (row.user_name || row.username)) || 'Team member';
+    }
+
+    function sharedDivideLinkForJob(job) {
+      if (!job || !job.jobNum) return null;
+      const candidates = teamSnapshotJobMatches(job.jobNum, sharedJob => !!String(sharedJob.divideUrl || '').trim())
+        .map(match => ({
+          url: String(match.job.divideUrl || '').trim(),
+          details: match.job.divideDetails && typeof match.job.divideDetails === 'object' ? match.job.divideDetails : {},
+          updatedAt: match.job.updatedAt || Date.parse(match.row && match.row.updated_at || '') || 0,
+          shared: true,
+          sharedFromUserId: String(match.row && match.row.user_id || ''),
+          sharedFromUserName: sharedOwnerLabel(match.row)
+        }))
+        .filter(link => link.url)
+        .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+      return candidates[0] || null;
+    }
+
+    function jobDivideLink(job) {
       if (!job) return null;
-      const stored = readStoredJobRmLink(job.id);
-      const current = job.rmSession && typeof job.rmSession === 'object' ? job.rmSession : null;
+      const localUrl = String(job.divideUrl || '').trim();
+      if (localUrl) {
+        return {
+          url: localUrl,
+          details: job.divideDetails && typeof job.divideDetails === 'object' ? job.divideDetails : {},
+          shared: false,
+          sharedFromUserName: ''
+        };
+      }
+      return sharedDivideLinkForJob(job);
+    }
+
+    function rmSharedSessionFromLink(link) {
+      const session = link && (link.sharedSession || link.session);
+      return session && typeof session === 'object' ? session : null;
+    }
+
+    function normaliseRmLink(link, fallbackJob = null, owner = null) {
+      if (!link || typeof link !== 'object') return null;
+      const sharedSession = rmSharedSessionFromLink(link);
+      const normalised = {
+        jobId: link.jobId || (fallbackJob && fallbackJob.id) || '',
+        jobNum: link.jobNum || (fallbackJob && fallbackJob.jobNum) || '',
+        jobName: link.jobName || (fallbackJob && fallbackJob.desc) || '',
+        rmReference: link.rmReference || (sharedSession && sharedSession.rmReference) || '',
+        savedAt: link.savedAt || (sharedSession && sharedSession.exported) || '',
+        latestPath: link.latestPath || '',
+        relativePath: link.relativePath || '',
+        fileName: link.fileName || '',
+        shared: !!link.shared,
+        sharedFromUserId: link.sharedFromUserId || (owner && owner.user_id) || '',
+        sharedFromUserName: link.sharedFromUserName || sharedOwnerLabel(owner),
+        sharedSession
+      };
+      if (!normalised.rmReference && !normalised.latestPath && !normalised.sharedSession) return null;
+      return normalised;
+    }
+
+    function localJobRmLink(job) {
+      if (!job) return null;
+      const stored = normaliseRmLink(readStoredJobRmLink(job.id), job, null);
+      const current = normaliseRmLink(job.rmSession && typeof job.rmSession === 'object' ? job.rmSession : null, job, null);
       if (!stored) return current;
       if (!current) return stored;
       const storedTime = Date.parse(stored.savedAt || '') || 0;
@@ -7241,11 +7471,79 @@
       return storedTime >= currentTime ? stored : current;
     }
 
+    function sharedRmSessionCandidatesForJob(job) {
+      if (!job || !job.jobNum) return [];
+      const target = normalizedJobNumber(job.jobNum);
+      const candidates = [];
+
+      readSharedRmSessionRecords().forEach(record => {
+        if (!record || normalizedJobNumber(record.jobNum) !== target || !record.session) return;
+        candidates.push({
+          record,
+          owner: null,
+          updatedAt: Date.parse(record.savedAt || record.session.exported || '') || 0
+        });
+      });
+
+      (supabaseTeamSnapshots || []).forEach(row => {
+        const state = row && row.state;
+        if (!state) return;
+        (Array.isArray(state.sharedRmSessions) ? state.sharedRmSessions : []).forEach(record => {
+          if (!record || normalizedJobNumber(record.jobNum) !== target || !record.session) return;
+          candidates.push({
+            record,
+            owner: row,
+            updatedAt: Date.parse(record.savedAt || record.session.exported || row.updated_at || '') || 0
+          });
+        });
+        (Array.isArray(state.jobs) ? state.jobs : []).forEach(sharedJob => {
+          if (!sharedJob || normalizedJobNumber(sharedJob.jobNum) !== target) return;
+          const rmSession = sharedJob.rmSession && typeof sharedJob.rmSession === 'object' ? sharedJob.rmSession : null;
+          const sharedSession = rmSharedSessionFromLink(rmSession);
+          if (!sharedSession) return;
+          candidates.push({
+            record: {
+              jobNum: sharedJob.jobNum || '',
+              jobName: sharedJob.desc || '',
+              rmReference: rmSession.rmReference || sharedSession.rmReference || 'resource-consent',
+              savedAt: rmSession.savedAt || sharedSession.exported || row.updated_at || '',
+              session: sharedSession
+            },
+            owner: row,
+            updatedAt: Date.parse(rmSession.savedAt || sharedSession.exported || row.updated_at || '') || 0
+          });
+        });
+      });
+
+      return candidates.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+    }
+
+    function sharedRmLinkForJob(job) {
+      const candidate = sharedRmSessionCandidatesForJob(job)[0];
+      if (!candidate || !candidate.record) return null;
+      return normaliseRmLink({
+        jobId: job.id,
+        jobNum: job.jobNum || candidate.record.jobNum || '',
+        jobName: job.desc || candidate.record.jobName || '',
+        rmReference: candidate.record.rmReference || '',
+        savedAt: candidate.record.savedAt || '',
+        shared: true,
+        sharedFromUserId: String(candidate.owner && candidate.owner.user_id || ''),
+        sharedFromUserName: candidate.owner ? sharedOwnerLabel(candidate.owner) : 'this browser',
+        sharedSession: candidate.record.session
+      }, job, candidate.owner);
+    }
+
+    function jobRmLink(job) {
+      return localJobRmLink(job) || sharedRmLinkForJob(job);
+    }
+
     function rememberJobRmLink(link, shouldSave = true) {
       if (!link || !link.jobId) return false;
       const job = jobs.find(j => j.id === link.jobId);
       if (!job) return false;
       normalizeJobRecord(job);
+      const sharedSession = rmSharedSessionFromLink(link);
       job.rmSession = {
         jobId: link.jobId,
         jobNum: link.jobNum || job.jobNum || '',
@@ -7256,6 +7554,7 @@
         relativePath: link.relativePath || '',
         fileName: link.fileName || ''
       };
+      if (sharedSession) rememberSharedRmSessionRecord(job.rmSession, sharedSession);
       try { localStorage.setItem(jobRmStorageKey(job.id), JSON.stringify(job.rmSession)); } catch(e) {}
       if (shouldSave) saveToStorage();
       return true;
@@ -7264,12 +7563,22 @@
     function refreshJobRmLinksFromStorage() {
       let changed = false;
       jobs.forEach(job => {
-        const stored = readStoredJobRmLink(job.id);
+        const stored = normaliseRmLink(readStoredJobRmLink(job.id), job, null);
         if (!stored) return;
         const currentTime = Date.parse(job.rmSession?.savedAt || '') || 0;
         const storedTime = Date.parse(stored.savedAt || '') || 0;
         if (!job.rmSession || storedTime >= currentTime) {
-          job.rmSession = stored;
+          job.rmSession = {
+            jobId: stored.jobId,
+            jobNum: stored.jobNum || job.jobNum || '',
+            jobName: stored.jobName || job.desc || '',
+            rmReference: stored.rmReference || '',
+            savedAt: stored.savedAt || '',
+            latestPath: stored.latestPath || '',
+            relativePath: stored.relativePath || '',
+            fileName: stored.fileName || ''
+          };
+          if (stored.sharedSession) rememberSharedRmSessionRecord(job.rmSession, stored.sharedSession);
           changed = true;
         }
       });
@@ -7278,6 +7587,25 @@
         scheduleSilentBackup();
         scheduleSupabaseSyncSoon();
       }
+    }
+
+    function prepareSharedRmSessionForTool(job, link) {
+      const sharedSession = rmSharedSessionFromLink(link);
+      if (!job || !link || !sharedSession || !isLocalAppHost()) return;
+      const envelope = {
+        ok: true,
+        app: 'cfma-taska-rm-session',
+        version: 1,
+        jobId: job.id,
+        jobNum: job.jobNum || link.jobNum || '',
+        jobName: job.desc || link.jobName || '',
+        rmReference: link.rmReference || sharedSession.rmReference || 'resource-consent',
+        savedAt: link.savedAt || sharedSession.exported || new Date().toISOString(),
+        sharedFromUserId: link.sharedFromUserId || '',
+        sharedFromUserName: link.sharedFromUserName || '',
+        session: sharedSession
+      };
+      try { localStorage.setItem(sharedRmToolStorageKey(job.id), JSON.stringify(envelope)); } catch(e) {}
     }
 
     function rmToolUrl(job, options = {}) {
@@ -7298,10 +7626,14 @@
         flashJobStatus(jobId, localSessionUnavailableMessage('RM consent tool'), true);
         return;
       }
+      const link = jobRmLink(job);
+      const sharedFallback = rmSharedSessionFromLink(link) ? link : sharedRmLinkForJob(job);
+      prepareSharedRmSessionForTool(job, sharedFallback);
       const url = rmToolUrl(job, options);
       const opened = window.open(url, '_blank');
       if (!opened) window.location.href = url;
-      flashJobStatus(jobId, options.replace ? 'Opening RM tool to replace the linked consent...' : (jobRmLink(job) ? 'Opening linked RM session...' : 'Opening RM tool to link a consent...'));
+      const sharedText = link && link.shared ? ` shared by ${link.sharedFromUserName || 'the team'}` : '';
+      flashJobStatus(jobId, options.replace ? 'Opening RM tool to replace the linked consent...' : (link ? `Opening linked RM session${sharedText}...` : 'Opening RM tool to link a consent...'));
     }
 
     function replaceJobRmLink(jobId) {
@@ -7356,7 +7688,8 @@
       if (type === 'rm') {
         addItem(jobRmLink(job) ? 'Replace RM' : 'Link RM', () => replaceJobRmLink(jobId));
       } else {
-        addItem(job.divideUrl ? 'Replace Divide' : 'Link Divide', () => handleJobDivideButton({ stopPropagation(){}, shiftKey: true }, jobId));
+        const divideLink = jobDivideLink(job);
+        addItem(job.divideUrl ? 'Replace Divide' : (divideLink ? 'Save/replace Divide' : 'Link Divide'), () => handleJobDivideButton({ stopPropagation(){}, shiftKey: true }, jobId));
         if (job.divideUrl) {
           addItem('Remove Divide', () => {
             job.divideUrl = '';
@@ -7383,7 +7716,7 @@
       const label = ref ? `RM ${ref}` : 'Link RM';
       const saved = link && link.savedAt ? ` Saved ${outlookScanDateLabel(link.savedAt)}` : '';
       const title = ref
-        ? `Open latest linked Resource Consent ${ref}.${saved}`
+        ? `Open ${link.shared ? 'shared ' : ''}linked Resource Consent ${ref}.${saved}${link.shared ? ` Shared by ${link.sharedFromUserName || 'team member'}.` : ''}`
         : 'Link a Resource Consent to this job';
       return `<button class="job-rm-btn ${ref ? 'linked' : ''}" onclick="openJobRmTool('${job.id}')" oncontextmenu="return showJobLinkMenu(event,'${job.id}','rm')" title="${escHtml(title)}">${escHtml(label)}</button>`;
     }
@@ -7416,13 +7749,15 @@
       const job = jobs.find(j => j.id === jobId);
       if (!job) return;
       normalizeJobRecord(job);
+      const divideLink = jobDivideLink(job);
+      const divideUrl = divideLink && divideLink.url ? divideLink.url : '';
 
-      if (job.divideUrl && !(event && (event.shiftKey || event.ctrlKey || event.metaKey))) {
-        window.open(job.divideUrl, '_blank');
+      if (divideUrl && !(event && (event.shiftKey || event.ctrlKey || event.metaKey))) {
+        window.open(divideUrl, '_blank');
         return;
       }
 
-      const current = job.divideUrl || DIVIDE_JOB_BASE_URL;
+      const current = job.divideUrl || divideUrl || DIVIDE_JOB_BASE_URL;
       const entered = prompt('Paste the Divide job URL, or paste just the Divide job id.', current);
       if (entered === null) return;
       if (!entered.trim()) {
@@ -7450,20 +7785,24 @@
     }
 
     function jobDivideButtonHtml(job) {
-      const url = (job.divideUrl || '').trim();
+      const link = jobDivideLink(job);
+      const url = link && link.url ? link.url : '';
       const title = url
-        ? `Open linked Divide job. Shift-click to edit: ${url}`
+        ? `Open ${link.shared ? 'shared ' : ''}linked Divide job. Shift-click to save or edit: ${url}${link.shared ? ` Shared by ${link.sharedFromUserName || 'team member'}.` : ''}`
         : 'Link this Taska job to a Divide job URL';
       return `<button class="job-divide-btn ${url ? 'linked' : ''}" onclick="handleJobDivideButton(event,'${job.id}')" oncontextmenu="return showJobLinkMenu(event,'${job.id}','divide')" title="${escHtml(title)}">${url ? 'Divide' : 'Link Divide'}</button>`;
     }
 
     function jobDivideDetails(job) {
       normalizeJobRecord(job);
+      const link = jobDivideLink(job);
+      if (link && link.details && !job.divideUrl) return link.details;
       return job.divideDetails;
     }
 
     function jobDivideSummary(job) {
       const d = jobDivideDetails(job);
+      const link = jobDivideLink(job);
       const parts = [];
       if (d.dpNumber) parts.push(d.dpNumber);
       if (d.fieldDaysRecorded) parts.push(`${d.fieldDaysRecorded}d`);
@@ -7474,8 +7813,10 @@
         d.fieldDaysRecorded ? `Field days recorded: ${d.fieldDaysRecorded}` : '',
         d.requiredMarksRemaining ? `Required marks remaining: ${d.requiredMarksRemaining}` : ''
       ].filter(Boolean);
+      if (link && link.shared) titleParts.push(`Shared by ${link.sharedFromUserName || 'team member'}`);
+      const displayLabel = link && link.shared ? label.replace(/^Divide/, 'Shared Divide') : label;
       return {
-        label,
+        label: displayLabel,
         title: titleParts.length ? `${titleParts.join(' | ')}. Right-click to replace Divide link.` : 'Right-click to replace Divide link'
       };
     }
@@ -7491,25 +7832,28 @@
     }
 
     function jobDivideDetailsHtml(job) {
-      if (!job.divideUrl) return '';
+      const link = jobDivideLink(job);
+      if (!link || !link.url) return '';
       const d = jobDivideDetails(job);
+      const readonly = link.shared && !job.divideUrl;
+      const readonlyAttrs = readonly ? 'readonly title="Shared Divide details. Shift-click Divide to save this link locally before editing."' : '';
       return `
         <div class="job-divide-details">
-          <div class="job-divide-details-title">Divide</div>
+          <div class="job-divide-details-title">${readonly ? `Shared Divide - ${escHtml(link.sharedFromUserName || 'team member')}` : 'Divide'}</div>
           <label class="job-divide-field">
             <span>DP</span>
             <input type="text" placeholder="DP number" value="${escHtml(d.dpNumber)}"
-              oninput="updateJobDivideDetail('${job.id}','dpNumber',this.value)">
+              ${readonlyAttrs} ${readonly ? '' : `oninput="updateJobDivideDetail('${job.id}','dpNumber',this.value)"`}>
           </label>
           <label class="job-divide-field">
             <span>Days</span>
             <input type="text" inputmode="decimal" placeholder="0" value="${escHtml(d.fieldDaysRecorded)}"
-              oninput="updateJobDivideDetail('${job.id}','fieldDaysRecorded',this.value)">
+              ${readonlyAttrs} ${readonly ? '' : `oninput="updateJobDivideDetail('${job.id}','fieldDaysRecorded',this.value)"`}>
           </label>
           <label class="job-divide-field">
             <span>Marks</span>
             <input type="text" inputmode="numeric" placeholder="0" value="${escHtml(d.requiredMarksRemaining)}"
-              oninput="updateJobDivideDetail('${job.id}','requiredMarksRemaining',this.value)">
+              ${readonlyAttrs} ${readonly ? '' : `oninput="updateJobDivideDetail('${job.id}','requiredMarksRemaining',this.value)"`}>
           </label>
         </div>`;
     }
@@ -9714,6 +10058,16 @@
       if (calendarViewTab !== 'gmail' && activeWorkTab === 'gmail') {
         setWorkTab('jobs');
       }
+      renderTaskCalendar();
+    }
+
+    function setYourWorkAssignedVisible(checked) {
+      yourWorkAssignedVisible = !!checked;
+      localStorage.setItem(YOUR_WORK_ASSIGNED_VISIBLE_KEY, yourWorkAssignedVisible ? '1' : '0');
+      hideCalendarJobDetails();
+      hideCalendarLogEditor();
+      hideCalendarReminderDetails();
+      hideGmailCalendarEditor();
       renderTaskCalendar();
     }
 
@@ -13406,6 +13760,24 @@
         });
     }
 
+    function teamCalendarAssignmentRows() {
+      if (!supabaseConfigured()) return supabaseTeamSnapshots || [];
+      const cfg = supabaseConfig();
+      const currentId = String(cfg.userId || '');
+      const rows = (supabaseTeamSnapshots || [])
+        .filter(row => row && String(row.user_id || '') !== currentId);
+      if (currentId) {
+        rows.push({
+          user_id: currentId,
+          user_name: cfg.userName,
+          username: cfg.userName,
+          state: buildAppBackupPayload(),
+          updated_at: new Date().toISOString()
+        });
+      }
+      return rows;
+    }
+
     function selectedTeamCalendarPerson(people = teamCalendarPeople()) {
       if (!people.length) {
         selectedTeamCalendarUserId = '';
@@ -13473,6 +13845,12 @@
       if (!supabaseConfigured()) return '';
       const peopleRows = teamCalendarPeople();
       const selected = selectedTeamCalendarPerson(peopleRows);
+      const assignmentRows = teamCalendarAssignmentRows();
+      const assignedCountsByUser = new Map();
+      peopleRows.forEach(person => {
+        const assignedCount = collectAssignedParentDeadlineTasksForUser(person.user_id, null, assignmentRows, person.user_id).length;
+        if (assignedCount) assignedCountsByUser.set(person.user_id, assignedCount);
+      });
       const updated = localStorage.getItem(SUPABASE_LAST_SYNC_KEY);
       const syncedCount = peopleRows.filter(person => person.row && person.row.state).length;
       const status = `${peopleRows.length} team calendar${peopleRows.length === 1 ? '' : 's'} available${syncedCount ? ` | ${syncedCount} synced` : ''}${updated ? ` | refreshed ${outlookScanDateLabel(updated)}` : ''}`;
@@ -13483,31 +13861,45 @@
       const tabs = peopleRows.map(person => {
         const synced = !!(person.row && person.row.state);
         const active = selected && person.user_id === selected.user_id;
-        const label = `${person.user_name || 'Team member'}${person.isCurrent ? ' (you)' : ''}`;
+        const assignedCount = assignedCountsByUser.get(person.user_id) || 0;
+        const assignedLabel = assignedCount ? ` (${assignedCount} assigned)` : '';
+        const label = `${person.user_name || 'Team member'}${person.isCurrent ? ' (you)' : ''}${assignedLabel}`;
         const title = synced
-          ? `Synced ${outlookScanDateLabel(person.row.updated_at)}`
-          : 'No saved calendar yet';
+          ? `Synced ${outlookScanDateLabel(person.row.updated_at)}${assignedCount ? ` | ${assignedCount} task${assignedCount === 1 ? '' : 's'} assigned to them` : ''}`
+          : (assignedCount ? `${assignedCount} assigned task${assignedCount === 1 ? '' : 's'}, no saved calendar yet` : 'No saved calendar yet');
         return `<button class="team-person-tab ${active ? 'active' : ''} ${synced ? '' : 'waiting'}" onclick="setTeamCalendarPerson('${encodeCalendarDetailParam(person.user_id)}')" title="${escHtml(title)}">${escHtml(label)}</button>`;
       }).join('');
 
-      if (!selected || !selected.row || !selected.row.state) {
-        return `<div class="team-calendar-section"><div class="team-calendar-heading">Shared Work Calendars ${refresh}</div><div class="team-person-tabs">${tabs}</div><div class="calendar-empty-week">${escHtml(status)}. Select a synced person to see their work calendar.</div></div>`;
+      if (!selected) {
+        return `<div class="team-calendar-section"><div class="team-calendar-heading">Shared Work Calendars ${refresh}</div><div class="team-person-tabs">${tabs}</div><div class="calendar-empty-week">${escHtml(status)}. Select a team member to see their work calendar.</div></div>`;
       }
 
-      const state = selected.row.state || {};
+      const selectedAssignedCount = assignedCountsByUser.get(selected.user_id) || 0;
+      const hasSelectedState = !!(selected.row && selected.row.state);
+      if (!hasSelectedState && !selectedAssignedCount) {
+        return `<div class="team-calendar-section"><div class="team-calendar-heading">Shared Work Calendars ${refresh}</div><div class="team-person-tabs">${tabs}</div><div class="calendar-empty-week">${escHtml(status)}. ${escHtml(selected.user_name || 'This person')} has no saved calendar or assigned work yet.</div></div>`;
+      }
+
+      const state = hasSelectedState ? (selected.row.state || {}) : { jobs: [], weeks: [], calendarReminders: [] };
       const weekRows = [];
       calendarVisibleWeekStarts(firstMonday, TEAM_CALENDAR_WEEK_COUNT).forEach(weekStart => {
-        const assignedDeadlines = collectAssignedParentDeadlineTasksForUser(selected.user_id, weekStart, supabaseTeamSnapshots, selected.user_id);
+        const assignedDeadlines = collectAssignedParentDeadlineTasksForUser(selected.user_id, weekStart, assignmentRows, selected.user_id);
         weekRows.push(renderReadonlySnapshotWeek(weekStart, state, todayStr, assignedDeadlines, selected));
       });
-      const selectedUpdated = selected.row.updated_at ? `Synced ${outlookScanDateLabel(selected.row.updated_at)}` : 'Live on this browser';
+      const selectedUpdated = hasSelectedState
+        ? (selected.row.updated_at ? `Synced ${outlookScanDateLabel(selected.row.updated_at)}` : 'Live on this browser')
+        : `${selectedAssignedCount} assigned task${selectedAssignedCount === 1 ? '' : 's'} - no saved calendar yet`;
       const selectedLabel = `${selected.user_name || 'Team member'}${selected.isCurrent ? ' (you)' : ''}`;
+      const assignedOnlyNotice = hasSelectedState
+        ? ''
+        : `<div class="calendar-empty-week">${escHtml(selected.user_name || 'This person')} has assigned work from the team, but has not synced their own calendar yet.</div>`;
       return `
         <div class="team-calendar-section">
           <div class="team-calendar-heading">Shared Work Calendars ${refresh}</div>
           <div class="team-person-tabs">${tabs}</div>
           <div class="calendar-empty-week">${escHtml(status)}</div>
           <div class="team-calendar-person">${escHtml(selectedLabel)} - ${escHtml(selectedUpdated)}</div>
+          ${assignedOnlyNotice}
           ${weekRows.join('')}
         </div>`;
     }
@@ -13585,6 +13977,42 @@
 
       body.innerHTML = `<div class="calendar-empty-week">${escHtml(summary)}</div>${weeks.join('')}`;
       restoreOrScrollCalendarToCurrent(body, shouldScrollPreviousWeek ? 0 : previousScrollTop, shouldScrollPreviousWeek ? -1 : 0);
+    }
+
+    function renderYourWorkAssignedToggle(assignmentsCount) {
+      const countLabel = assignmentsCount
+        ? `${assignmentsCount} open assigned task${assignmentsCount === 1 ? '' : 's'}`
+        : 'None assigned by you';
+      return `
+        <div class="calendar-work-options">
+          <label class="calendar-work-option">
+            <input type="checkbox" ${yourWorkAssignedVisible ? 'checked' : ''} onchange="setYourWorkAssignedVisible(this.checked)">
+            <span>Show work assigned by you</span>
+            <em>${escHtml(countLabel)}</em>
+          </label>
+        </div>`;
+    }
+
+    function renderAssignedByYouCalendarBars(weekStart, assignments, todayStr) {
+      const weekEnd = addCalendarDays(weekStart, 4);
+      const visible = (assignments || []).filter(item => item.due >= weekStart && item.due <= weekEnd);
+      return visible.map(item => {
+        const colStart = businessDayColumn(item.due) + 1;
+        const isDueToday = toLocalDateStr(item.due) === todayStr;
+        const jobParam = encodeCalendarDetailParam(item.jobId);
+        const taskParam = encodeCalendarDetailParam(item.taskIdx);
+        const subParam = encodeCalendarDetailParam(item.subIdx);
+        const title = `${item.label} | assigned by you to ${item.assigneeName || 'team member'} | due ${shortDateLabel(item.due)}`;
+        return `
+          <div class="calendar-task-bar ${isDueToday ? 'due-today' : ''} assigned-deadline assigned-by-you"
+            onclick="showOutgoingAssignedTaskDetails(event,'${jobParam}','${taskParam}','${subParam}')"
+            style="grid-column:${colStart} / ${colStart + 1}; --job-color:${escHtml(item.color)};"
+            title="${escHtml(title)}">
+            <span class="calendar-assigned-symbol">A</span>
+            <span class="calendar-task-label">${escHtml(item.label)}</span>
+            <span class="calendar-hours-badge">${escHtml(item.assigneeName)}</span>
+          </div>`;
+      }).join('');
     }
 
     function calendarVisibleWeekStarts(firstMonday, futureWeekCount = TASK_CALENDAR_WEEK_COUNT) {
@@ -13989,6 +14417,8 @@
       }
 
       const tasks = collectCalendarTasks();
+      const assignedByYou = collectOutgoingAssignedTasks();
+      const visibleAssignedByYou = yourWorkAssignedVisible ? assignedByYou : [];
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const todayStr = toLocalDateStr(today);
@@ -13996,10 +14426,10 @@
       const weeks = [];
 
       for (const weekStart of calendarVisibleWeekStarts(firstMonday)) {
-        weeks.push(renderCalendarWeek(weekStart, tasks, collectCalendarMeetingsForWeek(weekStart), todayStr));
+        weeks.push(renderCalendarWeek(weekStart, tasks, collectCalendarMeetingsForWeek(weekStart), todayStr, visibleAssignedByYou));
       }
 
-      body.innerHTML = weeks.join('');
+      body.innerHTML = renderYourWorkAssignedToggle(assignedByYou.length) + weeks.join('');
       restoreOrScrollCalendarToCurrent(body, shouldScrollPreviousWeek ? 0 : previousScrollTop, shouldScrollPreviousWeek ? -1 : 0);
     }
 
@@ -15125,7 +15555,7 @@
         </div>`;
     }
 
-    function renderCalendarWeek(weekStart, tasks, meetings, todayStr) {
+    function renderCalendarWeek(weekStart, tasks, meetings, todayStr, assignedByYou = []) {
       const weekEnd = addCalendarDays(weekStart, 4);
       const label = `Week of ${shortDateLabel(weekStart)} - ${shortDateLabel(weekEnd)}`;
       const weekStartStr = toLocalDateStr(weekStart);
@@ -15236,13 +15666,19 @@
           </div>`;
       }).join('');
 
-      const bars = pastDayOverlays + (reminderBars + logBars + taskBars + meetingBars || '<div class="calendar-empty-week">No scheduled tasks, logs, reminders, or meetings.</div>');
+      const assignedByYouBars = renderAssignedByYouCalendarBars(weekStart, assignedByYou, todayStr);
+      const normalBars = reminderBars + logBars + taskBars + meetingBars;
+      const bars = pastDayOverlays + (normalBars || '<div class="calendar-empty-week">No scheduled tasks, logs, reminders, or meetings.</div>');
+      const assignedByYouSection = assignedByYouBars
+        ? `<div class="calendar-assigned-by-you-label">Assigned by you</div><div class="calendar-bars calendar-assigned-by-you-layer">${pastDayOverlays}${assignedByYouBars}</div>`
+        : '';
 
       return `
         <div class="calendar-week"${calendarCurrentWeekAttr(weekStart)}>
           <div class="calendar-week-label">${label}</div>
           <div class="calendar-day-head">${dayHeads}</div>
           <div class="calendar-bars" ondragover="handleCalendarDragOver(event)" ondragleave="handleCalendarDragLeave(event)" ondrop="handleCalendarDrop(event,'${weekStartStr}')">${bars}</div>
+          ${assignedByYouSection}
         </div>`;
     }
 
@@ -15262,6 +15698,7 @@
         sidebarNotes: document.getElementById('sidebar-notes')?.value || localStorage.getItem('ljm-sidebar-notes') || '',
         calendarReminders,
         gmailCalendarItems,
+        sharedRmSessions: sharedRmSessionRecordsForBackup(),
         manualMeetings: typeof manualMeetings !== 'undefined' ? manualMeetings : []
       };
     }
@@ -15827,6 +16264,9 @@
           gmailCalendarItems = data.gmailCalendarItems.map(normalizeGmailCalendarItem);
           localStorage.setItem(GMAIL_CALENDAR_ITEMS_KEY, JSON.stringify(gmailCalendarItems));
         }
+        if (Array.isArray(data.sharedRmSessions)) {
+          applySharedRmSessionRecords(data.sharedRmSessions);
+        }
         if (Array.isArray(data.manualMeetings)) {
           manualMeetings = data.manualMeetings;
           localStorage.setItem(MANUAL_MEETINGS_KEY, JSON.stringify(manualMeetings));
@@ -15899,7 +16339,10 @@
         if (!resp.ok) throw new Error(`Supabase returned ${resp.status}`);
         const rows = await resp.json();
         supabaseTeamSnapshots = Array.isArray(rows) ? rows : [];
-        if (shouldRender && taskCalendarOpen) renderTaskCalendar();
+        if (shouldRender) {
+          renderJobsPreservingFocus();
+          if (taskCalendarOpen) renderTaskCalendar();
+        }
       } catch(e) {
         const label = document.getElementById('last-saved-label');
         if (label) label.textContent = `Team calendar load failed: ${e.message || 'check setup'}`;

@@ -1185,6 +1185,7 @@ const taskaJobNum = (taskaParams.get('jobNum') || '').trim();
 const taskaJobName = (taskaParams.get('jobName') || '').trim();
 const taskaReplaceMode = taskaParams.get('replace') === '1';
 const taskaRmLinkKey = taskaJobId ? 'cfma-rm-link-' + taskaJobId : '';
+const taskaSharedRmSessionKey = taskaJobId ? 'cfma-rm-shared-session-' + taskaJobId : '';
 let taskaRmSaveTimer = null;
 let taskaRmLastSavedJson = '';
 let taskaRmLoadedFromServer = false;
@@ -1280,6 +1281,7 @@ function buildProgressObject() {
 
 function rememberTaskaRmLink(envelope) {
   if (!taskaRmLinkKey || !envelope) return;
+  const currentSession = envelope.session || buildProgressObject();
   const link = {
     jobId: envelope.jobId || taskaJobId,
     jobNum: envelope.jobNum || taskaJobNum,
@@ -1288,7 +1290,8 @@ function rememberTaskaRmLink(envelope) {
     savedAt: envelope.savedAt || new Date().toISOString(),
     latestPath: envelope.latestPath || '',
     relativePath: envelope.relativePath || '',
-    fileName: envelope.fileName || ''
+    fileName: envelope.fileName || '',
+    sharedSession: currentSession || null
   };
   try { localStorage.setItem(taskaRmLinkKey, JSON.stringify(link)); } catch (_) {}
   try {
@@ -1317,7 +1320,9 @@ async function saveLinkedRmSession() {
   const ref = session.rmReference || 'resource-consent';
   updateTaskaLinkBanner('Saving linked RM session...');
   try {
-    const resp = await fetch('/api/rm-session?jobId=' + encodeURIComponent(taskaJobId), {
+    const saveParams = new URLSearchParams({ jobId: taskaJobId });
+    if (taskaJobNum) saveParams.set('jobNum', taskaJobNum);
+    const resp = await fetch('/api/rm-session?' + saveParams.toString(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1384,6 +1389,32 @@ function applySessionObject(obj, options = {}) {
   return true;
 }
 
+function loadSharedTaskaRmSessionFallback() {
+  if (!taskaSharedRmSessionKey) return false;
+  let envelope = null;
+  try {
+    const raw = localStorage.getItem(taskaSharedRmSessionKey);
+    envelope = raw ? JSON.parse(raw) : null;
+  } catch (_) {
+    envelope = null;
+  }
+  if (!envelope || !envelope.session) return false;
+  const localEnvelope = {
+    ...envelope,
+    jobId: taskaJobId,
+    jobNum: taskaJobNum || envelope.jobNum || '',
+    jobName: taskaJobName || envelope.jobName || '',
+    rmReference: envelope.rmReference || envelope.session.rmReference || '',
+    savedAt: envelope.savedAt || envelope.session.exported || new Date().toISOString()
+  };
+  if (!applySessionObject(localEnvelope)) return false;
+  try { localStorage.removeItem(taskaSharedRmSessionKey); } catch (_) {}
+  const from = envelope.sharedFromUserName ? ` from ${envelope.sharedFromUserName}` : '';
+  updateTaskaLinkBanner(`Opened shared RM${from}. Saving a local copy...`);
+  scheduleLinkedRmSave(120);
+  return true;
+}
+
 async function loadLinkedRmSession() {
   if (!taskaJobId || taskaRmLoadedFromServer) return;
   taskaRmLoadedFromServer = true;
@@ -1393,15 +1424,27 @@ async function loadLinkedRmSession() {
   }
   updateTaskaLinkBanner('Checking Taska for a linked RM session...');
   try {
-    const resp = await fetch('/api/rm-session?jobId=' + encodeURIComponent(taskaJobId));
+    const loadParams = new URLSearchParams({ jobId: taskaJobId });
+    if (taskaJobNum) loadParams.set('jobNum', taskaJobNum);
+    const resp = await fetch('/api/rm-session?' + loadParams.toString());
     if (resp.status === 404) {
+      if (loadSharedTaskaRmSessionFallback()) return;
       updateTaskaLinkBanner('No linked RM yet. Load a JSON or analyse a PDF to attach one.');
       return;
     }
     const envelope = await resp.json();
     if (!resp.ok) throw new Error(envelope.error || ('HTTP ' + resp.status));
-    if (applySessionObject(envelope, { skipSave: true })) {
-      updateTaskaLinkBanner(`Opened latest linked RM ${envelope.rmReference || ''}`.trim());
+    const relinkFromJobNumber = envelope.jobId && envelope.jobId !== taskaJobId;
+    const localEnvelope = {
+      ...envelope,
+      jobId: taskaJobId,
+      jobNum: taskaJobNum || envelope.jobNum || '',
+      jobName: taskaJobName || envelope.jobName || ''
+    };
+    if (applySessionObject(localEnvelope, { skipSave: !relinkFromJobNumber })) {
+      updateTaskaLinkBanner(relinkFromJobNumber
+        ? `Opened RM ${localEnvelope.rmReference || ''} by job number. Saving a local link...`.trim()
+        : `Opened latest linked RM ${localEnvelope.rmReference || ''}`.trim());
     } else {
       updateTaskaLinkBanner('Linked RM file was found but could not be loaded.');
     }

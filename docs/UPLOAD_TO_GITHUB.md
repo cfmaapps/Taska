@@ -42,11 +42,7 @@ node_modules/
 
 These are private, local, generated, or machine-specific files.
 
-When running locally, `server.ps1` keeps these folders outside the repo by default in:
-
-```text
-../Taska Local Data/
-```
+When running locally, `server.ps1` keeps these folders beside `Start Server.bat` by default. They are private/local files and are excluded by `.gitignore`.
 
 ## Easy Check
 

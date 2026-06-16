@@ -3,10 +3,11 @@ $appRoot = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInv
 $appRoot = [System.IO.Path]::GetFullPath($appRoot)
 $root = [System.IO.Path]::GetFullPath((Split-Path -Parent $appRoot))
 $appUrlSegment = 'Timewrap'
+$legacyLocalDataRoot = [System.IO.Path]::GetFullPath((Join-Path $root 'Taska Local Data'))
 $localDataRoot = if (-not [string]::IsNullOrWhiteSpace($env:TASKA_LOCAL_DATA_ROOT)) {
     [string]$env:TASKA_LOCAL_DATA_ROOT
 } else {
-    Join-Path $root 'Taska Local Data'
+    $appRoot
 }
 $localDataRoot = [System.IO.Path]::GetFullPath($localDataRoot)
 $localDataFolders = @('Backups', 'Job Emails', 'RM Sessions', 'Useful Documents')
@@ -38,15 +39,25 @@ function Get-UniqueLocalDataPath {
     return $candidate
 }
 
-function Move-RepoLocalDataItem {
-    param([string]$Name)
+function Move-LocalDataItem {
+    param(
+        [string]$SourceRoot,
+        [string]$TargetRoot,
+        [string]$Name
+    )
 
-    $source = [System.IO.Path]::GetFullPath((Join-Path $appRoot $Name))
-    $target = [System.IO.Path]::GetFullPath((Join-Path $localDataRoot $Name))
-    $appPrefix = $appRoot.TrimEnd('\') + '\'
-    $dataPrefix = $localDataRoot.TrimEnd('\') + '\'
-    if (-not $source.StartsWith($appPrefix, [System.StringComparison]::OrdinalIgnoreCase)) { return }
-    if (-not $target.StartsWith($dataPrefix, [System.StringComparison]::OrdinalIgnoreCase)) { return }
+    if ([string]::IsNullOrWhiteSpace($SourceRoot) -or [string]::IsNullOrWhiteSpace($TargetRoot) -or [string]::IsNullOrWhiteSpace($Name)) { return }
+
+    $sourceRootFull = [System.IO.Path]::GetFullPath($SourceRoot)
+    $targetRootFull = [System.IO.Path]::GetFullPath($TargetRoot)
+    $source = [System.IO.Path]::GetFullPath((Join-Path $sourceRootFull $Name))
+    $target = [System.IO.Path]::GetFullPath((Join-Path $targetRootFull $Name))
+    if ($source.Equals($target, [System.StringComparison]::OrdinalIgnoreCase)) { return }
+
+    $sourcePrefix = $sourceRootFull.TrimEnd('\') + '\'
+    $targetPrefix = $targetRootFull.TrimEnd('\') + '\'
+    if (-not $source.StartsWith($sourcePrefix, [System.StringComparison]::OrdinalIgnoreCase)) { return }
+    if (-not $target.StartsWith($targetPrefix, [System.StringComparison]::OrdinalIgnoreCase)) { return }
 
     if (Test-Path -LiteralPath $source -PathType Container) {
         if (-not (Test-Path -LiteralPath $target -PathType Container)) {
@@ -90,8 +101,15 @@ function Move-RepoLocalDataItem {
     }
 }
 
-foreach ($folder in $localDataFolders) { Move-RepoLocalDataItem $folder }
-foreach ($file in $localDataFiles) { Move-RepoLocalDataItem $file }
+if (-not $legacyLocalDataRoot.Equals($localDataRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
+    foreach ($folder in $localDataFolders) { Move-LocalDataItem -SourceRoot $legacyLocalDataRoot -TargetRoot $localDataRoot -Name $folder }
+    foreach ($file in $localDataFiles) { Move-LocalDataItem -SourceRoot $legacyLocalDataRoot -TargetRoot $localDataRoot -Name $file }
+}
+
+if (-not $appRoot.Equals($localDataRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
+    foreach ($folder in $localDataFolders) { Move-LocalDataItem -SourceRoot $appRoot -TargetRoot $localDataRoot -Name $folder }
+    foreach ($file in $localDataFiles) { Move-LocalDataItem -SourceRoot $appRoot -TargetRoot $localDataRoot -Name $file }
+}
 
 $listener = New-Object System.Net.HttpListener
 $listener.Prefixes.Add("http://localhost:$port/")
@@ -291,6 +309,39 @@ function Get-RmSessionFileName {
     if ($ref -eq 'unknown') { $ref = 'resource-consent' }
     $stamp = (Get-Date).ToString('yyyyMMdd-HHmmss')
     return "$ref-$stamp.json"
+}
+
+function Find-RmSessionByJobNumber {
+    param([string]$JobNum)
+
+    $target = ([string]$JobNum).Trim()
+    if ([string]::IsNullOrWhiteSpace($target)) { return $null }
+
+    $rmRoot = Get-AppFilePath 'RM Sessions'
+    if (-not (Test-Path $rmRoot -PathType Container)) { return $null }
+
+    $best = $null
+    foreach ($folder in Get-ChildItem -Path $rmRoot -Directory -ErrorAction SilentlyContinue) {
+        $latest = Join-Path $folder.FullName 'latest.json'
+        if (-not (Test-Path $latest -PathType Leaf)) { continue }
+        try {
+            $raw = Get-Content -Path $latest -Raw -Encoding UTF8
+            $json = $raw | ConvertFrom-Json
+            if (([string]$json.jobNum).Trim() -ne $target) { continue }
+            $savedAt = [datetime]::MinValue
+            if (-not [datetime]::TryParse([string]$json.savedAt, [ref]$savedAt)) {
+                $savedAt = (Get-Item -Path $latest).LastWriteTimeUtc
+            }
+            if ($null -eq $best -or $savedAt -gt $best.SavedAt) {
+                $best = [pscustomobject]@{
+                    Path = $latest
+                    Raw = $raw
+                    SavedAt = $savedAt
+                }
+            }
+        } catch {}
+    }
+    return $best
 }
 
 function Open-FolderWithExplorer {
@@ -1837,6 +1888,7 @@ while ($listener.IsListening) {
     if ($path -eq 'api/rm-session') {
         try {
             $jobId = [string]$req.QueryString['jobId']
+            $jobNumQuery = [string]$req.QueryString['jobNum']
             if ($req.HttpMethod -eq 'GET') {
                 if ([string]::IsNullOrWhiteSpace($jobId)) {
                     Write-JsonResponse $res 400 @{ ok = $false; error = 'Missing jobId.' }
@@ -1846,6 +1898,12 @@ while ($listener.IsListening) {
                 $folder = Get-RmSessionFolder -JobId $jobId
                 $latest = Join-Path $folder 'latest.json'
                 if (-not (Test-Path $latest -PathType Leaf)) {
+                    $byJobNum = Find-RmSessionByJobNumber -JobNum $jobNumQuery
+                    if ($null -ne $byJobNum) {
+                        Write-TextResponse $res 200 'application/json; charset=utf-8' $byJobNum.Raw
+                        Write-Host "  [RM] Loaded linked session for job number $jobNumQuery" -ForegroundColor Cyan
+                        continue
+                    }
                     Write-JsonResponse $res 404 @{ ok = $false; error = 'No linked RM session found for this job.' }
                     continue
                 }

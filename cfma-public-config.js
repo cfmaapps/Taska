@@ -8,6 +8,7 @@
 // Never put a Supabase secret key or service role key in this file.
 window.CFMA_TASKA_CONFIG = {
   appUrl: 'https://cfmaapps.github.io/Taska/',
+  aiKeyOwner: 'Lachlan',
   supabase: {
     url: 'https://yuacwrehzltupcwiucoc.supabase.co',
     publishableKey: 'sb_publishable_xJiw1uj3RfQL9tPttB8KYQ_pYXdqU1Z',

@@ -474,6 +474,10 @@ function Get-OpenAiModel {
     return 'gpt-5.4-mini'
 }
 
+function Get-AiApiKeyOwnerMessage {
+    return 'Come see Lachlan for API key to use this tool, you will only need to see him once.'
+}
+
 function ConvertTo-ValidUtf16Text {
     param([string]$Text)
 
@@ -721,7 +725,7 @@ function Invoke-TimewrapOpenAiExtraction {
 
     $api = Get-OpenAiApiKey
     if ([string]::IsNullOrWhiteSpace($api.key)) {
-        throw 'AI is not configured. Click AI Setup and paste an OpenAI API key, or set OPENAI_API_KEY before starting the server.'
+        throw (Get-AiApiKeyOwnerMessage)
     }
 
     $today = ConvertTo-SafeAiText $Payload.today 32
@@ -988,7 +992,7 @@ function Invoke-TimewrapOutlookTriage {
 
     $api = Get-OpenAiApiKey
     if ([string]::IsNullOrWhiteSpace($api.key)) {
-        throw 'AI is not configured. Click AI Setup and paste an OpenAI API key, or set OPENAI_API_KEY before starting the server.'
+        throw (Get-AiApiKeyOwnerMessage)
     }
 
     $userPayload = [ordered]@{
@@ -1051,7 +1055,7 @@ function Invoke-TimewrapWeeklyBriefing {
 
     $api = Get-OpenAiApiKey
     if ([string]::IsNullOrWhiteSpace($api.key)) {
-        throw 'AI is not configured. Click AI Setup and paste an OpenAI API key, or set OPENAI_API_KEY before starting the server.'
+        throw (Get-AiApiKeyOwnerMessage)
     }
 
     $userPayload = [ordered]@{
@@ -1770,7 +1774,7 @@ while ($listener.IsListening) {
                 $apiKey = [string]$storedApi.key
             }
             if ([string]::IsNullOrWhiteSpace($apiKey) -or -not $apiKey.StartsWith('sk-')) {
-                Write-JsonResponse $res 503 @{ ok = $false; error = 'AI is not configured. Click AI Setup in Taska and save an OpenAI API key first.' }
+                Write-JsonResponse $res 503 @{ ok = $false; error = (Get-AiApiKeyOwnerMessage) }
                 continue
             }
 
@@ -2106,6 +2110,7 @@ while ($listener.IsListening) {
                 configured = -not [string]::IsNullOrWhiteSpace($api.key)
                 source = $api.source
                 model = Get-OpenAiModel
+                helpMessage = (Get-AiApiKeyOwnerMessage)
             }
         } catch {
             Write-JsonResponse $res 500 @{ ok = $false; error = 'Could not read AI status.' }

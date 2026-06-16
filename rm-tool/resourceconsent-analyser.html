@@ -809,7 +809,7 @@
             <svg id="eyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           </button>
         </div>
-        <p class="fh">Leave blank when the hosted endpoint has <code>OPENAI_API_KEY</code> configured. If entered, the key is used for this session only and sent through the same-origin <code>/api/openai</code> proxy.</p>
+        <p class="fh">Come see Lachlan for API key to use this tool, you will only need to see him once. If you are setting this up, the key is used for this session only and sent through the same-origin <code>/api/openai</code> proxy.</p>
       </div>
 
       <div class="fg" style="margin-top:20px">
@@ -1178,6 +1178,7 @@ let flatConditionMetaCache = null;
 let conditionsPanelDirty = false;
 let pmScanState = { inFlight: false, promise: null, startedTab: '', showResponsibilities: false, error: '' };
 const AI_ENDPOINT = window.RC_ANALYSER_API_ENDPOINT || '/api/openai';
+const AI_KEY_OWNER_MESSAGE = 'Come see Lachlan for API key to use this tool, you will only need to see him once.';
 const taskaParams = new URLSearchParams(window.location.search);
 const taskaJobId = (taskaParams.get('jobId') || '').trim();
 const taskaJobNum = (taskaParams.get('jobNum') || '').trim();
@@ -1233,6 +1234,12 @@ function togglePw() {
 
 function manualApiKey() {
   return (document.getElementById('manualApiKey')?.value || '').trim();
+}
+
+function aiProxyErrorMessage(message) {
+  return /not configured|save an openai api key|click ai setup/i.test(message || '')
+    ? AI_KEY_OWNER_MESSAGE
+    : message;
 }
 
 function taskaJobLabel() {
@@ -1662,7 +1669,7 @@ async function openaiOnce(messages, maxTokens) {
   const apiKey = manualApiKey();
   if (apiKey) {
     if (!apiKey.startsWith('sk-')) {
-      throw new Error('OpenAI API keys usually start with "sk-". Please check the key or leave the field blank to use the hosted server key.');
+      throw new Error('OpenAI API keys usually start with "sk-". Please check the key or leave the field blank if Lachlan has already set this tool up.');
     }
   }
 
@@ -1691,7 +1698,8 @@ async function openaiOnce(messages, maxTokens) {
     if (err.fallbackModel) details.push('fallback ' + err.fallbackModel);
     if (err.upstream) details.push('upstream: ' + err.upstream);
     const suffix = details.length ? ' (' + details.join('; ') + ')' : '';
-    throw new Error((err.error || err.message || 'AI endpoint error: ' + res.status) + suffix);
+    const baseMessage = err.error || err.message || 'AI endpoint error: ' + res.status;
+    throw new Error(aiProxyErrorMessage(baseMessage) + suffix);
   }
   return res.json();
 }
@@ -2018,7 +2026,7 @@ async function startAnalysis() {
 
   if (!selFile) return showErr('Please select a PDF file to analyse.');
   if (manualApiKey() && !manualApiKey().startsWith('sk-')) {
-    return showErr('OpenAI API keys usually start with "sk-". Please check the key or leave the field blank to use the hosted server key.');
+    return showErr('OpenAI API keys usually start with "sk-". Please check the key or leave the field blank if Lachlan has already set this tool up.');
   }
 
   btn.disabled = true;

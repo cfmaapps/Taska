@@ -335,6 +335,11 @@
     .gantt-edit-status { display: none; border-radius: var(--r); padding: 7px 9px; margin: 0 0 10px; font-size: .76rem; line-height: 1.4; background: #eef8f0; border: 1px solid #abd6b8; color: #1f6a38; }
     .gantt-edit-status.active { display: block; }
     .gantt-edit-status.error { background: var(--danger-l); border-color: #f5b7b1; color: var(--danger); }
+    .taska-gantt-toggle { display: flex; align-items: flex-start; gap: 10px; border: 1.5px solid #9fcfb0; border-radius: var(--r); background: #eef8f0; color: #1f6a38; padding: 10px 12px; margin: 0 0 14px; font-size: .82rem; line-height: 1.4; cursor: pointer; }
+    .taska-gantt-toggle input { margin-top: 2px; accent-color: var(--success); flex-shrink: 0; }
+    .taska-gantt-toggle strong { display: block; color: #1f6a38; font-size: .86rem; margin-bottom: 2px; }
+    .taska-gantt-toggle span { display: block; color: #49795a; font-size: .76rem; }
+    .gantt-head .taska-gantt-toggle { max-width: 360px; margin: 0; }
     @media (max-width: 760px) {
       .prog-item { grid-template-columns: auto 1fr; }
       .prog-party-editor, .prog-select, .prog-time, .prog-remove { grid-column: 2; width: 100%; }
@@ -4728,6 +4733,7 @@ function renderGanttChart() {
   if (!allEntries.length) {
     content.innerHTML = `
       <div class="gantt-panel">
+        ${renderTaskaGanttToggle()}
         <div class="pm-empty">No action items have been added yet.</div>
         <div class="gantt-unscheduled" data-gantt-unscheduled-drop="true">
           <div class="gantt-unscheduled-head">
@@ -4812,6 +4818,7 @@ function renderGanttChart() {
           <h3>Gantt Chart</h3>
           <p>${x(niceDate(chartStart))} to ${x(niceDate(chartEnd))} - weekdays only</p>
         </div>
+        ${renderTaskaGanttToggle()}
         <div class="gantt-summary">
           <span class="gantt-chip">${timed.length} timed</span>
           <span class="gantt-chip">${doneCount} complete</span>
@@ -6077,6 +6084,7 @@ function defaultPmState() {
     responsibilityDone: {},
     hiddenResponsibilities: {},
     manualResponsibilities: [],
+    showGanttOnTaska: false,
     progressItems: {}
   };
 }
@@ -6146,6 +6154,7 @@ function ensurePmState() {
     evidence: String(r.evidence || '').trim(),
     confidence: String(r.confidence || 'manual').trim()
   })).filter(r => r.partyKey && r.conditionKey);
+  pmState.showGanttOnTaska = !!pmState.showGanttOnTaska;
   if (!pmState.progressItems || typeof pmState.progressItems !== 'object' || Array.isArray(pmState.progressItems)) {
     pmState.progressItems = {};
   }
@@ -6291,6 +6300,26 @@ function setPmParty(field, value, rerender = false) {
   if (rerender) autoSave();
   else autoSaveSoon();
   if (rerender) renderProjectTeamPanel({ preserveScroll: true });
+}
+
+function setPmShowGanttOnTaska(value) {
+  ensurePmState();
+  pmState.showGanttOnTaska = !!value;
+  autoSave();
+  if (conditionsTab === 'gantt') renderGanttChart();
+  if (conditionsTab === 'project') renderProjectTeamPanel({ preserveScroll: true });
+}
+
+function renderTaskaGanttToggle() {
+  ensurePmState();
+  return `
+    <label class="taska-gantt-toggle">
+      <input type="checkbox"${pmState.showGanttOnTaska ? ' checked' : ''} onchange="setPmShowGanttOnTaska(this.checked)">
+      <span>
+        <strong>Show Gantt items on Taska</strong>
+        <span>Add this RM tracker's Gantt items to the Taska RC 224(c) calendar.</span>
+      </span>
+    </label>`;
 }
 
 function setPmContractor(idx, field, value) {
@@ -6877,6 +6906,7 @@ function renderPmTeamWizard() {
           <button class="btn btn-outline btn-sm" onclick="addPmManualTeamContractor()" type="button">Add Contractor</button>
         </div>
       </div>
+      ${renderTaskaGanttToggle()}
       <div class="pm-team-bubbles" id="pmTeamBubbles">${renderPmTeamBubbles(steps)}</div>
       <div class="pm-team-shell">
         <div class="pm-step-list" id="pmTeamStepList">${renderPmTeamStepList(steps)}</div>
@@ -7156,6 +7186,7 @@ function renderPmParties() {
     <div class="pm-panel">
       <h3>Project Team</h3>
       <p>Enter the known parties. The scan uses these names when assigning consent-condition responsibilities.</p>
+      ${renderTaskaGanttToggle()}
       <div class="pm-field">
         <label>Developer</label>
         <input class="pm-input" value="${xt(p.developer)}" placeholder="Developer / applicant" oninput="setPmParty('developer',this.value)">

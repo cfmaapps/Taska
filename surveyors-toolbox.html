@@ -13673,108 +13673,9 @@
       return Array.from(new Set(keys.map(key => String(key || '').trim()).filter(Boolean)));
     }
 
-    function rmPartySearchText(value) {
-      return String(value || '').trim().toLowerCase();
-    }
-
-    function rmPartyLooksLikeCfma(...values) {
-      const text = values.map(rmPartySearchText).filter(Boolean).join(' ');
-      return /\bc\.?\s*f\.?\s*m\.?\s*a\.?\b|clark\s+fortune|fortune\s+mcdonald|mcdonald\s+(?:&\s*)?associates/.test(text);
-    }
-
-    function rmPartyLooksLikeCfmaSurveyor(...values) {
-      const text = values.map(rmPartySearchText).filter(Boolean).join(' ');
-      return rmPartyLooksLikeCfma(text) || /surveyor|surveying/.test(text);
-    }
-
-    function rmEffectiveResponsibilityRows(pmState) {
-      const scanned = Array.isArray(pmState && pmState.analysis && pmState.analysis.responsibilityMatrix)
-        ? pmState.analysis.responsibilityMatrix
-        : [];
-      const manual = Array.isArray(pmState && pmState.manualResponsibilities)
-        ? pmState.manualResponsibilities
-        : [];
-      return scanned.concat(manual).filter(row => row && typeof row === 'object');
-    }
-
-    function rmSurveyorPartyKeys(pmState) {
-      const p = pmState && pmState.parties || {};
-      const keys = new Set(['surveyor']);
-      if (p.surveyorIsEngineer) keys.add('engineer');
-      if (p.surveyorIsProjectManager) keys.add('projectManager');
-      if (p.surveyorIsMainContractor) keys.add('mainContractor');
-      [
-        ['surveyor', p.surveyor, 'Surveyor'],
-        ['engineer', p.engineer, 'Engineer'],
-        ['projectManager', p.projectManager, 'Project Manager'],
-        ['mainContractor', p.mainContractor, 'Main Contractor'],
-        ['solicitor', p.solicitor, 'Solicitor'],
-        ['powerContractor', p.powerContractor, 'Power Contractor'],
-        ['telecomContractor', p.telecomContractor, 'Telecom / Fibre Contractor'],
-        ['gasContractor', p.gasContractor, 'Gas Contractor']
-      ].forEach(([key, name, role]) => {
-        if (rmPartyLooksLikeCfmaSurveyor(key, name, role)) keys.add(key);
-      });
-      (Array.isArray(p.extraContractors) ? p.extraContractors : []).forEach((contractor, idx) => {
-        const role = contractor && contractor.role || '';
-        const name = contractor && contractor.name || '';
-        const key = 'contractor_' + idx + '_' + String(role || 'other').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
-        if (rmPartyLooksLikeCfmaSurveyor(key, name, role)) keys.add(key);
-      });
-      rmEffectiveResponsibilityRows(pmState).forEach(row => {
-        const key = String(row.partyKey || '').trim();
-        if (key && rmPartyLooksLikeCfmaSurveyor(key, row.partyLabel, row.role, row.responsibility, row.action)) keys.add(key);
-      });
-      return keys;
-    }
-
-    function rmPmHasNamedCfmaParty(pmState) {
-      const p = pmState && pmState.parties || {};
-      if ([
-        p.surveyor,
-        p.engineer,
-        p.projectManager,
-        p.mainContractor,
-        p.solicitor,
-        p.powerContractor,
-        p.telecomContractor,
-        p.gasContractor
-      ].some(value => rmPartyLooksLikeCfma(value))) return true;
-      if ((Array.isArray(p.extraContractors) ? p.extraContractors : [])
-        .some(contractor => rmPartyLooksLikeCfma(contractor && contractor.name, contractor && contractor.role))) return true;
-      return rmEffectiveResponsibilityRows(pmState)
-        .some(row => rmPartyLooksLikeCfma(row.partyKey, row.partyLabel, row.role));
-    }
-
-    function rmRowMatchesCondition(row, conditionKey, meta) {
-      const rowKey = String(row && row.conditionKey || '').trim();
-      if (rowKey && rowKey === conditionKey) return true;
-      const rowNumber = String(row && row.conditionNumber || '').trim();
-      const metaNumber = String(meta && meta.number || '').trim();
-      if (!rowNumber || !metaNumber || rowNumber !== metaNumber) return false;
-      const rowSource = String(row && row.source || '').toLowerCase();
-      const metaSource = String(meta && meta.source || '').toLowerCase();
-      const rowEa = rowSource.includes('engineering acceptance') || rowSource.includes('engineering review') || rowSource.includes('acceptance');
-      const metaEa = /^ea_/.test(conditionKey) || metaSource.includes('engineering acceptance') || metaSource.includes('engineering review') || metaSource.includes('acceptance');
-      return rowEa === metaEa || !rowSource;
-    }
-
-    function rmConditionRelatesToSurveyor(conditionKey, meta, pmState, surveyorKeys) {
-      return rmEffectiveResponsibilityRows(pmState)
-        .filter(row => rmRowMatchesCondition(row, conditionKey, meta))
-        .some(row => {
-          const partyKey = String(row.partyKey || '').trim();
-          return (partyKey && surveyorKeys.has(partyKey)) ||
-            rmPartyLooksLikeCfmaSurveyor(partyKey, row.partyLabel, row.role, row.responsibility, row.action);
-        });
-    }
-
-    function rmItemRelatesToSurveyor(item, pmState, conditionKey, meta) {
-      const surveyorKeys = rmSurveyorPartyKeys(pmState);
-      const keys = rmProgressAssigneeKeys(item);
-      if (keys.some(key => surveyorKeys.has(key) || rmPartyLooksLikeCfmaSurveyor(key))) return true;
-      if (!keys.length && rmPmHasNamedCfmaParty(pmState)) return true;
-      return rmConditionRelatesToSurveyor(conditionKey, meta, pmState, surveyorKeys);
+    function rmSessionShowsGanttOnTaska(session) {
+      const pm = session && session.pmState;
+      return !!(pm && pm.showGanttOnTaska);
     }
 
     function rmPriorityKey(value) {
@@ -13790,6 +13691,7 @@
         normalizeJobRecord(job);
         if (job.dormant) return;
         const session = rmSessionForJob(job);
+        if (!rmSessionShowsGanttOnTaska(session)) return;
         const pm = session && session.pmState;
         const progressItems = pm && pm.progressItems && typeof pm.progressItems === 'object' && !Array.isArray(pm.progressItems)
           ? pm.progressItems
@@ -13807,7 +13709,7 @@
               number: '',
               text: ''
             };
-            if (!item || !rmItemRelatesToSurveyor(item, pm, conditionKey, meta)) return;
+            if (!item) return;
             const startRaw = parseTaskDate(item.startDate);
             const endRaw = parseTaskDate(item.endDate || item.startDate);
             const start = startRaw ? toBusinessDay(startRaw) : null;
@@ -14911,7 +14813,7 @@
         <div class="calendar-rc-summary">
           <div>
             <strong>Resource consent 224(c) work</strong>
-            <span>Surveyor/CFMA Gantt items from linked Resource Consent trackers.</span>
+            <span>Gantt items from linked Resource Consent trackers enabled for Taska.</span>
           </div>
           <div class="calendar-rc-stats">
             <span class="calendar-rc-pill">${pending} open</span>
@@ -14977,7 +14879,7 @@
         <div class="calendar-week"${calendarCurrentWeekAttr(weekStart)}>
           <div class="calendar-week-label">${label}</div>
           <div class="calendar-day-head">${dayHeads}</div>
-          <div class="calendar-bars">${pastDayOverlays}${bars || '<div class="calendar-empty-week">No Surveyor RM Gantt work this week.</div>'}</div>
+          <div class="calendar-bars">${pastDayOverlays}${bars || '<div class="calendar-empty-week">No enabled RM Gantt work this week.</div>'}</div>
         </div>`;
     }
 
@@ -14992,7 +14894,7 @@
       const unscheduled = items.filter(item => !item.start || !item.due);
 
       if (!items.length) {
-        body.innerHTML = '<div class="calendar-empty-week">No linked Resource Consent Gantt items assigned to Surveyor/CFMA yet.</div>';
+        body.innerHTML = '<div class="calendar-empty-week">No linked Resource Consent trackers have "Show Gantt items on Taska" enabled yet.</div>';
         return;
       }
 

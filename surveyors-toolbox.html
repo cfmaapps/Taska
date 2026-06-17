@@ -3596,6 +3596,116 @@
       box-shadow: inset 0 0 0 999px rgba(15, 23, 34, 0.32);
     }
 
+    .calendar-task-bar.rc-gantt-task {
+      cursor: pointer;
+      border-color: rgba(240, 165, 0, 0.72);
+      box-shadow: inset 0 0 0 999px rgba(17, 24, 39, 0.2);
+    }
+
+    .calendar-task-bar.rc-gantt-task.priority-urgent {
+      border-color: #fc8a6a;
+      box-shadow: inset 0 0 0 999px rgba(17, 24, 39, 0.1), 0 0 0 1px rgba(252, 138, 106, 0.5);
+    }
+
+    .calendar-task-bar.rc-gantt-task.priority-hold {
+      border-style: dashed;
+      border-color: #f0a500;
+    }
+
+    .calendar-rc-summary {
+      background: rgba(74, 144, 196, 0.12);
+      border: 1px solid rgba(74, 144, 196, 0.28);
+      border-radius: 8px;
+      color: #d8e5ef;
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding: 10px 12px;
+      flex-wrap: wrap;
+    }
+
+    .calendar-rc-summary strong {
+      color: #ffffff;
+      display: block;
+      font-size: 0.84rem;
+      margin-bottom: 2px;
+    }
+
+    .calendar-rc-summary span {
+      color: #9cb3c8;
+      display: block;
+      font-size: 0.72rem;
+    }
+
+    .calendar-rc-stats {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .calendar-rc-pill {
+      background: rgba(240, 165, 0, 0.13);
+      border: 1px solid rgba(240, 165, 0, 0.35);
+      border-radius: 999px;
+      color: #ffd079;
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      white-space: nowrap;
+    }
+
+    .calendar-rc-unscheduled {
+      border: 1px dashed rgba(156, 179, 200, 0.35);
+      border-radius: 8px;
+      margin-bottom: 12px;
+      padding: 10px 12px;
+    }
+
+    .calendar-rc-unscheduled-title {
+      color: #f0a500;
+      font-size: 0.72rem;
+      font-weight: 900;
+      margin-bottom: 7px;
+      text-transform: uppercase;
+    }
+
+    .calendar-rc-unscheduled-list {
+      display: grid;
+      gap: 6px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+
+    .calendar-rc-unscheduled-item {
+      background: rgba(15, 23, 34, 0.48);
+      border: 1px solid rgba(74, 144, 196, 0.24);
+      border-left: 4px solid var(--job-color, #4a90c4);
+      border-radius: 6px;
+      color: #d8e5ef;
+      cursor: pointer;
+      font-size: 0.72rem;
+      line-height: 1.25;
+      padding: 7px 9px;
+    }
+
+    .calendar-rc-unscheduled-item strong {
+      color: #ffffff;
+      display: block;
+      margin-bottom: 2px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .calendar-rc-unscheduled-item span {
+      color: #9cb3c8;
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
     .calendar-assigned-symbol {
       align-items: center;
       background: rgba(240, 165, 0, 0.18);
@@ -5780,6 +5890,7 @@
           <div class="task-calendar-title">Your Work Calendar</div>
           <div class="calendar-view-tabs">
             <button class="calendar-view-tab active" id="calendar-view-jobs" onclick="setCalendarView('jobs')">Your Work</button>
+            <button class="calendar-view-tab" id="calendar-view-rm" onclick="setCalendarView('rm')">RC 224(c)</button>
             <button class="calendar-view-tab" id="calendar-view-assigned" onclick="setCalendarView('assigned')">Assigned</button>
             <button class="calendar-view-tab" id="calendar-view-gmail" onclick="setCalendarView('gmail')" hidden>Gmail</button>
             <button class="calendar-view-tab" id="calendar-view-team" onclick="setCalendarView('team')">Team</button>
@@ -6765,7 +6876,7 @@
     let emailMenuEl = null;
     let jobLinkMenuEl = null;
     let taskCalendarOpen = true;
-    let calendarViewTab = ['jobs', 'assigned', 'team'].includes(localStorage.getItem('ljm-calendar-view-tab'))
+    let calendarViewTab = ['jobs', 'assigned', 'rm', 'gmail', 'team'].includes(localStorage.getItem('ljm-calendar-view-tab'))
       ? localStorage.getItem('ljm-calendar-view-tab')
       : 'jobs';
     const GMAIL_CALENDAR_ENABLED = false;
@@ -7614,6 +7725,7 @@
       if (job.jobNum) params.set('jobNum', job.jobNum);
       if (job.desc) params.set('jobName', job.desc);
       if (options.replace) params.set('replace', '1');
+      params.set('tab', options.tab || 'gantt');
       const path = `rm-tool/resourceconsent-analyser.html?${params.toString()}`;
       return isLocalAppHost() ? path : `http://localhost:8080/${path}`;
     }
@@ -8739,6 +8851,71 @@
         const taskInputs = document.querySelectorAll(`[data-job="${jobId}"] .task-text`);
         if (taskInputs.length) taskInputs[taskInputs.length - 1].focus();
       }
+    }
+
+    function createTaskFromRmTracker(payload = {}) {
+      const taskPayload = payload.task && typeof payload.task === 'object' ? payload.task : {};
+      const jobId = String(payload.jobId || '').trim();
+      const jobNum = String(payload.jobNum || '').trim();
+      const job = (jobId ? jobs.find(j => j.id === jobId) : null) || findJobByJobNumber(jobNum);
+      if (!job) {
+        throw new Error(jobNum ? `Could not find Taska job ${jobNum}.` : 'Could not find the Taska job for this consent tracker.');
+      }
+
+      normalizeJobRecord(job);
+      freezeJobOrderForEdit(job.id);
+      const now = new Date().toISOString();
+      const task = {
+        text: String(taskPayload.text || '').trim() || 'Resource consent task',
+        done: false,
+        emailId: '',
+        emailIds: [],
+        dueDate: '',
+        todoDays: '',
+        completedHours: '',
+        completedDate: '',
+        subtasks: [],
+        createdAt: now,
+        updatedAt: now,
+        rmSource: {
+          rmReference: String(taskPayload.rmReference || '').trim(),
+          conditionKey: String(taskPayload.conditionKey || '').trim(),
+          conditionNumber: String(taskPayload.conditionNumber || '').trim(),
+          conditionSource: String(taskPayload.conditionSource || '').trim(),
+          conditionStage: String(taskPayload.conditionStage || '').trim(),
+          progressItemId: String(taskPayload.progressItemId || '').trim()
+        }
+      };
+
+      job.tasks.push(task);
+      const taskIdx = job.tasks.length - 1;
+      const startDate = String(taskPayload.startDate || '').trim();
+      const endDate = String(taskPayload.endDate || startDate || '').trim();
+      const hadDates = !!(startDate || endDate);
+      const scheduled = hadDates ? setTaskDateRange(job.id, taskIdx, startDate || endDate, endDate || startDate) : false;
+      if (!scheduled) {
+        job.updatedAt = Date.now();
+        saveToStorage();
+        if (taskCalendarOpen) renderTaskCalendar();
+      }
+
+      setJobExpanded(job.id, true, false);
+      renderJobsPreservingFocus();
+      refreshTodayTasksView();
+      if (taskCalendarOpen) renderTaskCalendar();
+
+      const jobLabel = job.jobNum ? `job ${job.jobNum}` : 'the Taska job';
+      const dateNote = scheduled ? ' with matching dates' : (hadDates ? ' without dates because Taska could not read that date range' : '');
+      flashJobStatus(job.id, `Created task from consent tracker${dateNote}.`);
+      return { job, taskIdx, scheduled, message: `Created Taska task on ${jobLabel}${dateNote}.` };
+    }
+
+    function replyToRmTaskRequest(target, requestId, ok, message) {
+      try {
+        if (target && typeof target.postMessage === 'function') {
+          target.postMessage({ type: 'cfma-rm-task-created', requestId, ok, message }, '*');
+        }
+      } catch(e) {}
     }
 
     function deleteTask(jobId, idx) {
@@ -10047,7 +10224,7 @@
 
     function setCalendarView(tab) {
       const previousTab = calendarViewTab;
-      const allowedTabs = GMAIL_CALENDAR_ENABLED ? ['jobs', 'assigned', 'gmail', 'team'] : ['jobs', 'assigned', 'team'];
+      const allowedTabs = GMAIL_CALENDAR_ENABLED ? ['jobs', 'assigned', 'rm', 'gmail', 'team'] : ['jobs', 'assigned', 'rm', 'team'];
       calendarViewTab = allowedTabs.includes(tab) ? tab : 'jobs';
       if (previousTab !== calendarViewTab) calendarForcePreviousWeekTop = true;
       localStorage.setItem('ljm-calendar-view-tab', calendarViewTab);
@@ -10073,10 +10250,16 @@
 
     function updateCalendarViewTabs() {
       const jobsBtn = document.getElementById('calendar-view-jobs');
+      const rmBtn = document.getElementById('calendar-view-rm');
       const assignedBtn = document.getElementById('calendar-view-assigned');
       const gmailBtn = document.getElementById('calendar-view-gmail');
       const teamBtn = document.getElementById('calendar-view-team');
       if (jobsBtn) jobsBtn.classList.toggle('active', calendarViewTab === 'jobs');
+      if (rmBtn) {
+        const pendingRcCount = collectRmGanttCalendarItems().filter(item => !item.done).length;
+        rmBtn.classList.toggle('active', calendarViewTab === 'rm');
+        rmBtn.textContent = `RC 224(c)${pendingRcCount ? ' ' + pendingRcCount : ''}`;
+      }
       if (assignedBtn) {
         const assignedCount = collectOutgoingAssignedTasks().length;
         assignedBtn.classList.toggle('active', calendarViewTab === 'assigned');
@@ -13441,6 +13624,232 @@
       return items.sort((a, b) => a.due - b.due || a.start - b.start || a.label.localeCompare(b.label));
     }
 
+    function rmSessionForJob(job) {
+      const link = jobRmLink(job);
+      return rmSharedSessionFromLink(link);
+    }
+
+    function rmSessionConditionMetaMap(session) {
+      const d = session && session.data;
+      const out = new Map();
+      const add = (key, stage, source, list) => {
+        (Array.isArray(list) ? list : []).forEach((cond, idx) => {
+          out.set(`${key}_${idx}`, {
+            key: `${key}_${idx}`,
+            stage,
+            source,
+            number: cond && cond.number ? String(cond.number) : '',
+            text: cond && cond.text ? String(cond.text) : ''
+          });
+        });
+      };
+      const sc = d && d.conditions && d.conditions.subdivisionConditions || {};
+      const lc = d && d.conditions && d.conditions.landUseConditions || {};
+      add('sub_general', 'General Conditions', 'Resource Consent', sc.general);
+      add('sub_priorToWorks', 'Prior to Commencement of Works', 'Resource Consent', sc.priorToWorks);
+      add('sub_priorTo223', 'Prior to Section 223 Certificate', 'Resource Consent', sc.priorTo223);
+      add('sub_priorTo224c', 'Prior to Section 224(c) Certificate', 'Resource Consent', sc.priorTo224c);
+      add('sub_ongoing', 'Ongoing Conditions & Consent Notices', 'Resource Consent', sc.ongoing);
+      add('lu_general', 'General Conditions', 'Resource Consent', lc.general);
+      add('lu_duringConstruction', 'During Construction', 'Resource Consent', lc.duringConstruction);
+      add('lu_ongoing', 'Ongoing Conditions & Consent Notices', 'Resource Consent', lc.ongoing);
+      const ea = d && d.eaData;
+      (Array.isArray(ea && ea.eaConditions) ? ea.eaConditions : []).forEach((cond, idx) => {
+        out.set(`ea_${idx}`, {
+          key: `ea_${idx}`,
+          stage: 'Engineering Acceptance Conditions',
+          source: 'Engineering Acceptance',
+          number: cond && cond.number ? String(cond.number) : '',
+          text: cond && cond.text ? String(cond.text) : ''
+        });
+      });
+      return out;
+    }
+
+    function rmProgressAssigneeKeys(item) {
+      const keys = [];
+      if (Array.isArray(item && item.assigneeKeys)) keys.push(...item.assigneeKeys);
+      if (item && item.assigneeKey) keys.push(item.assigneeKey);
+      return Array.from(new Set(keys.map(key => String(key || '').trim()).filter(Boolean)));
+    }
+
+    function rmPartySearchText(value) {
+      return String(value || '').trim().toLowerCase();
+    }
+
+    function rmPartyLooksLikeCfma(...values) {
+      const text = values.map(rmPartySearchText).filter(Boolean).join(' ');
+      return /\bc\.?\s*f\.?\s*m\.?\s*a\.?\b|clark\s+fortune|fortune\s+mcdonald|mcdonald\s+(?:&\s*)?associates/.test(text);
+    }
+
+    function rmPartyLooksLikeCfmaSurveyor(...values) {
+      const text = values.map(rmPartySearchText).filter(Boolean).join(' ');
+      return rmPartyLooksLikeCfma(text) || /surveyor|surveying/.test(text);
+    }
+
+    function rmEffectiveResponsibilityRows(pmState) {
+      const scanned = Array.isArray(pmState && pmState.analysis && pmState.analysis.responsibilityMatrix)
+        ? pmState.analysis.responsibilityMatrix
+        : [];
+      const manual = Array.isArray(pmState && pmState.manualResponsibilities)
+        ? pmState.manualResponsibilities
+        : [];
+      return scanned.concat(manual).filter(row => row && typeof row === 'object');
+    }
+
+    function rmSurveyorPartyKeys(pmState) {
+      const p = pmState && pmState.parties || {};
+      const keys = new Set(['surveyor']);
+      if (p.surveyorIsEngineer) keys.add('engineer');
+      if (p.surveyorIsProjectManager) keys.add('projectManager');
+      if (p.surveyorIsMainContractor) keys.add('mainContractor');
+      [
+        ['surveyor', p.surveyor, 'Surveyor'],
+        ['engineer', p.engineer, 'Engineer'],
+        ['projectManager', p.projectManager, 'Project Manager'],
+        ['mainContractor', p.mainContractor, 'Main Contractor'],
+        ['solicitor', p.solicitor, 'Solicitor'],
+        ['powerContractor', p.powerContractor, 'Power Contractor'],
+        ['telecomContractor', p.telecomContractor, 'Telecom / Fibre Contractor'],
+        ['gasContractor', p.gasContractor, 'Gas Contractor']
+      ].forEach(([key, name, role]) => {
+        if (rmPartyLooksLikeCfmaSurveyor(key, name, role)) keys.add(key);
+      });
+      (Array.isArray(p.extraContractors) ? p.extraContractors : []).forEach((contractor, idx) => {
+        const role = contractor && contractor.role || '';
+        const name = contractor && contractor.name || '';
+        const key = 'contractor_' + idx + '_' + String(role || 'other').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+        if (rmPartyLooksLikeCfmaSurveyor(key, name, role)) keys.add(key);
+      });
+      rmEffectiveResponsibilityRows(pmState).forEach(row => {
+        const key = String(row.partyKey || '').trim();
+        if (key && rmPartyLooksLikeCfmaSurveyor(key, row.partyLabel, row.role, row.responsibility, row.action)) keys.add(key);
+      });
+      return keys;
+    }
+
+    function rmPmHasNamedCfmaParty(pmState) {
+      const p = pmState && pmState.parties || {};
+      if ([
+        p.surveyor,
+        p.engineer,
+        p.projectManager,
+        p.mainContractor,
+        p.solicitor,
+        p.powerContractor,
+        p.telecomContractor,
+        p.gasContractor
+      ].some(value => rmPartyLooksLikeCfma(value))) return true;
+      if ((Array.isArray(p.extraContractors) ? p.extraContractors : [])
+        .some(contractor => rmPartyLooksLikeCfma(contractor && contractor.name, contractor && contractor.role))) return true;
+      return rmEffectiveResponsibilityRows(pmState)
+        .some(row => rmPartyLooksLikeCfma(row.partyKey, row.partyLabel, row.role));
+    }
+
+    function rmRowMatchesCondition(row, conditionKey, meta) {
+      const rowKey = String(row && row.conditionKey || '').trim();
+      if (rowKey && rowKey === conditionKey) return true;
+      const rowNumber = String(row && row.conditionNumber || '').trim();
+      const metaNumber = String(meta && meta.number || '').trim();
+      if (!rowNumber || !metaNumber || rowNumber !== metaNumber) return false;
+      const rowSource = String(row && row.source || '').toLowerCase();
+      const metaSource = String(meta && meta.source || '').toLowerCase();
+      const rowEa = rowSource.includes('engineering acceptance') || rowSource.includes('engineering review') || rowSource.includes('acceptance');
+      const metaEa = /^ea_/.test(conditionKey) || metaSource.includes('engineering acceptance') || metaSource.includes('engineering review') || metaSource.includes('acceptance');
+      return rowEa === metaEa || !rowSource;
+    }
+
+    function rmConditionRelatesToSurveyor(conditionKey, meta, pmState, surveyorKeys) {
+      return rmEffectiveResponsibilityRows(pmState)
+        .filter(row => rmRowMatchesCondition(row, conditionKey, meta))
+        .some(row => {
+          const partyKey = String(row.partyKey || '').trim();
+          return (partyKey && surveyorKeys.has(partyKey)) ||
+            rmPartyLooksLikeCfmaSurveyor(partyKey, row.partyLabel, row.role, row.responsibility, row.action);
+        });
+    }
+
+    function rmItemRelatesToSurveyor(item, pmState, conditionKey, meta) {
+      const surveyorKeys = rmSurveyorPartyKeys(pmState);
+      const keys = rmProgressAssigneeKeys(item);
+      if (keys.some(key => surveyorKeys.has(key) || rmPartyLooksLikeCfmaSurveyor(key))) return true;
+      if (!keys.length && rmPmHasNamedCfmaParty(pmState)) return true;
+      return rmConditionRelatesToSurveyor(conditionKey, meta, pmState, surveyorKeys);
+    }
+
+    function rmPriorityKey(value) {
+      const raw = String(value || '').trim().toLowerCase().replace(/[\s_-]+/g, '-');
+      if (raw === 'hold' || raw === 'hold-point' || raw === 'holdpoint') return 'hold';
+      if (raw === 'urgent' || raw === 'high' || raw === 'high-priority') return 'urgent';
+      return '';
+    }
+
+    function collectRmGanttCalendarItems() {
+      const items = [];
+      jobs.forEach(job => {
+        normalizeJobRecord(job);
+        if (job.dormant) return;
+        const session = rmSessionForJob(job);
+        const pm = session && session.pmState;
+        const progressItems = pm && pm.progressItems && typeof pm.progressItems === 'object' && !Array.isArray(pm.progressItems)
+          ? pm.progressItems
+          : null;
+        if (!progressItems) return;
+
+        const metaMap = rmSessionConditionMetaMap(session);
+        const rmReference = session.rmReference || session.data?.consentDetails?.rmReference || jobRmLink(job)?.rmReference || '';
+        Object.entries(progressItems).forEach(([conditionKey, list]) => {
+          (Array.isArray(list) ? list : []).forEach(item => {
+            const meta = metaMap.get(conditionKey) || {
+              key: conditionKey,
+              stage: '',
+              source: '',
+              number: '',
+              text: ''
+            };
+            if (!item || !rmItemRelatesToSurveyor(item, pm, conditionKey, meta)) return;
+            const startRaw = parseTaskDate(item.startDate);
+            const endRaw = parseTaskDate(item.endDate || item.startDate);
+            const start = startRaw ? toBusinessDay(startRaw) : null;
+            const due = endRaw ? toBusinessDay(endRaw) : start;
+            const taskText = String(item.text || '').trim() || (meta.number ? `Condition ${meta.number}` : 'Resource consent action item');
+            const priority = rmPriorityKey(item.priority);
+            const assigneeKeys = rmProgressAssigneeKeys(item);
+            const id = [job.id, conditionKey, item.id || taskText].map(value => String(value || '').replace(/\|/g, '_')).join('|');
+            items.push({
+              id,
+              jobId: job.id,
+              jobNum: job.jobNum || '',
+              jobDesc: job.desc || '',
+              color: job.color || '#4a90c4',
+              rmReference,
+              conditionKey,
+              conditionNumber: meta.number || '',
+              conditionStage: meta.stage || '',
+              conditionSource: meta.source || '',
+              conditionText: meta.text || '',
+              progressItemId: String(item.id || ''),
+              text: taskText,
+              start,
+              due,
+              startDate: start ? toLocalDateStr(start) : '',
+              endDate: due ? toLocalDateStr(due) : '',
+              done: !!item.done,
+              milestone: !!item.milestone,
+              priority,
+              assigneeKeys,
+              label: `${job.jobNum ? job.jobNum + ' ' : ''}${taskText}`.trim()
+            });
+          });
+        });
+      });
+      return items.sort((a, b) =>
+        (a.due ? a.due.getTime() : Infinity) - (b.due ? b.due.getTime() : Infinity) ||
+        (a.start ? a.start.getTime() : Infinity) - (b.start ? b.start.getTime() : Infinity) ||
+        a.label.localeCompare(b.label)
+      );
+    }
+
     function completedTaskDay(task) {
       if (!task || !task.done) return null;
       let d = parseTaskDate(task.completedDate) || parseTaskDate(task.dueDate);
@@ -14391,6 +14800,209 @@
       hideCalendarLogEditor();
     }
 
+    function rmGanttCalendarItemById(itemId) {
+      return collectRmGanttCalendarItems().find(item => item.id === itemId) || null;
+    }
+
+    function rmGanttTaskPayload(entry) {
+      return {
+        jobId: entry.jobId,
+        jobNum: entry.jobNum,
+        jobName: entry.jobDesc,
+        task: {
+          text: entry.text,
+          startDate: entry.startDate || '',
+          endDate: entry.endDate || entry.startDate || '',
+          rmReference: entry.rmReference || '',
+          conditionKey: entry.conditionKey || '',
+          conditionNumber: entry.conditionNumber || '',
+          conditionSource: entry.conditionSource || '',
+          conditionStage: entry.conditionStage || '',
+          progressItemId: entry.progressItemId || ''
+        }
+      };
+    }
+
+    function openRmGanttFromCalendar(itemId) {
+      const entry = rmGanttCalendarItemById(itemId);
+      if (!entry) return;
+      openJobRmTool(entry.jobId, { tab: 'gantt' });
+    }
+
+    function createTaskaItemFromRmGanttCalendar(itemId) {
+      const entry = rmGanttCalendarItemById(itemId);
+      if (!entry) return;
+      try {
+        const result = createTaskFromRmTracker(rmGanttTaskPayload(entry));
+        hideCalendarJobDetails();
+        setCalendarView('jobs');
+        focusJobInTasksToDoIfActive(result.job.id, result.taskIdx);
+      } catch(e) {
+        alert(e.message || 'Could not create a Taska item from this RM task.');
+      }
+    }
+
+    function rmGanttCalendarDateLabel(entry) {
+      if (!entry.startDate && !entry.endDate) return 'No timing set';
+      if (entry.startDate === entry.endDate || !entry.endDate) return formatTaskDateInput(entry.startDate || entry.endDate);
+      return `${formatTaskDateInput(entry.startDate)} - ${formatTaskDateInput(entry.endDate)}`;
+    }
+
+    function rmGanttTaskDetailsHtml(entry) {
+      const itemId = encodeCalendarDetailParam(entry.id);
+      const jobId = encodeCalendarDetailParam(entry.jobId);
+      const conditionLabel = entry.conditionNumber ? `Condition ${entry.conditionNumber}` : (entry.conditionKey || 'RM condition');
+      const pills = [
+        entry.rmReference ? `RM ${entry.rmReference}` : '',
+        conditionLabel,
+        entry.conditionStage || '',
+        entry.priority === 'urgent' ? 'Urgent' : '',
+        entry.priority === 'hold' ? 'Hold point' : '',
+        entry.milestone ? 'Milestone' : '',
+        entry.done ? 'Complete' : 'Open'
+      ].filter(Boolean).map(label => `<span class="calendar-job-pill">${escHtml(label)}</span>`).join('');
+      return `
+        <div class="calendar-job-popover-head">
+          <div>
+            <div class="calendar-job-popover-title">${escHtml(entry.jobNum || 'No job #')}</div>
+            <div class="calendar-job-popover-desc">${escHtml(entry.jobDesc || entry.rmReference || 'Resource consent task')}</div>
+          </div>
+          <button class="calendar-job-popover-close" onclick="hideCalendarJobDetails()" title="Close">x</button>
+        </div>
+        <div class="calendar-job-meta">${pills}</div>
+        <div class="calendar-job-section-title">Resource Consent Gantt Task</div>
+        <div class="calendar-job-task-row">
+          <div class="calendar-job-task-text ${entry.done ? 'done' : ''}">${escHtml(entry.text)}</div>
+          <div class="calendar-job-task-date">${escHtml(rmGanttCalendarDateLabel(entry))}</div>
+        </div>
+        ${entry.conditionText ? `<div class="calendar-reminder-full-text">${escHtml(entry.conditionText)}</div>` : ''}
+        <div class="calendar-job-email-actions">
+          <button class="calendar-job-email-link" onclick="event.stopPropagation(); openRmGanttFromCalendar(decodeURIComponent('${itemId}'))">Open RM Gantt</button>
+          <button class="calendar-job-email-link" onclick="event.stopPropagation(); createTaskaItemFromRmGanttCalendar(decodeURIComponent('${itemId}'))">Make Taska Item</button>
+          <button class="calendar-job-email-link" onclick="event.stopPropagation(); focusJobInTasksToDoIfActive(decodeURIComponent('${jobId}'))">Open Job</button>
+        </div>`;
+    }
+
+    function showRmGanttTaskDetails(event, itemId) {
+      if (calendarDragSuppressClick) return;
+      event.stopPropagation();
+      const entry = rmGanttCalendarItemById(itemId);
+      if (!entry) return;
+      hideCalendarJobDetails();
+      hideCalendarLogEditor();
+      hideCalendarReminderDetails();
+      hideGmailCalendarEditor();
+
+      const pop = document.createElement('div');
+      pop.className = 'calendar-job-popover';
+      pop.style.setProperty('--job-color', entry.color || '#4a90c4');
+      pop.innerHTML = rmGanttTaskDetailsHtml(entry);
+      pop.addEventListener('click', e => e.stopPropagation());
+      document.body.appendChild(pop);
+      calendarJobPopupEl = pop;
+      positionCalendarJobPopup(pop, event.currentTarget);
+    }
+
+    function renderRmGanttCalendarSummary(items, dated, unscheduled) {
+      const pending = items.filter(item => !item.done).length;
+      const overdue = dated.filter(item => !item.done && item.due && item.due < todayDate()).length;
+      const jobsWithItems = new Set(items.map(item => item.jobId)).size;
+      return `
+        <div class="calendar-rc-summary">
+          <div>
+            <strong>Resource consent 224(c) work</strong>
+            <span>Surveyor/CFMA Gantt items from linked Resource Consent trackers.</span>
+          </div>
+          <div class="calendar-rc-stats">
+            <span class="calendar-rc-pill">${pending} open</span>
+            <span class="calendar-rc-pill">${dated.length} scheduled</span>
+            <span class="calendar-rc-pill">${unscheduled.length} without timing</span>
+            <span class="calendar-rc-pill">${overdue} overdue</span>
+            <span class="calendar-rc-pill">${jobsWithItems} job${jobsWithItems === 1 ? '' : 's'}</span>
+          </div>
+        </div>`;
+    }
+
+    function renderRmGanttUnscheduled(items) {
+      if (!items.length) return '';
+      const rows = items.slice(0, 30).map(item => {
+        const itemId = encodeCalendarDetailParam(item.id);
+        const meta = [item.rmReference ? `RM ${item.rmReference}` : '', item.conditionNumber ? `Cond ${item.conditionNumber}` : '', item.conditionStage].filter(Boolean).join(' - ');
+        return `
+          <button type="button" class="calendar-rc-unscheduled-item" style="--job-color:${escHtml(item.color)}"
+            onclick="showRmGanttTaskDetails(event,decodeURIComponent('${itemId}'))">
+            <strong>${escHtml(item.label)}</strong>
+            <span>${escHtml(meta || 'No timing set')}</span>
+          </button>`;
+      }).join('');
+      const more = items.length > 30 ? `<div class="calendar-empty-week">${items.length - 30} more untimed RM item${items.length - 30 === 1 ? '' : 's'} not shown.</div>` : '';
+      return `
+        <div class="calendar-rc-unscheduled">
+          <div class="calendar-rc-unscheduled-title">Needs timing</div>
+          <div class="calendar-rc-unscheduled-list">${rows}</div>
+          ${more}
+        </div>`;
+    }
+
+    function renderRmGanttCalendarWeek(weekStart, items, todayStr) {
+      const weekEnd = addCalendarDays(weekStart, 4);
+      const label = `RC 224(c) week of ${shortDateLabel(weekStart)} - ${shortDateLabel(weekEnd)}`;
+      const dayHeads = renderBasicCalendarDayHeads(weekStart, todayStr);
+      const pastDayOverlays = renderCalendarPastDayOverlays(weekStart, todayStr);
+      const visible = items.filter(item => item.start && item.due && item.start <= weekEnd && item.due >= weekStart);
+      const bars = visible.map(item => {
+        const segmentStart = item.start < weekStart ? weekStart : item.start;
+        const segmentEnd = item.due > weekEnd ? weekEnd : item.due;
+        const colStart = businessDayColumn(segmentStart) + 1;
+        const colEnd = businessDayColumn(segmentEnd) + 2;
+        const itemId = encodeCalendarDetailParam(item.id);
+        const isDueToday = toLocalDateStr(item.due) === todayStr;
+        const doneClass = item.done ? 'completed' : '';
+        const priorityClass = item.priority ? `priority-${item.priority}` : '';
+        const badges = [
+          item.priority === 'urgent' ? '<span class="calendar-hours-badge">Urgent</span>' : '',
+          item.priority === 'hold' ? '<span class="calendar-hours-badge">Hold</span>' : '',
+          item.milestone ? '<span class="calendar-hours-badge">Milestone</span>' : ''
+        ].join('');
+        const title = `${item.label} - ${rmGanttCalendarDateLabel(item)}${item.rmReference ? ' - RM ' + item.rmReference : ''}`;
+        return `
+          <div class="calendar-task-bar rc-gantt-task ${isDueToday ? 'due-today' : ''} ${doneClass} ${priorityClass}"
+            onclick="showRmGanttTaskDetails(event,decodeURIComponent('${itemId}'))"
+            style="grid-column:${colStart} / ${colEnd}; --job-color:${escHtml(item.color)};"
+            title="${escHtml(title)}">
+            <span class="calendar-task-label">${escHtml(item.label)}</span>${badges}
+          </div>`;
+      }).join('');
+      return `
+        <div class="calendar-week"${calendarCurrentWeekAttr(weekStart)}>
+          <div class="calendar-week-label">${label}</div>
+          <div class="calendar-day-head">${dayHeads}</div>
+          <div class="calendar-bars">${pastDayOverlays}${bars || '<div class="calendar-empty-week">No Surveyor RM Gantt work this week.</div>'}</div>
+        </div>`;
+    }
+
+    function renderRmGanttCalendarView(body, shouldScrollPreviousWeek = false) {
+      const previousScrollTop = body ? body.scrollTop : 0;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todayStr = toLocalDateStr(today);
+      const firstMonday = getMonday(today);
+      const items = collectRmGanttCalendarItems();
+      const dated = items.filter(item => item.start && item.due);
+      const unscheduled = items.filter(item => !item.start || !item.due);
+
+      if (!items.length) {
+        body.innerHTML = '<div class="calendar-empty-week">No linked Resource Consent Gantt items assigned to Surveyor/CFMA yet.</div>';
+        return;
+      }
+
+      const weeksHtml = calendarVisibleWeekStarts(firstMonday)
+        .map(weekStart => renderRmGanttCalendarWeek(weekStart, dated, todayStr))
+        .join('');
+      body.innerHTML = renderRmGanttCalendarSummary(items, dated, unscheduled) + renderRmGanttUnscheduled(unscheduled) + weeksHtml;
+      restoreOrScrollCalendarToCurrent(body, shouldScrollPreviousWeek ? 0 : previousScrollTop, shouldScrollPreviousWeek ? -1 : 0);
+    }
+
     function renderTaskCalendar() {
       const body = document.getElementById('task-calendar-body');
       if (!body) return;
@@ -14409,6 +15021,10 @@
       }
       if (calendarViewTab === 'assigned') {
         renderAssignedOutCalendarView(body, shouldScrollPreviousWeek);
+        return;
+      }
+      if (calendarViewTab === 'rm') {
+        renderRmGanttCalendarView(body, shouldScrollPreviousWeek);
         return;
       }
       if (calendarViewTab === 'team') {
@@ -17245,10 +17861,21 @@
 
     window.addEventListener('message', event => {
       const data = event && event.data;
-      if (!data || data.type !== 'cfma-rm-link-updated' || !data.link) return;
-      if (rememberJobRmLink(data.link, true)) {
-        renderJobs();
-        flashJobStatus(data.link.jobId, `Linked RM ${data.link.rmReference || ''}`.trim());
+      if (!data) return;
+      if (data.type === 'cfma-rm-link-updated' && data.link) {
+        if (rememberJobRmLink(data.link, true)) {
+          renderJobs();
+          flashJobStatus(data.link.jobId, `Linked RM ${data.link.rmReference || ''}`.trim());
+        }
+        return;
+      }
+      if (data.type === 'cfma-rm-create-taska-task') {
+        try {
+          const result = createTaskFromRmTracker(data);
+          replyToRmTaskRequest(event.source, data.requestId || '', true, result.message);
+        } catch(e) {
+          replyToRmTaskRequest(event.source, data.requestId || '', false, e.message || 'Taska could not create the task.');
+        }
       }
     });
 

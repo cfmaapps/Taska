@@ -332,6 +332,9 @@
     .gantt-edit-textarea:focus { outline: none; border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px rgba(27,79,138,.08); }
     .gantt-edit-danger { color: var(--danger) !important; border-color: #f5b7b1 !important; }
     .gantt-edit-danger:hover { background: var(--danger-l) !important; }
+    .gantt-edit-status { display: none; border-radius: var(--r); padding: 7px 9px; margin: 0 0 10px; font-size: .76rem; line-height: 1.4; background: #eef8f0; border: 1px solid #abd6b8; color: #1f6a38; }
+    .gantt-edit-status.active { display: block; }
+    .gantt-edit-status.error { background: var(--danger-l); border-color: #f5b7b1; color: var(--danger); }
     @media (max-width: 760px) {
       .prog-item { grid-template-columns: auto 1fr; }
       .prog-party-editor, .prog-select, .prog-time, .prog-remove { grid-column: 2; width: 100%; }
@@ -1039,8 +1042,10 @@
       <label for="ganttEditChecklistComment">Comment for checklist</label>
       <textarea class="gantt-edit-textarea" id="ganttEditChecklistComment" placeholder="Developer comment for the s224(c) checklist" oninput="setGanttChecklistComment(this.value)"></textarea>
     </div>
+    <div class="gantt-edit-status" id="ganttTaskaStatus" aria-live="polite"></div>
     <div class="timing-actions">
       <button class="btn btn-outline btn-sm" type="button" onclick="openGanttEditorTiming()">Change Timing</button>
+      <button class="btn btn-outline btn-sm" type="button" onclick="duplicateGanttTaskToTaska()">Duplicate to Taska</button>
       <button class="btn btn-outline btn-sm" type="button" onclick="addGanttEditorTaskForCondition()">Add Task For This Condition</button>
       <button class="btn btn-outline btn-sm gantt-edit-danger" type="button" onclick="deleteGanttEditorItem()">Delete Item</button>
       <button class="btn btn-outline btn-sm" type="button" onclick="closeGanttItemEditor()">Close</button>
@@ -1165,7 +1170,8 @@ let pdfObjectUrl = null;
 let eaPdfObjectUrl = null;  // blob URL for the uploaded EA PDF (session only, not persisted)
 let continueResolver = null; // resolves the pause-for-user-confirmation promise in openaiFetch
 let expressMode = true;      // default: Express (faster, conditions + key details only)
-let conditionsTab = 'summary';
+const CONDITION_TAB_KEYS = ['summary', 'conditions', 'flagged', 'overdue', 'project', 'responsibilities', 'gantt'];
+let conditionsTab = 'gantt';
 let timingState = null;
 let ganttEditState = null;
 let ganttDayState = null;
@@ -1184,11 +1190,13 @@ const taskaJobId = (taskaParams.get('jobId') || '').trim();
 const taskaJobNum = (taskaParams.get('jobNum') || '').trim();
 const taskaJobName = (taskaParams.get('jobName') || '').trim();
 const taskaReplaceMode = taskaParams.get('replace') === '1';
+conditionsTab = normalizeConditionsTab(taskaParams.get('tab'), conditionsTab);
 const taskaRmLinkKey = taskaJobId ? 'cfma-rm-link-' + taskaJobId : '';
 const taskaSharedRmSessionKey = taskaJobId ? 'cfma-rm-shared-session-' + taskaJobId : '';
 let taskaRmSaveTimer = null;
 let taskaRmLastSavedJson = '';
 let taskaRmLoadedFromServer = false;
+let taskaDuplicateRequestId = '';
 
 /* ── API keys are never saved in browser storage ── */
 
@@ -1470,8 +1478,13 @@ function showPage(name) {
   if (name === 'conditions') setConditionsTab(conditionsTab || 'summary');
 }
 
+function normalizeConditionsTab(tab, fallback = 'summary') {
+  const value = String(tab || '').trim().toLowerCase();
+  return CONDITION_TAB_KEYS.includes(value) ? value : fallback;
+}
+
 function setConditionsTab(tab) {
-  conditionsTab = tab === 'conditions' || tab === 'flagged' || tab === 'overdue' || tab === 'project' || tab === 'responsibilities' || tab === 'gantt' ? tab : 'summary';
+  conditionsTab = normalizeConditionsTab(tab);
   const summary = conditionsTab === 'summary';
   const flagged = conditionsTab === 'flagged';
   const overdue = conditionsTab === 'overdue';
@@ -3911,6 +3924,7 @@ function ganttEditorItem() {
 function openGanttItemEditor(conditionKey, itemId) {
   if (!conditionKey || !itemId) return;
   ganttEditState = { conditionKey: String(conditionKey), itemId: String(itemId) };
+  setGanttTaskaStatus('');
   const overlay = document.getElementById('ganttEditOverlay');
   if (overlay) overlay.classList.add('active');
   renderGanttItemEditor();
@@ -4031,6 +4045,62 @@ function addGanttEditorTaskForCondition() {
   const item = addProgressItem(ref.conditionKey);
   if (item) openGanttItemEditor(ref.conditionKey, item.id);
 }
+
+function setGanttTaskaStatus(message, isError = false) {
+  const el = document.getElementById('ganttTaskaStatus');
+  if (!el) return;
+  el.textContent = message || '';
+  el.classList.toggle('active', !!message);
+  el.classList.toggle('error', !!message && !!isError);
+}
+
+function duplicateGanttTaskToTaska() {
+  const ref = ganttEditorItem();
+  if (!ref) return;
+  if (!taskaJobId && !taskaJobNum) {
+    setGanttTaskaStatus('Open this tracker from a Taska job before duplicating tasks.', true);
+    return;
+  }
+  if (!window.opener || window.opener.closed) {
+    setGanttTaskaStatus('Taska is not available. Open this tracker from Taska and try again.', true);
+    return;
+  }
+
+  const meta = conditionMetaByKey(ref.conditionKey);
+  const standalone = isStandaloneActionConditionKey(ref.conditionKey);
+  const range = ref.item.startDate
+    ? normalizeWorkdayRange(ref.item.startDate, ref.item.endDate || ref.item.startDate)
+    : { startDate: '', endDate: '' };
+  const fallbackText = standalone ? 'Resource consent task' : `Condition ${meta.number || ref.conditionKey}`;
+  const requestId = 'rm_task_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+  taskaDuplicateRequestId = requestId;
+  window.opener.postMessage({
+    type: 'cfma-rm-create-taska-task',
+    requestId,
+    jobId: taskaJobId,
+    jobNum: taskaJobNum,
+    jobName: taskaJobName,
+    task: {
+      text: String(ref.item.text || '').trim() || fallbackText,
+      startDate: range.startDate || '',
+      endDate: range.endDate || range.startDate || '',
+      rmReference: data?.consentDetails?.rmReference || '',
+      conditionKey: ref.conditionKey,
+      conditionNumber: standalone ? '' : (meta.number || ''),
+      conditionSource: standalone ? 'Standalone Action' : (meta.source || 'Resource Consent'),
+      conditionStage: meta.stage || '',
+      progressItemId: ref.item.id || ''
+    }
+  }, '*');
+  setGanttTaskaStatus('Sending task to Taska...');
+}
+
+window.addEventListener('message', event => {
+  const msg = event && event.data;
+  if (!msg || msg.type !== 'cfma-rm-task-created') return;
+  if (msg.requestId && taskaDuplicateRequestId && msg.requestId !== taskaDuplicateRequestId) return;
+  setGanttTaskaStatus(msg.message || (msg.ok ? 'Created in Taska.' : 'Taska could not create the task.'), !msg.ok);
+});
 
 function openGanttEditorTiming() {
   const ref = ganttEditorItem();

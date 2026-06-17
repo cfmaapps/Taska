@@ -71,6 +71,10 @@
     .tpw { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--muted); background: none; border: none; padding: 4px; }
     .fh { font-size: .78rem; color: var(--muted); margin-top: 4px; }
     .fh a { color: var(--primary); text-decoration: none; }
+    .ai-status { margin-top: 8px; border: 1px solid var(--border); border-radius: var(--r); background: #f8fafc; color: var(--muted); padding: 8px 10px; font-size: .78rem; line-height: 1.45; }
+    .ai-status.ready { background: var(--success-l); border-color: #9bd4b1; color: #1f6a38; }
+    .ai-status.warn { background: var(--warning-l); border-color: #e8c888; color: #744600; }
+    .ai-status.error { background: var(--danger-l); border-color: #f5b7b1; color: var(--danger); }
 
     /* Buttons */
     .btn { display: inline-flex; align-items: center; gap: 7px; padding: 10px 18px; border-radius: var(--r); font-size: .88rem; font-weight: 500; cursor: pointer; border: none; transition: all .15s; text-decoration: none; white-space: nowrap; }
@@ -833,7 +837,8 @@
             <svg id="eyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           </button>
         </div>
-        <p class="fh">Come see Lachlan for API key to use this tool, you will only need to see him once. If you are setting this up, the key is used for this session only and sent through the same-origin <code>/api/openai</code> proxy.</p>
+        <p class="fh">Taska's saved AI setup is used automatically when Start Server.bat is running. This field is only a one-off fallback and the key is never saved in browser storage.</p>
+        <div class="ai-status" id="aiSetupStatus">Checking Taska AI setup...</div>
       </div>
 
       <div class="fg" style="margin-top:20px">
@@ -1205,6 +1210,7 @@ let flatConditionMetaCache = null;
 let conditionsPanelDirty = false;
 let pmScanState = { inFlight: false, promise: null, startedTab: '', showResponsibilities: false, error: '' };
 const AI_ENDPOINT = window.RC_ANALYSER_API_ENDPOINT || '/api/openai';
+const AI_STATUS_ENDPOINT = window.RC_ANALYSER_AI_STATUS_ENDPOINT || '/api/ai-status';
 const AI_KEY_OWNER_MESSAGE = 'Come see Lachlan for API key to use this tool, you will only need to see him once.';
 const taskaParams = new URLSearchParams(window.location.search);
 const taskaJobId = (taskaParams.get('jobId') || '').trim();
@@ -1247,6 +1253,10 @@ jdz.addEventListener('drop', e => {
   if (f) loadSessionFromFile(f);
 });
 jfi.addEventListener('change', e => { if (e.target.files[0]) loadSessionFromFile(e.target.files[0]); });
+document.getElementById('manualApiKey')?.addEventListener('input', () => {
+  if (!refreshManualAiKeyStatus()) refreshAiSetupStatus();
+});
+setTimeout(refreshAiSetupStatus, 0);
 
 function setFile(f) {
   selFile = f;
@@ -1264,6 +1274,43 @@ function togglePw() {
 
 function manualApiKey() {
   return (document.getElementById('manualApiKey')?.value || '').trim();
+}
+
+function setAiSetupStatus(message, cls = '') {
+  const el = document.getElementById('aiSetupStatus');
+  if (!el) return;
+  el.className = 'ai-status' + (cls ? ' ' + cls : '');
+  el.textContent = message;
+}
+
+function refreshManualAiKeyStatus() {
+  const key = manualApiKey();
+  if (key) {
+    setAiSetupStatus('Using the one-off key typed here for this RC tool session only.', key.startsWith('sk-') ? 'warn' : 'error');
+    return true;
+  }
+  return false;
+}
+
+async function refreshAiSetupStatus() {
+  if (refreshManualAiKeyStatus()) return;
+  setAiSetupStatus('Checking Taska AI setup...');
+  try {
+    const res = await fetch(AI_STATUS_ENDPOINT, { cache: 'no-store' });
+    const status = await res.json().catch(() => ({}));
+    if (!res.ok || !status || status.ok === false) {
+      throw new Error(status.error || 'Could not read AI setup status.');
+    }
+    if (status.configured) {
+      const model = status.model ? ' using ' + status.model : '';
+      const source = status.source ? ' from ' + status.source : '';
+      setAiSetupStatus('AI is ready' + model + source + '. The fallback key field can stay blank.', 'ready');
+    } else {
+      setAiSetupStatus((status.helpMessage || AI_KEY_OWNER_MESSAGE) + ' Taska AI setup has not been saved on this local server yet.', 'warn');
+    }
+  } catch (err) {
+    setAiSetupStatus('Could not check Taska AI setup. If analysis fails, restart Start Server.bat and reopen this RC tool.', 'warn');
+  }
 }
 
 function aiProxyErrorMessage(message) {
@@ -1900,9 +1947,9 @@ ${truncated}`;
    within ~600 chars, not just a TOC listing. Multiple fallbacks handle the
    variety of QLDC, Southland District Council, and other NZ council
    formatting conventions. */
-function numberedConditionLinePattern(number = '\\d{1,3}') {
-  const starts = '(?:The|That|Prior|Before|No|All|Any|This|These|Activities|Works|Consent|A|An|At|During|Within|In|Upon|Where|Except|Unless|If)\\b';
-  return new RegExp('(?:^|\\n)\\s*(?:Condition\\s+)?(' + number + ')(?:\\s*[.)]\\s+|\\s{2,}|\\s+(?=' + starts + '))(?=\\S)', 'i');
+function numberedConditionLinePattern(number = '\\d{1,3}', flags = 'i') {
+  const starts = '(?:The|That|Prior|Before|No|All|Any|This|These|Activities|Works|Consent|A|An|At|During|Within|In|Upon|Where|Except|Unless|If|To|For|Subject|Pursuant|Development|Subdivision|Land|Use|Access|Water|Wastewater|Stormwater|Earthworks|Monitoring|Records|Review|Fees|Lapse|Duration|Construction|Accidental|Discovery|Prior\\s+to|Before\\s+the|The\\s+consent)\\b';
+  return new RegExp('(?:^|\\n)\\s*(?:Condition\\s+)?(' + number + ')(?:\\s*[.)]\\s+|\\s{2,}|\\s+(?=' + starts + '))(?=\\S)', flags);
 }
 
 function hasNumberedConditionAfter(text, number = '1') {
@@ -1914,7 +1961,7 @@ function looksLikeConditionsHeading(line) {
   if (!clean || clean.length > 140) return false;
   if (/[.!?]\s*$/.test(clean)) return false;
   return /^(?:appendix|schedule|part|section)?\s*(?:\d+|[a-z])?\s*[-:\u2013\u2014\s]*(?:resource\s+consent\s+)?(?:consent\s+)?conditions(?:\s+of\s+(?:resource\s+)?consent)?$/i.test(clean)
-    || /^(?:conditions\s+of\s+(?:the\s+)?(?:resource\s+)?consent|resource\s+consent\s+conditions|consent\s+conditions|schedule\s+of\s+conditions|conditions\s+imposed\s+under\s+s(?:ection)?\s*108)$/i.test(clean)
+    || /^(?:conditions\s+of\s+(?:the\s+)?(?:resource\s+)?consent|resource\s+consent\s+conditions|consent\s+conditions|schedules?\s+(?:\d+\s*)?(?:[-:\u2013\u2014]\s*)?of\s+(?:(?:resource\s+)?consent\s+)?conditions|conditions\s+imposed\s+under\s+s(?:ection)?\s*108)$/i.test(clean)
     || /^(?:(?:land\s+use|subdivision|earthworks|discharge)\s+)?(?:resource\s+)?consent\s+conditions$/i.test(clean);
 }
 
@@ -1952,9 +1999,9 @@ function findConditionsSectionStart(text) {
   if (gcMatch) return Math.max(0, gcMatch.index - 200);
 
   /* Strategy 3 — "SCHEDULE OF CONDITIONS" or similar standalone heading */
-  const schedRe = /SCHEDULE\s+(?:\d+\s*)?(?:[-:\u2013\u2014]\s*)?OF\s+(?:RESOURCE\s+)?CONSENT\s+CONDITIONS/i.exec(text);
-  if (schedRe) {
-    const after = text.slice(schedRe.index, schedRe.index + 1800);
+  const schedRe = /SCHEDULES?\s+(?:\d+\s*)?(?:[-:\u2013\u2014]\s*)?OF\s+(?:(?:RESOURCE\s+)?CONSENT\s+)?CONDITIONS/gi;
+  while ((m = schedRe.exec(text)) !== null) {
+    const after = text.slice(m.index, m.index + 6000);
     if (hasNumberedConditionAfter(after)) return schedRe.index;
   }
 
@@ -2598,7 +2645,7 @@ function conditionSubpartCount(text, parentNumber = '') {
 function rawConditionBlocksByNumber(rawText) {
   const source = String(rawText || '');
   const matches = [];
-  const re = /(?:^|\n)\s*(?:Condition\s+)?(\d{1,3})(?:\s*[.)]\s+|\s{2,}|\s+(?=(?:The|That|Prior|Before|No|All|Any|This|These|Activities|Works|Consent|A|An|At|During|Within|In|Upon|Where|Except|Unless|If)\b))(?=\S)/gi;
+  const re = numberedConditionLinePattern('\\d{1,3}', 'gi');
   let m;
   while ((m = re.exec(source)) !== null) {
     matches.push({

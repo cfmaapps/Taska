@@ -4066,6 +4066,37 @@
       overflow-wrap: anywhere;
     }
 
+    .calendar-rm-condition {
+      background: rgba(27, 79, 138, 0.18);
+      border: 1px solid rgba(139, 185, 228, 0.35);
+      border-radius: 7px;
+      color: #dce8f5;
+      margin-top: 9px;
+      padding: 9px 10px;
+    }
+
+    .calendar-rm-condition strong {
+      display: block;
+      color: #ffffff;
+      font-size: 0.74rem;
+      margin-bottom: 4px;
+    }
+
+    .calendar-rm-condition span {
+      display: block;
+      color: #a8c4e0;
+      font-size: 0.7rem;
+      line-height: 1.35;
+      margin-bottom: 6px;
+    }
+
+    .calendar-rm-condition div {
+      font-size: 0.78rem;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
     .calendar-job-popover-close {
       background: none;
       border: none;
@@ -5019,9 +5050,18 @@
     .gmail-debug-pre,
     .email-saved-summary,
     .completed-empty,
-    .calendar-reminder-full-text {
+    .calendar-reminder-full-text,
+    .calendar-rm-condition {
       background: #f8fafc !important;
       border-color: var(--border) !important;
+      color: var(--muted) !important;
+    }
+
+    .calendar-rm-condition strong {
+      color: var(--primary) !important;
+    }
+
+    .calendar-rm-condition span {
       color: var(--muted) !important;
     }
 
@@ -5168,11 +5208,20 @@
     body.night-mode .gmail-debug-pre,
     body.night-mode .email-saved-summary,
     body.night-mode .completed-empty,
-    body.night-mode .calendar-reminder-full-text {
+    body.night-mode .calendar-reminder-full-text,
+    body.night-mode .calendar-rm-condition {
       background: #162030 !important;
       border-color: #2e3d55 !important;
       color: #e8edf2 !important;
       box-shadow: none !important;
+    }
+
+    body.night-mode .calendar-rm-condition strong {
+      color: #e8edf2 !important;
+    }
+
+    body.night-mode .calendar-rm-condition span {
+      color: #9eb1c5 !important;
     }
 
     body.night-mode .sidebar-divider,
@@ -14838,6 +14887,20 @@
       return `${formatTaskDateInput(entry.startDate)} - ${formatTaskDateInput(entry.endDate)}`;
     }
 
+    function rmGanttConditionDetailsHtml(entry) {
+      const conditionLabel = entry.conditionNumber ? `Condition ${entry.conditionNumber}` : (entry.conditionKey || 'RM condition');
+      const meta = [entry.conditionSource || '', entry.conditionStage || ''].filter(Boolean).join(' - ');
+      const text = String(entry.conditionText || '').trim();
+      if (!text && !meta && !conditionLabel) return '';
+      return `
+        <div class="calendar-job-section-title">Condition</div>
+        <div class="calendar-rm-condition">
+          <strong>${escHtml(conditionLabel)}</strong>
+          ${meta ? `<span>${escHtml(meta)}</span>` : ''}
+          <div>${escHtml(text || 'No condition text saved for this Gantt item.')}</div>
+        </div>`;
+    }
+
     function rmGanttTaskDetailsHtml(entry) {
       const itemId = encodeCalendarDetailParam(entry.id);
       const jobId = encodeCalendarDetailParam(entry.jobId);
@@ -14865,7 +14928,7 @@
           <div class="calendar-job-task-text ${entry.done ? 'done' : ''}">${escHtml(entry.text)}</div>
           <div class="calendar-job-task-date">${escHtml(rmGanttCalendarDateLabel(entry))}</div>
         </div>
-        ${entry.conditionText ? `<div class="calendar-reminder-full-text">${escHtml(entry.conditionText)}</div>` : ''}
+        ${rmGanttConditionDetailsHtml(entry)}
         <div class="calendar-job-email-actions">
           <button class="calendar-job-email-link" onclick="event.stopPropagation(); openRmGanttFromCalendar(decodeURIComponent('${itemId}'))">Open RM Gantt</button>
           <button class="calendar-job-email-link" onclick="event.stopPropagation(); createTaskaItemFromRmGanttCalendar(decodeURIComponent('${itemId}'))">Make Taska Item</button>

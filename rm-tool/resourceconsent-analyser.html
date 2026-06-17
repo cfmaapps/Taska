@@ -335,10 +335,14 @@
     .gantt-edit-status { display: none; border-radius: var(--r); padding: 7px 9px; margin: 0 0 10px; font-size: .76rem; line-height: 1.4; background: #eef8f0; border: 1px solid #abd6b8; color: #1f6a38; }
     .gantt-edit-status.active { display: block; }
     .gantt-edit-status.error { background: var(--danger-l); border-color: #f5b7b1; color: var(--danger); }
-    .taska-gantt-toggle { display: flex; align-items: flex-start; gap: 10px; border: 1.5px solid #9fcfb0; border-radius: var(--r); background: #eef8f0; color: #1f6a38; padding: 10px 12px; margin: 0 0 14px; font-size: .82rem; line-height: 1.4; cursor: pointer; }
+    .taska-gantt-toggle { display: flex; flex-direction: column; gap: 8px; border: 1.5px solid #9fcfb0; border-radius: var(--r); background: #eef8f0; color: #1f6a38; padding: 10px 12px; margin: 0 0 14px; font-size: .82rem; line-height: 1.4; }
+    .taska-gantt-main { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
     .taska-gantt-toggle input { margin-top: 2px; accent-color: var(--success); flex-shrink: 0; }
     .taska-gantt-toggle strong { display: block; color: #1f6a38; font-size: .86rem; margin-bottom: 2px; }
     .taska-gantt-toggle span { display: block; color: #49795a; font-size: .76rem; }
+    .taska-gantt-options { display: flex; flex-wrap: wrap; gap: 7px; margin-left: 24px; }
+    .taska-gantt-option { display: flex; align-items: center; gap: 6px; border: 1px solid #c5dfcd; border-radius: var(--r); background: rgba(255,255,255,.78); color: #2e6840; padding: 6px 8px; cursor: pointer; font-size: .75rem; font-weight: 700; }
+    .taska-gantt-option.selected { background: #dff1e5; border-color: #8cc79c; color: #1f6a38; }
     .gantt-head .taska-gantt-toggle { max-width: 360px; margin: 0; }
     @media (max-width: 760px) {
       .prog-item { grid-template-columns: auto 1fr; }
@@ -555,6 +559,9 @@
     .gantt-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 12px; }
     .gantt-head h3 { font-size: .96rem; font-weight: 700; color: var(--primary); margin: 0 0 4px; }
     .gantt-head p { font-size: .78rem; color: var(--muted); line-height: 1.5; margin: 0; }
+    .gantt-display-controls { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; flex: 1 1 100%; }
+    .gantt-display-check { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--border); border-radius: var(--r); background: #fff; color: var(--text); padding: 6px 9px; font-size: .76rem; font-weight: 800; cursor: pointer; }
+    .gantt-display-check input { accent-color: var(--success); }
     .gantt-summary { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
     .gantt-chip { display: inline-flex; align-items: center; padding: 4px 9px; border-radius: 100px; border: 1px solid var(--border); background: #fafbfc; color: var(--muted); font-size: .72rem; font-weight: 700; white-space: nowrap; }
     .gantt-shell { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--r); background: #fff; }
@@ -583,6 +590,8 @@
     .gantt-unscheduled-item.milestone { border-left-width: 9px; box-shadow: 0 0 0 3px rgba(202,111,30,.14), 0 4px 12px rgba(15,23,42,.1); }
     .gantt-unscheduled-item.priority-urgent { border-left-width: 9px; border-color: #f5b7b1; box-shadow: 0 0 0 3px rgba(192,57,43,.14), 0 4px 12px rgba(15,23,42,.12); }
     .gantt-unscheduled-item.priority-hold { border-left-width: 9px; border-color: #e8c888; background-image: repeating-linear-gradient(135deg, rgba(116,70,0,.12) 0 7px, transparent 7px 14px); box-shadow: 0 0 0 3px rgba(202,111,30,.18), 0 4px 12px rgba(15,23,42,.12); }
+    .gantt-unscheduled-item.done { border-left-width: 9px; border-color: #9bd4b1; background: #f0fdf4; background-image: repeating-linear-gradient(135deg, rgba(30,132,73,.12) 0 7px, transparent 7px 14px); box-shadow: 0 0 0 3px rgba(30,132,73,.12), 0 4px 12px rgba(15,23,42,.08); }
+    .gantt-unscheduled-item.done .gantt-unscheduled-input { color: #1e8449; text-decoration: line-through; font-weight: 900; }
     .gantt-unscheduled-item:active { cursor: grabbing; }
     .gantt-unscheduled-item strong { display: block; font-size: .8rem; color: var(--gantt-text); line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .gantt-unscheduled-item span, .gantt-unscheduled-item small { display: block; margin-top: 4px; font-size: .7rem; color: var(--muted); line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -594,6 +603,9 @@
     .gantt-add-item:hover { background: #dcecff; }
     .gantt-row { border-top: 1px solid var(--border); min-height: 28px; }
     .gantt-row:first-child { border-top: none; }
+    .gantt-row.completed .gantt-label { background: #f0fdf4; }
+    .gantt-row.completed .gantt-label strong { color: #1e8449; text-decoration: line-through; }
+    .gantt-row.completed .gantt-cond { background: #dff3e7; border-color: #9bd4b1; color: #1e8449; }
     .gantt-label { border-right: 1px solid var(--border); padding: 4px 8px; min-width: 0; background: #fff; display: flex; align-items: center; gap: 6px; }
     .gantt-label strong { display: block; font-size: .74rem; color: var(--text); line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
     .gantt-label .gantt-cond { flex: 0 0 auto; font-size: .65rem; font-weight: 900; color: var(--muted); background: #eef2f7; border: 1px solid var(--border); border-radius: 999px; padding: 1px 5px; line-height: 1.35; }
@@ -605,12 +617,16 @@
     .gantt-track { min-height: 28px; background-color: #fbfdff; }
     .gantt-bar { --gantt-bg: var(--primary); --gantt-border: var(--primary); --gantt-text: #fff; position: absolute; top: 6px; height: 16px; min-width: 14px; border: 1px solid var(--gantt-border); border-radius: 4px; background: var(--gantt-bg); color: var(--gantt-text); box-shadow: 0 1px 4px rgba(27,79,138,.18); overflow: hidden; cursor: grab; touch-action: none; user-select: none; }
     .gantt-bar.dragging { cursor: grabbing; opacity: .88; z-index: 4; }
-    .gantt-bar.done { opacity: .82; box-shadow: inset 0 0 0 2px rgba(255,255,255,.45), 0 2px 7px rgba(36,143,93,.16); }
+    .gantt-bar.done { top: 4px; height: 20px; opacity: 1; border: 2px solid #1e8449; background: #eafaf1; background-image: repeating-linear-gradient(135deg, rgba(30,132,73,.16) 0 6px, transparent 6px 12px); color: #145a32; box-shadow: inset 0 0 0 1px rgba(255,255,255,.7), 0 0 0 2px rgba(30,132,73,.16), 0 3px 10px rgba(30,132,73,.16); z-index: 3; }
+    .gantt-bar.done span { padding-top: 2px; font-weight: 900; }
+    .gantt-bar.done span::before { content: "DONE - "; font-weight: 900; }
     .gantt-bar.milestone { top: 4px; height: 20px; border: 2px solid #ca6f1e; box-shadow: 0 0 0 2px rgba(202,111,30,.2), 0 3px 10px rgba(116,70,0,.18); z-index: 3; }
     .gantt-bar.milestone span { padding-top: 2px; font-size: .64rem; }
     .gantt-bar.milestone span::before { content: "Milestone "; font-weight: 900; text-transform: uppercase; letter-spacing: .03em; }
     .gantt-bar.priority-urgent { top: 3px; height: 22px; border: 2px solid var(--danger); box-shadow: 0 0 0 2px rgba(192,57,43,.22), 0 4px 12px rgba(192,57,43,.2); z-index: 5; }
     .gantt-bar.priority-hold { top: 3px; height: 22px; border: 2px solid #744600; background-image: repeating-linear-gradient(135deg, rgba(116,70,0,.2) 0 6px, transparent 6px 12px); box-shadow: 0 0 0 2px rgba(202,111,30,.24), 0 4px 12px rgba(116,70,0,.2); z-index: 6; }
+    .gantt-bar.done.milestone, .gantt-bar.done.priority-urgent, .gantt-bar.done.priority-hold { top: 3px; height: 22px; border-color: #1e8449; background: #eafaf1; background-image: repeating-linear-gradient(135deg, rgba(30,132,73,.2) 0 6px, transparent 6px 12px); color: #145a32; box-shadow: inset 0 0 0 1px rgba(255,255,255,.7), 0 0 0 2px rgba(30,132,73,.2), 0 4px 12px rgba(30,132,73,.18); z-index: 7; }
+    .gantt-bar.done.milestone span::before { content: "DONE - MILESTONE - "; }
     .gantt-bar.priority-urgent span, .gantt-bar.priority-hold span { padding-top: 2px; font-size: .64rem; }
     .gantt-bar.milestone.priority-urgent span, .gantt-bar.milestone.priority-hold span { padding-top: 2px; }
     .gantt-bar.one-day { min-width: 14px; }
@@ -4187,8 +4203,8 @@ function renderPmAllProgressItems() {
     </div>`;
 }
 
-function ganttTimedEntries() {
-  return allProgressEntries().map(entry => {
+function ganttTimedEntries(entries = allProgressEntries()) {
+  return entries.map(entry => {
     const item = normalizeProgressItem(entry.item);
     if (!item || !item.startDate) return null;
     const range = normalizeWorkdayRange(item.startDate, item.endDate || item.startDate);
@@ -4508,7 +4524,7 @@ function openGanttItemEditorFromCard(ev, conditionKey, itemId) {
   openGanttItemEditor(conditionKey, itemId);
 }
 
-function renderGanttUnscheduledList(untimed) {
+function renderGanttUnscheduledList(untimed, hideCompleted = false) {
   if (!untimed.length) {
     return `
       <div class="gantt-unscheduled" data-gantt-unscheduled-drop="true">
@@ -4516,7 +4532,7 @@ function renderGanttUnscheduledList(untimed) {
           <h3>Items Without Timing</h3>
           <span>Drop a scheduled bar here to remove its timing</span>
         </div>
-        <div class="pm-empty">All action items have timing.</div>
+        <div class="pm-empty">${hideCompleted ? 'All visible action items have timing.' : 'All action items have timing.'}</div>
         <button class="gantt-add-item" type="button" onclick="addStandaloneGanttItem()">+ Add additional item</button>
       </div>`;
   }
@@ -4535,13 +4551,14 @@ function renderGanttUnscheduledList(untimed) {
           const displayTitle = `${progressPriorityPrefix(entry.priority)}${entry.milestone ? 'Milestone - ' : ''}${entry.title}`;
           const title = [
             displayTitle,
+            entry.item.done ? 'Status: Complete' : '',
             `Party: ${entry.assignee}`,
             standalone ? 'Additional item' : (conditionText ? `Condition ${condLabel}: ${conditionText}` : `Condition ${condLabel}`)
           ].filter(Boolean).join(' | ');
           return `
-            <div class="gantt-unscheduled-item ${x(entry.colorClass || 'color-unassigned')}${entry.priorityClass ? ' ' + x(entry.priorityClass) : ''}${entry.milestone ? ' milestone' : ''}" data-progress-item-id="${xt(entry.item.id)}" draggable="true" title="${x(title)}" onclick="openGanttItemEditorFromCard(event,'${jsq(entry.conditionKey)}','${jsq(entry.item.id)}')" ondragstart="startGanttUntimedDrag(event,'${jsq(entry.conditionKey)}','${jsq(entry.item.id)}')">
+            <div class="gantt-unscheduled-item ${x(entry.colorClass || 'color-unassigned')}${entry.priorityClass ? ' ' + x(entry.priorityClass) : ''}${entry.milestone ? ' milestone' : ''}${entry.item.done ? ' done' : ''}" data-progress-item-id="${xt(entry.item.id)}" draggable="true" title="${x(title)}" onclick="openGanttItemEditorFromCard(event,'${jsq(entry.conditionKey)}','${jsq(entry.item.id)}')" ondragstart="startGanttUntimedDrag(event,'${jsq(entry.conditionKey)}','${jsq(entry.item.id)}')">
               <input class="gantt-unscheduled-input" value="${xt(entry.item.text || '')}" placeholder="Action item" onpointerdown="event.stopPropagation()" oninput="setProgressItem('${jsq(entry.conditionKey)}','${jsq(entry.item.id)}','text',this.value)">
-              <span>${x(progressPriorityPrefix(entry.priority))}${entry.milestone ? 'Milestone - ' : ''}${standalone ? 'Additional item' : 'Cond ' + x(condLabel)} - ${x(entry.assignee)}</span>
+              <span>${entry.item.done ? 'Done - ' : ''}${x(progressPriorityPrefix(entry.priority))}${entry.milestone ? 'Milestone - ' : ''}${standalone ? 'Additional item' : 'Cond ' + x(condLabel)} - ${x(entry.assignee)}</span>
               <small>${x(source)}${entry.assigneeRole ? ' - ' + x(entry.assigneeRole) : ''}</small>
               <button class="gantt-unscheduled-remove" type="button" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation(); removeProgressItem('${jsq(entry.conditionKey)}','${jsq(entry.item.id)}')">Delete action item</button>
             </div>`;
@@ -4716,6 +4733,28 @@ function cancelGanttDrag(ev) {
   renderGanttChart();
 }
 
+function setGanttHideCompletedItems(value) {
+  ensurePmState();
+  pmState.hideCompletedGanttItems = !!value;
+  autoSaveSoon();
+  renderGanttChart();
+}
+
+function renderGanttDisplayControls(hiddenCompletedCount = 0) {
+  ensurePmState();
+  const checked = !!pmState.hideCompletedGanttItems;
+  const hiddenLabel = checked && hiddenCompletedCount
+    ? ` (${hiddenCompletedCount} hidden)`
+    : '';
+  return `
+    <div class="gantt-display-controls">
+      <label class="gantt-display-check">
+        <input type="checkbox"${checked ? ' checked' : ''} onchange="setGanttHideCompletedItems(this.checked)">
+        <span>Hide completed items${hiddenLabel}</span>
+      </label>
+    </div>`;
+}
+
 function renderGanttChart() {
   if (!data) return;
   ensurePmState();
@@ -4723,18 +4762,53 @@ function renderGanttChart() {
   if (!content) return;
 
   const allEntries = allProgressEntries();
-  const timed = ganttTimedEntries();
-  const untimed = ganttUntimedEntries(allEntries);
+  const hideCompleted = !!pmState.hideCompletedGanttItems;
+  const visibleEntries = hideCompleted
+    ? allEntries.filter(entry => !normalizeProgressItem(entry.item)?.done)
+    : allEntries;
+  const timed = ganttTimedEntries(visibleEntries);
+  const untimed = ganttUntimedEntries(visibleEntries);
+  const completedCount = allEntries.filter(entry => !!normalizeProgressItem(entry.item)?.done).length;
+  const hiddenCompletedCount = hideCompleted ? completedCount : 0;
   const sub = document.getElementById('ganttSub');
   if (sub) {
-    sub.textContent = `${timed.length} timed, ${untimed.length} without timing from ${allEntries.length} action item${allEntries.length !== 1 ? 's' : ''}`;
+    const hiddenText = hiddenCompletedCount ? `, ${hiddenCompletedCount} completed hidden` : '';
+    sub.textContent = `${timed.length} timed, ${untimed.length} without timing from ${visibleEntries.length} visible action item${visibleEntries.length !== 1 ? 's' : ''}${hiddenText}`;
   }
 
   if (!allEntries.length) {
     content.innerHTML = `
       <div class="gantt-panel">
         ${renderTaskaGanttToggle()}
+        ${renderGanttDisplayControls(hiddenCompletedCount)}
         <div class="pm-empty">No action items have been added yet.</div>
+        <div class="gantt-unscheduled" data-gantt-unscheduled-drop="true">
+          <div class="gantt-unscheduled-head">
+            <h3>Items Without Timing</h3>
+            <span>Add a standalone action item</span>
+          </div>
+          <button class="gantt-add-item" type="button" onclick="addStandaloneGanttItem()">+ Add additional item</button>
+        </div>
+      </div>`;
+    return;
+  }
+
+  if (!visibleEntries.length) {
+    content.innerHTML = `
+      <div class="gantt-panel">
+        <div class="gantt-head">
+          <div>
+            <h3>Gantt Chart</h3>
+            <p>All action items are complete.</p>
+          </div>
+          ${renderTaskaGanttToggle()}
+          <div class="gantt-summary">
+            <span class="gantt-chip">${completedCount} complete</span>
+            <span class="gantt-chip">${hiddenCompletedCount} hidden</span>
+          </div>
+          ${renderGanttDisplayControls(hiddenCompletedCount)}
+        </div>
+        <div class="pm-empty">Completed items are hidden. Untick "Hide completed items" to show them on the chart.</div>
         <div class="gantt-unscheduled" data-gantt-unscheduled-drop="true">
           <div class="gantt-unscheduled-head">
             <h3>Items Without Timing</h3>
@@ -4757,14 +4831,14 @@ function renderGanttChart() {
   if (workdaySpanIso(chartStart, chartEnd) < 10) chartEnd = addWorkdaysIso(chartStart, 9);
   const spanDays = Math.max(1, workdaySpanIso(chartStart, chartEnd));
   const gridSize = (1 / spanDays * 100).toFixed(4) + '%';
-  const doneCount = timed.filter(entry => entry.item.done).length;
+  const doneCount = completedCount;
   const months = ganttMonthSegments(chartStart, chartEnd, spanDays);
   const dateTicks = ganttDateTicks(chartStart, spanDays);
   const todayLine = ganttTodayLine(chartStart, chartEnd, spanDays, true);
   const gridMinWidth = Math.max(920, 340 + spanDays * 54);
-  const milestoneCount = allEntries.filter(entry => !!normalizeProgressItem(entry.item)?.milestone).length;
-  const urgentCount = allEntries.filter(entry => normalizeProgressItem(entry.item)?.priority === 'urgent').length;
-  const holdCount = allEntries.filter(entry => normalizeProgressItem(entry.item)?.priority === 'hold').length;
+  const milestoneCount = visibleEntries.filter(entry => !!normalizeProgressItem(entry.item)?.milestone).length;
+  const urgentCount = visibleEntries.filter(entry => normalizeProgressItem(entry.item)?.priority === 'urgent').length;
+  const holdCount = visibleEntries.filter(entry => normalizeProgressItem(entry.item)?.priority === 'hold').length;
 
   const rows = timed.map(entry => {
     const duration = workdaySpanIso(entry.startDate, entry.endDate);
@@ -4780,12 +4854,13 @@ function renderGanttChart() {
     const displayTitle = `${progressPriorityPrefix(entry.priority)}${entry.milestone ? 'Milestone - ' : ''}${entry.title}`;
     const barTitle = [
       displayTitle,
+      entry.item.done ? 'Status: Complete' : '',
       `Party: ${entry.assignee}`,
       `Dates: ${range}`,
       conditionTitle
     ].filter(Boolean).join(' | ');
     return `
-      <div class="gantt-row">
+      <div class="gantt-row${entry.item.done ? ' completed' : ''}">
         <div class="gantt-label" title="${x(conditionTitle)}">
           <span class="gantt-cond">Cond ${x(condLabel)}</span>
           <strong>${x(entry.title)}</strong>
@@ -4822,12 +4897,14 @@ function renderGanttChart() {
         <div class="gantt-summary">
           <span class="gantt-chip">${timed.length} timed</span>
           <span class="gantt-chip">${doneCount} complete</span>
+          ${hiddenCompletedCount ? `<span class="gantt-chip">${hiddenCompletedCount} hidden</span>` : ''}
           <span class="gantt-chip">${unfinishedOverdue.length} overdue</span>
           <span class="gantt-chip">${urgentCount} urgent</span>
           <span class="gantt-chip">${holdCount} hold point${holdCount !== 1 ? 's' : ''}</span>
           <span class="gantt-chip">${milestoneCount} milestone${milestoneCount !== 1 ? 's' : ''}</span>
           <span class="gantt-chip">${untimed.length} without timing</span>
         </div>
+        ${renderGanttDisplayControls(hiddenCompletedCount)}
       </div>
       <div class="gantt-shell" ondragover="onGanttUntimedDragOver(event)" ondragleave="onGanttUntimedDragLeave(event)" ondrop="dropUntimedOnGantt(event)">
         <div class="gantt-grid" style="--gantt-grid:${gridSize};min-width:${gridMinWidth}px">
@@ -4843,7 +4920,7 @@ function renderGanttChart() {
           ${dropRow}
         </div>
       </div>
-      ${renderGanttUnscheduledList(untimed)}
+      ${renderGanttUnscheduledList(untimed, hideCompleted)}
     </div>`;
 }
 
@@ -6085,6 +6162,8 @@ function defaultPmState() {
     hiddenResponsibilities: {},
     manualResponsibilities: [],
     showGanttOnTaska: false,
+    taskaGanttMode: 'off',
+    hideCompletedGanttItems: false,
     progressItems: {}
   };
 }
@@ -6154,7 +6233,12 @@ function ensurePmState() {
     evidence: String(r.evidence || '').trim(),
     confidence: String(r.confidence || 'manual').trim()
   })).filter(r => r.partyKey && r.conditionKey);
-  pmState.showGanttOnTaska = !!pmState.showGanttOnTaska;
+  const taskaGanttMode = String(pmState.taskaGanttMode || '').trim().toLowerCase();
+  pmState.taskaGanttMode = taskaGanttMode === 'surveyor' || taskaGanttMode === 'all'
+    ? taskaGanttMode
+    : (pmState.showGanttOnTaska ? 'all' : 'off');
+  pmState.showGanttOnTaska = pmState.taskaGanttMode !== 'off';
+  pmState.hideCompletedGanttItems = !!pmState.hideCompletedGanttItems;
   if (!pmState.progressItems || typeof pmState.progressItems !== 'object' || Array.isArray(pmState.progressItems)) {
     pmState.progressItems = {};
   }
@@ -6302,9 +6386,7 @@ function setPmParty(field, value, rerender = false) {
   if (rerender) renderProjectTeamPanel({ preserveScroll: true });
 }
 
-function setPmShowGanttOnTaska(value) {
-  ensurePmState();
-  pmState.showGanttOnTaska = !!value;
+function savePmTaskaGanttModeChange() {
   autoSave();
   const session = buildProgressObject();
   if (session) {
@@ -6322,16 +6404,47 @@ function setPmShowGanttOnTaska(value) {
   if (conditionsTab === 'project') renderProjectTeamPanel({ preserveScroll: true });
 }
 
+function setPmTaskaGanttMode(mode) {
+  ensurePmState();
+  const next = String(mode || '').trim().toLowerCase();
+  pmState.taskaGanttMode = next === 'surveyor' || next === 'all' ? next : 'off';
+  pmState.showGanttOnTaska = pmState.taskaGanttMode !== 'off';
+  savePmTaskaGanttModeChange();
+}
+
+function setPmShowGanttOnTaska(value) {
+  ensurePmState();
+  if (!value) {
+    setPmTaskaGanttMode('off');
+    return;
+  }
+  setPmTaskaGanttMode(pmState.taskaGanttMode === 'all' ? 'all' : 'surveyor');
+}
+
 function renderTaskaGanttToggle() {
   ensurePmState();
+  const mode = pmState.taskaGanttMode;
+  const enabled = mode !== 'off';
   return `
-    <label class="taska-gantt-toggle">
-      <input type="checkbox"${pmState.showGanttOnTaska ? ' checked' : ''} onchange="setPmShowGanttOnTaska(this.checked)">
-      <span>
-        <strong>Show Gantt items on Taska</strong>
-        <span>Add this RM tracker's Gantt items to the Taska RC 224(c) calendar.</span>
-      </span>
-    </label>`;
+    <div class="taska-gantt-toggle">
+      <label class="taska-gantt-main">
+        <input type="checkbox"${enabled ? ' checked' : ''} onchange="setPmShowGanttOnTaska(this.checked)">
+        <span>
+          <strong>Show Gantt items on Taska</strong>
+          <span>Choose whether Taska shows only surveyor items or every Gantt item for this RM.</span>
+        </span>
+      </label>
+      <div class="taska-gantt-options" role="radiogroup" aria-label="Taska Gantt calendar mode">
+        <label class="taska-gantt-option${mode === 'surveyor' ? ' selected' : ''}">
+          <input type="radio" name="taskaGanttMode" value="surveyor"${mode === 'surveyor' ? ' checked' : ''} onchange="setPmTaskaGanttMode('surveyor')">
+          <span>Surveyor tasks only</span>
+        </label>
+        <label class="taska-gantt-option${mode === 'all' ? ' selected' : ''}">
+          <input type="radio" name="taskaGanttMode" value="all"${mode === 'all' ? ' checked' : ''} onchange="setPmTaskaGanttMode('all')">
+          <span>All Gantt tasks</span>
+        </label>
+      </div>
+    </div>`;
 }
 
 function setPmContractor(idx, field, value) {

@@ -13676,9 +13676,91 @@
       return Array.from(new Set(keys.map(key => String(key || '').trim()).filter(Boolean)));
     }
 
-    function rmSessionShowsGanttOnTaska(session) {
+    function rmTaskaGanttModeForSession(session) {
       const pm = session && session.pmState;
-      return !!(pm && pm.showGanttOnTaska);
+      const mode = String(pm && pm.taskaGanttMode || '').trim().toLowerCase();
+      if (mode === 'surveyor' || mode === 'all') return mode;
+      return pm && pm.showGanttOnTaska ? 'all' : 'off';
+    }
+
+    function rmPartySearchText(value) {
+      return String(value || '').trim().toLowerCase();
+    }
+
+    function rmValueLooksLikeSurveyor(...values) {
+      const text = values.map(rmPartySearchText).filter(Boolean).join(' ');
+      return /\bsurvey(?:ors?|ing|ed)?\b/.test(text);
+    }
+
+    function rmEffectiveResponsibilityRows(pmState) {
+      const scanned = Array.isArray(pmState && pmState.analysis && pmState.analysis.responsibilityMatrix)
+        ? pmState.analysis.responsibilityMatrix
+        : [];
+      const manual = Array.isArray(pmState && pmState.manualResponsibilities)
+        ? pmState.manualResponsibilities
+        : [];
+      return scanned.concat(manual).filter(row => row && typeof row === 'object');
+    }
+
+    function rmSurveyorPartyKeys(pmState) {
+      const p = pmState && pmState.parties || {};
+      const keys = new Set(['surveyor']);
+      if (p.surveyorIsEngineer) keys.add('engineer');
+      if (p.surveyorIsProjectManager) keys.add('projectManager');
+      if (p.surveyorIsMainContractor) keys.add('mainContractor');
+      [
+        ['surveyor', p.surveyor, 'Surveyor'],
+        ['engineer', p.engineer, p.surveyorIsEngineer ? 'Surveyor / Engineer' : 'Engineer'],
+        ['projectManager', p.projectManager, p.surveyorIsProjectManager ? 'Surveyor / Project Manager' : 'Project Manager'],
+        ['mainContractor', p.mainContractor, p.surveyorIsMainContractor ? 'Surveyor / Main Contractor' : 'Main Contractor'],
+        ['solicitor', p.solicitor, 'Solicitor'],
+        ['powerContractor', p.powerContractor, 'Power Contractor'],
+        ['telecomContractor', p.telecomContractor, 'Telecom / Fibre Contractor'],
+        ['gasContractor', p.gasContractor, 'Gas Contractor']
+      ].forEach(([key, name, role]) => {
+        if (rmValueLooksLikeSurveyor(key, name, role)) keys.add(key);
+      });
+      (Array.isArray(p.extraContractors) ? p.extraContractors : []).forEach((contractor, idx) => {
+        const role = contractor && contractor.role || '';
+        const name = contractor && contractor.name || '';
+        const key = 'contractor_' + idx + '_' + String(role || 'other').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+        if (rmValueLooksLikeSurveyor(key, name, role)) keys.add(key);
+      });
+      rmEffectiveResponsibilityRows(pmState).forEach(row => {
+        const key = String(row.partyKey || '').trim();
+        if (key && rmValueLooksLikeSurveyor(row.partyKey, row.partyLabel, row.role)) keys.add(key);
+      });
+      return keys;
+    }
+
+    function rmRowMatchesCondition(row, conditionKey, meta) {
+      const rowKey = String(row && row.conditionKey || '').trim();
+      if (rowKey && rowKey === conditionKey) return true;
+      const rowNumber = String(row && row.conditionNumber || '').trim();
+      const metaNumber = String(meta && meta.number || '').trim();
+      if (!rowNumber || !metaNumber || rowNumber !== metaNumber) return false;
+      const rowSource = String(row && row.source || '').toLowerCase();
+      const metaSource = String(meta && meta.source || '').toLowerCase();
+      const rowEa = rowSource.includes('engineering acceptance') || rowSource.includes('engineering review') || rowSource.includes('acceptance');
+      const metaEa = /^ea_/.test(conditionKey) || metaSource.includes('engineering acceptance') || metaSource.includes('engineering review') || metaSource.includes('acceptance');
+      return rowEa === metaEa || !rowSource;
+    }
+
+    function rmConditionRelatesToSurveyor(conditionKey, meta, pmState, surveyorKeys) {
+      return rmEffectiveResponsibilityRows(pmState)
+        .filter(row => rmRowMatchesCondition(row, conditionKey, meta))
+        .some(row => {
+          const partyKey = String(row.partyKey || '').trim();
+          return (partyKey && surveyorKeys.has(partyKey)) ||
+            rmValueLooksLikeSurveyor(partyKey, row.partyLabel, row.role);
+        });
+    }
+
+    function rmItemRelatesToSurveyor(item, pmState, conditionKey, meta) {
+      const surveyorKeys = rmSurveyorPartyKeys(pmState);
+      const keys = rmProgressAssigneeKeys(item);
+      if (keys.length) return keys.some(key => surveyorKeys.has(key) || rmValueLooksLikeSurveyor(key));
+      return rmConditionRelatesToSurveyor(conditionKey, meta, pmState, surveyorKeys);
     }
 
     function rmPriorityKey(value) {
@@ -13694,7 +13776,8 @@
         normalizeJobRecord(job);
         if (job.dormant) return;
         const session = rmSessionForJob(job);
-        if (!rmSessionShowsGanttOnTaska(session)) return;
+        const taskaGanttMode = rmTaskaGanttModeForSession(session);
+        if (taskaGanttMode === 'off') return;
         const pm = session && session.pmState;
         const progressItems = pm && pm.progressItems && typeof pm.progressItems === 'object' && !Array.isArray(pm.progressItems)
           ? pm.progressItems
@@ -13713,6 +13796,7 @@
               text: ''
             };
             if (!item) return;
+            if (taskaGanttMode === 'surveyor' && !rmItemRelatesToSurveyor(item, pm, conditionKey, meta)) return;
             const startRaw = parseTaskDate(item.startDate);
             const endRaw = parseTaskDate(item.endDate || item.startDate);
             const start = startRaw ? toBusinessDay(startRaw) : null;
@@ -13742,6 +13826,7 @@
               done: !!item.done,
               milestone: !!item.milestone,
               priority,
+              taskaGanttMode,
               assigneeKeys,
               label: `${job.jobNum ? job.jobNum + ' ' : ''}${taskText}`.trim()
             });
@@ -14816,7 +14901,7 @@
         <div class="calendar-rc-summary">
           <div>
             <strong>Resource consent 224(c) work</strong>
-            <span>Gantt items from linked Resource Consent trackers enabled for Taska.</span>
+            <span>RM Gantt items enabled for Taska: surveyor-only or all-task mode.</span>
           </div>
           <div class="calendar-rc-stats">
             <span class="calendar-rc-pill">${pending} open</span>
@@ -14882,7 +14967,7 @@
         <div class="calendar-week"${calendarCurrentWeekAttr(weekStart)}>
           <div class="calendar-week-label">${label}</div>
           <div class="calendar-day-head">${dayHeads}</div>
-          <div class="calendar-bars">${pastDayOverlays}${bars || '<div class="calendar-empty-week">No enabled RM Gantt work this week.</div>'}</div>
+          <div class="calendar-bars">${pastDayOverlays}${bars || '<div class="calendar-empty-week">No matching RM Gantt work this week.</div>'}</div>
         </div>`;
     }
 
@@ -14897,7 +14982,7 @@
       const unscheduled = items.filter(item => !item.start || !item.due);
 
       if (!items.length) {
-        body.innerHTML = '<div class="calendar-empty-week">No linked Resource Consent trackers have "Show Gantt items on Taska" enabled yet.</div>';
+        body.innerHTML = '<div class="calendar-empty-week">No linked Resource Consent trackers are set to show surveyor tasks or all Gantt tasks on Taska yet.</div>';
         return;
       }
 

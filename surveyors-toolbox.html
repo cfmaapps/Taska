@@ -13626,7 +13626,10 @@
 
     function rmSessionForJob(job) {
       const link = jobRmLink(job);
-      return rmSharedSessionFromLink(link);
+      const linkedSession = rmSharedSessionFromLink(link);
+      if (linkedSession) return linkedSession;
+      const sharedLink = sharedRmLinkForJob(job);
+      return rmSharedSessionFromLink(sharedLink);
     }
 
     function rmSessionConditionMetaMap(session) {
@@ -17767,6 +17770,8 @@
       if (data.type === 'cfma-rm-link-updated' && data.link) {
         if (rememberJobRmLink(data.link, true)) {
           renderJobs();
+          if (taskCalendarOpen) renderTaskCalendar();
+          else updateCalendarViewTabs();
           flashJobStatus(data.link.jobId, `Linked RM ${data.link.rmReference || ''}`.trim());
         }
         return;

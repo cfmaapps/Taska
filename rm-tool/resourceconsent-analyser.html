@@ -6306,6 +6306,18 @@ function setPmShowGanttOnTaska(value) {
   ensurePmState();
   pmState.showGanttOnTaska = !!value;
   autoSave();
+  const session = buildProgressObject();
+  if (session) {
+    rememberTaskaRmLink({
+      jobId: taskaJobId,
+      jobNum: taskaJobNum,
+      jobName: taskaJobName,
+      rmReference: session.rmReference || data?.consentDetails?.rmReference || '',
+      savedAt: session.exported || new Date().toISOString(),
+      session
+    });
+    scheduleLinkedRmSave(80);
+  }
   if (conditionsTab === 'gantt') renderGanttChart();
   if (conditionsTab === 'project') renderProjectTeamPanel({ preserveScroll: true });
 }

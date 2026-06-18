@@ -5817,35 +5817,38 @@
           <span class="arrow">▼</span>
         </button>
         <div class="dropdown-menu">
-          <a class="dropdown-item" href="Timewrap/Useful Documents/224c-subdivision-checklist-september-2025.docx" target="_blank">
+          <a class="dropdown-item" href="#" onclick="openUsefulDocumentsFolder(event)">
+            <span class="file-icon">+</span> Open Useful Documents Folder
+          </a>
+          <a class="dropdown-item" href="Timewrap/Useful Documents/224c-subdivision-checklist-september-2025.docx" data-useful-file="224c-subdivision-checklist-september-2025.docx" onclick="openUsefulDocument(event,this.dataset.usefulFile)">
             <span class="file-icon">📄</span> 224c Subdivision Checklist
           </a>
-          <a class="dropdown-item" href="Timewrap/Useful Documents/QLDC District Plan transport Section 29.pdf" target="_blank">
+          <a class="dropdown-item" href="Timewrap/Useful Documents/QLDC District Plan transport Section 29.pdf" data-useful-file="QLDC District Plan transport Section 29.pdf" onclick="openUsefulDocument(event,this.dataset.usefulFile)">
             <span class="file-icon">📕</span> QLDC District Plan — Transport s29
           </a>
-          <a class="dropdown-item" href="Timewrap/Useful Documents/QLDC code of practice.pdf" target="_blank">
+          <a class="dropdown-item" href="Timewrap/Useful Documents/QLDC code of practice.pdf" data-useful-file="QLDC code of practice.pdf" onclick="openUsefulDocument(event,this.dataset.usefulFile)">
             <span class="file-icon">📕</span> QLDC Code of Practice
           </a>
-          <a class="dropdown-item" href="Timewrap/Useful Documents/QLDC standard design drawings.pdf" target="_blank">
+          <a class="dropdown-item" href="Timewrap/Useful Documents/QLDC standard design drawings.pdf" data-useful-file="QLDC standard design drawings.pdf" onclick="openUsefulDocument(event,this.dataset.usefulFile)">
             <span class="file-icon">📕</span> QLDC Standard Design Drawings
           </a>
-          <a class="dropdown-item" href="Timewrap/Useful Documents/Resource Management Act 1991.pdf" target="_blank">
+          <a class="dropdown-item" href="Timewrap/Useful Documents/Resource Management Act 1991.pdf" data-useful-file="Resource Management Act 1991.pdf" onclick="openUsefulDocument(event,this.dataset.usefulFile)">
             <span class="file-icon">⚖️</span> Resource Management Act 1991
           </a>
-          <a class="dropdown-item" href="Timewrap/Useful Documents/e1-surface-water-1st-edition-amendment10-rp.pdf" target="_blank">
+          <a class="dropdown-item" href="Timewrap/Useful Documents/e1-surface-water-1st-edition-amendment10-rp.pdf" data-useful-file="e1-surface-water-1st-edition-amendment10-rp.pdf" onclick="openUsefulDocument(event,this.dataset.usefulFile)">
             <span class="file-icon">📕</span> E1 Surface Water
           </a>
           <div style="font-size:0.65rem;color:#4a7fa8;text-transform:uppercase;letter-spacing:0.06em;padding:6px 8px 2px;margin-top:2px;border-top:1px solid #2e3d55;">Forms</div>
-          <a class="dropdown-item" href="Timewrap/Useful Documents/Forms/QLDC 1A certificate.pdf" target="_blank">
+          <a class="dropdown-item" href="Timewrap/Useful Documents/Forms/QLDC 1A certificate.pdf" data-useful-file="Forms/QLDC 1A certificate.pdf" onclick="openUsefulDocument(event,this.dataset.usefulFile)">
             <span class="file-icon">📋</span> QLDC 1A Certificate
           </a>
-          <a class="dropdown-item" href="Timewrap/Useful Documents/Forms/QLDC 1B certificate.pdf" target="_blank">
+          <a class="dropdown-item" href="Timewrap/Useful Documents/Forms/QLDC 1B certificate.pdf" data-useful-file="Forms/QLDC 1B certificate.pdf" onclick="openUsefulDocument(event,this.dataset.usefulFile)">
             <span class="file-icon">📋</span> QLDC 1B Certificate
           </a>
-          <a class="dropdown-item" href="Timewrap/Useful Documents/Forms/QLDC 1C certificate.pdf" target="_blank">
+          <a class="dropdown-item" href="Timewrap/Useful Documents/Forms/QLDC 1C certificate.pdf" data-useful-file="Forms/QLDC 1C certificate.pdf" onclick="openUsefulDocument(event,this.dataset.usefulFile)">
             <span class="file-icon">📋</span> QLDC 1C Certificate
           </a>
-          <a class="dropdown-item" href="Timewrap/Useful Documents/Forms/NZS3910 Schedule 6 Form.pdf" target="_blank">
+          <a class="dropdown-item" href="Timewrap/Useful Documents/Forms/NZS3910 Schedule 6 Form.pdf" data-useful-file="Forms/NZS3910 Schedule 6 Form.pdf" onclick="openUsefulDocument(event,this.dataset.usefulFile)">
             <span class="file-icon">📋</span> NZS3910 Schedule 6 Form
           </a>
         </div>
@@ -5882,7 +5885,7 @@
           <a class="dropdown-item" href="https://caster.emlid.com/app/mountpoints" target="_blank">
             <span class="file-icon">📡</span> Emlid Caster
           </a>
-          <a class="dropdown-item" href="Timewrap/Useful Documents/CFMA BASE - NTRIP USERS.xlsx" target="_blank">
+          <a class="dropdown-item" href="Timewrap/Useful Documents/CFMA BASE - NTRIP USERS.xlsx" data-useful-file="CFMA BASE - NTRIP USERS.xlsx" onclick="openUsefulDocument(event,this.dataset.usefulFile)">
             <span class="file-icon">📊</span> CFMA BASE — NTRIP Users
           </a>
         </div>
@@ -6315,6 +6318,36 @@
         return `Could not reach the local server. ${localSessionStartInstructions()} If Start Server.bat is already running, close it and start it again.`;
       }
       return (error && error.message) || fallback;
+    }
+
+    async function openUsefulDocumentsFolder(event) {
+      if (event) event.preventDefault();
+      try {
+        const resp = await fetchWithTimeout(localApiUrl('/api/open-useful-documents-folder'), {}, 30000);
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok || !data.ok) {
+          throw new Error((data && data.error) || 'Could not open Useful Documents folder.');
+        }
+      } catch (e) {
+        alert(localServerErrorMessage(e, 'Start Server.bat to open the Useful Documents folder.'));
+      }
+    }
+
+    async function openUsefulDocument(event, relativePath) {
+      if (event) event.preventDefault();
+      const file = String(relativePath || '').trim();
+      if (!file) return;
+      try {
+        const resp = await fetchWithTimeout(localApiUrl(`/api/open-useful-document?file=${encodeURIComponent(file)}`), {}, 30000);
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok || !data.ok) {
+          const expected = data && data.path ? `\n\nExpected file:\n${data.path}` : '';
+          const folder = data && data.folder ? `\n\nPut useful files in:\n${data.folder}` : '';
+          throw new Error(((data && data.error) || 'Could not open useful file.') + expected + folder);
+        }
+      } catch (e) {
+        alert(localServerErrorMessage(e, 'Start Server.bat to open useful files.'));
+      }
     }
 
     // ── Log task to week ───────────────────────────────────

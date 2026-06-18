@@ -1610,6 +1610,21 @@ function setConditionsTab(tab) {
 async function extractPdf(file) {
   const buf = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+  const text = await extractPdfTextLayer(pdf);
+  if (selectablePdfTextLooksUsable(text, pdf.numPages)) return text;
+
+  const trimmed = text.replace(/\s+/g, ' ').trim();
+  const pageLabel = pdf.numPages === 1 ? '1 page' : pdf.numPages + ' pages';
+  setLoad(
+    'Scanning PDF with AI OCR...',
+    'The PDF looks image-based, so the analyser is reading ' + pageLabel + ' visually.'
+  );
+  const ocrText = await ocrPdfWithOpenAi(pdf);
+  const merged = [trimmed, ocrText].filter(Boolean).join('\n\n');
+  return merged || text;
+}
+
+async function extractPdfTextLayer(pdf) {
   let text = '';
   for (let i = 1; i <= pdf.numPages; i++) {
     const page = await pdf.getPage(i);
@@ -1620,6 +1635,96 @@ async function extractPdf(file) {
     text += pageTextFromItems(content.items, strikeRects);
   }
   return text;
+}
+
+function selectablePdfTextLooksUsable(text, pageCount = 1) {
+  const cleaned = String(text || '').replace(/\s+/g, ' ').trim();
+  const letters = (cleaned.match(/[A-Za-z]/g) || []).length;
+  if (cleaned.length < 600 || letters < 250) return false;
+  if (/conditions?|schedule|resource\s+consent|decision|applicant|consent\s+holder/i.test(cleaned)) return true;
+  return cleaned.length >= Math.max(1200, Number(pageCount || 1) * 180);
+}
+
+async function ocrPdfWithOpenAi(pdf) {
+  const pageCount = pdf.numPages || 0;
+  const pages = [];
+  for (let i = 1; i <= pageCount; i++) {
+    setLoad('Scanning PDF with AI OCR...', 'Reading scanned page ' + i + ' of ' + pageCount + '.');
+    const page = await pdf.getPage(i);
+    try {
+      const imageUrl = await renderPdfPageDataUrl(page);
+      const pageText = await ocrPdfPageWithOpenAi(i, pageCount, imageUrl);
+      if (pageText) pages.push('--- OCR PAGE ' + i + ' ---\n' + pageText);
+    } catch (err) {
+      const msg = String(err?.message || err || '');
+      if (/input_image|image input|vision|unsupported|does not support|not support/i.test(msg)) {
+        throw new Error('This PDF is image-only and needs AI OCR, but the current AI model/settings did not accept page images. In Taska AI Setup, use a model that supports image input, then retry. ' + msg);
+      }
+      throw err;
+    } finally {
+      if (typeof page.cleanup === 'function') page.cleanup();
+    }
+  }
+  const text = pages.join('\n\n').trim();
+  if (!text) {
+    throw new Error('This PDF appears to be image-only, and AI OCR could not read any usable text from it. Try a cleaner PDF scan or export a selectable-text copy from council.');
+  }
+  return text;
+}
+
+async function renderPdfPageDataUrl(page) {
+  const baseViewport = page.getViewport({ scale: 1 });
+  const maxSide = 1800;
+  const scale = Math.min(
+    2,
+    Math.max(1.15, Math.min(maxSide / baseViewport.width, maxSide / baseViewport.height))
+  );
+  const viewport = page.getViewport({ scale });
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d', { alpha: false });
+  if (!ctx) throw new Error('Could not create a browser canvas for scanned PDF OCR.');
+  canvas.width = Math.ceil(viewport.width);
+  canvas.height = Math.ceil(viewport.height);
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  await page.render({ canvasContext: ctx, viewport }).promise;
+  const imageUrl = canvas.toDataURL('image/jpeg', 0.78);
+  canvas.width = 0;
+  canvas.height = 0;
+  return imageUrl;
+}
+
+async function ocrPdfPageWithOpenAi(pageNumber, pageCount, imageUrl) {
+  const prompt = `Extract all visible text from this scanned New Zealand resource consent PDF page.
+
+Return one valid JSON object only:
+{"text":""}
+
+Rules:
+- Preserve headings, condition numbers, decimal condition numbers, letters, dates, RM references, and section references exactly as visible.
+- Keep the text in natural reading order.
+- Do not summarise, classify, explain, or invent missing words.
+- If a word is unclear, use your best reading rather than omitting the surrounding sentence.
+- This is page ${pageNumber} of ${pageCount}.`;
+  const messages = [{
+    role: 'user',
+    content: [
+      { type: 'input_text', text: prompt },
+      { type: 'input_image', image_url: imageUrl, detail: 'high' }
+    ]
+  }];
+  const { text, stopReason } = await openaiOnce(messages, 12000);
+  let parsed;
+  try {
+    parsed = parseJSON(String(text || '').trim()
+      .replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim());
+  } catch (err) {
+    throw new Error('AI OCR returned unreadable JSON on scanned page ' + pageNumber + '. ' + err.message);
+  }
+  if (stopReason === 'max_tokens') {
+    throw new Error('AI OCR ran out of output room while reading scanned page ' + pageNumber + '. Try a clearer or smaller PDF scan.');
+  }
+  return String(parsed?.text || parsed?.pageText || '').trim();
 }
 
 /* Some variation PDFs keep deleted and inserted text in the same text layer.
@@ -1947,12 +2052,12 @@ ${truncated}`;
    within ~600 chars, not just a TOC listing. Multiple fallbacks handle the
    variety of QLDC, Southland District Council, and other NZ council
    formatting conventions. */
-function numberedConditionLinePattern(number = '\\d{1,3}', flags = 'i') {
+function numberedConditionLinePattern(number = '\\d{1,3}(?:\\.\\d{1,3})*[A-Za-z]?', flags = 'i') {
   const starts = '(?:The|That|Prior|Before|No|All|Any|This|These|Activities|Works|Consent|A|An|At|During|Within|In|Upon|Where|Except|Unless|If|To|For|Subject|Pursuant|Development|Subdivision|Land|Use|Access|Water|Wastewater|Stormwater|Earthworks|Monitoring|Records|Review|Fees|Lapse|Duration|Construction|Accidental|Discovery|Prior\\s+to|Before\\s+the|The\\s+consent)\\b';
   return new RegExp('(?:^|\\n)\\s*(?:Condition\\s+)?(' + number + ')(?:\\s*[.)]\\s+|\\s{2,}|\\s+(?=' + starts + '))(?=\\S)', flags);
 }
 
-function hasNumberedConditionAfter(text, number = '1') {
+function hasNumberedConditionAfter(text, number = '1(?:\\.\\d{1,3})*[A-Za-z]?') {
   return numberedConditionLinePattern(number).test(text);
 }
 
@@ -2002,11 +2107,11 @@ function findConditionsSectionStart(text) {
   const schedRe = /SCHEDULES?\s+(?:\d+\s*)?(?:[-:\u2013\u2014]\s*)?OF\s+(?:(?:RESOURCE\s+)?CONSENT\s+)?CONDITIONS/gi;
   while ((m = schedRe.exec(text)) !== null) {
     const after = text.slice(m.index, m.index + 6000);
-    if (hasNumberedConditionAfter(after)) return schedRe.index;
+    if (hasNumberedConditionAfter(after)) return m.index;
   }
 
   /* Strategy 4 — first numbered condition with typical QLDC opening language */
-  const firstCondRe = /\n\s*(?:Condition\s+)?1(?:\s*[.)]\s+|\s{2,}|\s+)(?:That\s+the\s+development|The\s+consent\s+holder|All\s+engineering\s+works|The\s+development\s+must|The\s+activity|The\s+proposal|The\s+consent|This\s+consent)/i.exec(text);
+  const firstCondRe = /\n\s*(?:Condition\s+)?1(?:\.\d{1,3})*(?:\s*[.)]\s+|\s{2,}|\s+)(?:That\s+the\s+development|The\s+consent\s+holder|All\s+engineering\s+works|The\s+development\s+must|The\s+activity|The\s+proposal|The\s+consent|This\s+consent|To\s+ensure|Pursuant\s+to|Subject\s+to)/i.exec(text);
   if (firstCondRe) return Math.max(0, firstCondRe.index - 400);
 
   /* Strategy 5 — generic "CONDITIONS OF CONSENT" heading with numbered list following */
@@ -2511,7 +2616,7 @@ function assertExtractedConsentConditions(d, rawText = '') {
   const detail = rawCount
     ? 'The PDF appears to contain numbered conditions, but the analyser could not classify them into the tracker.'
     : 'The analyser could not find a numbered consent-conditions section in the PDF text.';
-  throw new Error(`${detail} No condition tracker was created. Please check the PDF text is selectable, or send this council format for setup.`);
+  throw new Error(`${detail} No condition tracker was created. If this is a scanned consent, try a cleaner PDF scan or send this council format for setup.`);
 }
 
 function normalizeExtractedConditionText(text) {
@@ -2645,7 +2750,7 @@ function conditionSubpartCount(text, parentNumber = '') {
 function rawConditionBlocksByNumber(rawText) {
   const source = String(rawText || '');
   const matches = [];
-  const re = numberedConditionLinePattern('\\d{1,3}', 'gi');
+  const re = numberedConditionLinePattern(undefined, 'gi');
   let m;
   while ((m = re.exec(source)) !== null) {
     matches.push({

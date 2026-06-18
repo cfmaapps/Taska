@@ -111,6 +111,17 @@ if (-not $appRoot.Equals($localDataRoot, [System.StringComparison]::OrdinalIgnor
     foreach ($file in $localDataFiles) { Move-LocalDataItem -SourceRoot $appRoot -TargetRoot $localDataRoot -Name $file }
 }
 
+foreach ($folder in $localDataFolders) {
+    $folderPath = Join-Path $localDataRoot $folder
+    if (-not (Test-Path -LiteralPath $folderPath -PathType Container)) {
+        New-Item -ItemType Directory -Path $folderPath -Force | Out-Null
+    }
+}
+$usefulFormsPath = Join-Path (Join-Path $localDataRoot 'Useful Documents') 'Forms'
+if (-not (Test-Path -LiteralPath $usefulFormsPath -PathType Container)) {
+    New-Item -ItemType Directory -Path $usefulFormsPath -Force | Out-Null
+}
+
 $listener = New-Object System.Net.HttpListener
 $listener.Prefixes.Add("http://localhost:$port/")
 $listener.Start()
@@ -2032,6 +2043,76 @@ while ($listener.IsListening) {
         } catch {
             Write-JsonResponse $res 500 @{ ok = $false; error = 'Could not open folder.' }
             Write-Host "  [Explorer] Error: $_" -ForegroundColor Red
+        }
+        continue
+    }
+
+    if ($path -eq 'api/open-useful-documents-folder') {
+        try {
+            $folderPath = Get-AppFilePath 'Useful Documents'
+            if (-not (Test-Path -LiteralPath $folderPath -PathType Container)) {
+                New-Item -ItemType Directory -Path $folderPath -Force | Out-Null
+            }
+            $formsPath = Join-Path $folderPath 'Forms'
+            if (-not (Test-Path -LiteralPath $formsPath -PathType Container)) {
+                New-Item -ItemType Directory -Path $formsPath -Force | Out-Null
+            }
+
+            Open-FolderWithExplorer -FolderPath $folderPath
+            Write-JsonResponse $res 200 @{ ok = $true; path = $folderPath }
+            Write-Host "  [Useful] Opened $folderPath" -ForegroundColor Green
+        } catch {
+            Write-JsonResponse $res 500 @{ ok = $false; error = 'Could not open Useful Documents folder.' }
+            Write-Host "  [Useful] Folder open error: $_" -ForegroundColor Red
+        }
+        continue
+    }
+
+    if ($path -eq 'api/open-useful-document') {
+        try {
+            $relativePath = $req.QueryString['file']
+            if ([string]::IsNullOrWhiteSpace($relativePath)) {
+                Write-JsonResponse $res 400 @{ ok = $false; error = 'Missing useful file.' }
+                continue
+            }
+
+            $usefulRoot = [System.IO.Path]::GetFullPath((Get-AppFilePath 'Useful Documents'))
+            if (-not (Test-Path -LiteralPath $usefulRoot -PathType Container)) {
+                New-Item -ItemType Directory -Path $usefulRoot -Force | Out-Null
+            }
+            $formsPath = Join-Path $usefulRoot 'Forms'
+            if (-not (Test-Path -LiteralPath $formsPath -PathType Container)) {
+                New-Item -ItemType Directory -Path $formsPath -Force | Out-Null
+            }
+
+            $relative = Normalize-AppRelativePath $relativePath
+            if ($relative.Equals('Useful Documents', [System.StringComparison]::OrdinalIgnoreCase)) {
+                $relative = ''
+            } elseif ($relative.StartsWith('Useful Documents\', [System.StringComparison]::OrdinalIgnoreCase)) {
+                $relative = $relative.Substring('Useful Documents\'.Length)
+            }
+
+            $filePath = Resolve-SafeChildPath -BasePath $usefulRoot -RelativePath $relative
+            $usefulRootPrefix = $usefulRoot.TrimEnd('\') + '\'
+
+            if ([string]::IsNullOrWhiteSpace($relative) -or ($null -eq $filePath) -or (-not $filePath.StartsWith($usefulRootPrefix, [System.StringComparison]::OrdinalIgnoreCase))) {
+                Write-JsonResponse $res 403 @{ ok = $false; error = 'Useful file must be inside Useful Documents.'; folder = $usefulRoot }
+                Write-Host "  [Useful] Rejected path: $relativePath" -ForegroundColor Yellow
+                continue
+            }
+
+            if (-not (Test-Path -LiteralPath $filePath -PathType Leaf)) {
+                Write-JsonResponse $res 404 @{ ok = $false; error = 'Useful file not found.'; path = $filePath; folder = $usefulRoot }
+                Write-Host "  [Useful] Missing: $filePath" -ForegroundColor Yellow
+                continue
+            }
+
+            Start-Process -FilePath $filePath
+            Write-JsonResponse $res 200 @{ ok = $true; path = $filePath }
+            Write-Host "  [Useful] Opened $filePath" -ForegroundColor Green
+        } catch {
+            Write-JsonResponse $res 500 @{ ok = $false; error = 'Could not open useful file.' }
+            Write-Host "  [Useful] Open error: $_" -ForegroundColor Red
         }
         continue
     }

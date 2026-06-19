@@ -6769,7 +6769,7 @@
   <script src="gmail-analysis-core.js"></script>
   <script src="cfma-public-config.js"></script>
   <script>
-    const TASKA_APP_VERSION = String(window.CFMA_TASKA_CONFIG?.appVersion || '2026.06.19.6');
+    const TASKA_APP_VERSION = String(window.CFMA_TASKA_CONFIG?.appVersion || '2026.06.19.7');
     const TASKA_UPDATE_DISMISS_KEY = 'cfma-taska-update-dismissed';
     const TASKA_MOBILE_VIEW_KEY = 'cfma-taska-mobile-view';
     const TASKA_INSTALL_DISMISS_KEY = 'cfma-taska-install-dismissed';
@@ -15272,6 +15272,12 @@
         return;
       }
 
+      if (isMobileDevice()) {
+        body.innerHTML = renderMobileTeamWorkCalendars(firstMonday, todayStr) + renderTeamSummary();
+        restoreMobileCalendarScroll(body, previousScrollTop, shouldScrollPreviousWeek);
+        return;
+      }
+
       body.innerHTML = renderTeamWorkCalendars(firstMonday, todayStr) + renderTeamSummary();
       restoreOrScrollCalendarToCurrent(body, shouldScrollPreviousWeek ? 0 : previousScrollTop, shouldScrollPreviousWeek ? -1 : 0);
     }
@@ -15323,6 +15329,10 @@
       const summary = assignments.length
         ? `${assignments.length} open delegated task${assignments.length === 1 ? '' : 's'} assigned to ${peopleCount} ${peopleCount === 1 ? 'person' : 'people'}.`
         : 'No open tasks assigned to others yet.';
+      if (isMobileDevice()) {
+        renderMobileAssignedOutCalendarView(body, previousScrollTop, shouldScrollPreviousWeek);
+        return;
+      }
       const weeks = calendarVisibleWeekStarts(firstMonday).map(weekStart => renderAssignedOutCalendarWeek(weekStart, assignments, todayStr));
 
       body.innerHTML = `<div class="calendar-empty-week">${escHtml(summary)}</div>${weeks.join('')}`;
@@ -15363,6 +15373,452 @@
             <span class="calendar-hours-badge">${escHtml(item.assigneeName)}</span>
           </div>`;
       }).join('');
+    }
+
+    function mobileCalendarVisibleDates(firstMonday, days = TASK_CALENDAR_DAYS, futureWeekCount = TASK_CALENDAR_WEEK_COUNT) {
+      const dates = [];
+      calendarVisibleWeekStarts(firstMonday, futureWeekCount).forEach(weekStart => {
+        days.forEach(day => dates.push(addCalendarDays(weekStart, day.offset)));
+      });
+      return dates;
+    }
+
+    function mobileCalendarItemDateRange(start, due, date = null) {
+      if (!start && !due) return '';
+      const startDate = start || due;
+      const dueDate = due || start;
+      const startStr = toLocalDateStr(startDate);
+      const dueStr = toLocalDateStr(dueDate);
+      const dateStr = date ? toLocalDateStr(date) : '';
+      if (startStr === dueStr) return `Due ${formatTaskDateInput(dueStr)}`;
+      if (dateStr && dateStr === startStr) return `Starts ${shortDateLabel(startDate)} - due ${shortDateLabel(dueDate)}`;
+      if (dateStr && dateStr === dueStr) return `Due ${shortDateLabel(dueDate)} - started ${shortDateLabel(startDate)}`;
+      return `${shortDateLabel(startDate)} - ${shortDateLabel(dueDate)}`;
+    }
+
+    function renderMobileCalendarDay(date, todayStr, itemsHtml, itemCount, options = {}) {
+      const dateStr = toLocalDateStr(date);
+      const classes = ['mobile-calendar-day'];
+      if (dateStr < todayStr) classes.push('past');
+      if (dateStr === todayStr) classes.push('today');
+      const weekday = date.toLocaleDateString('en-NZ', { weekday: 'long' });
+      const subLabel = dateStr === todayStr ? `${shortDateLabel(date)} - Today` : shortDateLabel(date);
+      const countLabel = options.countLabel || (itemCount ? `${itemCount} item${itemCount === 1 ? '' : 's'}` : 'No items');
+      const logButton = options.logButton
+        ? `<button type="button" class="mobile-calendar-day-log" onclick="showCalendarDayLogForm(event,'${dateStr}')" title="Log work to this day">Log</button>`
+        : '';
+      const right = `${options.rightLabel ? `<span class="mobile-calendar-day-pill">${escHtml(options.rightLabel)}</span>` : ''}<span class="mobile-calendar-day-pill">${escHtml(countLabel)}</span>${logButton}`;
+      const empty = options.emptyLabel || 'No scheduled work this day.';
+      return `
+        <section class="${classes.join(' ')}" data-mobile-date="${dateStr}"${dateStr === todayStr ? ' data-current-day="true"' : ''}>
+          <div class="mobile-calendar-day-head">
+            <div class="mobile-calendar-day-title">${escHtml(weekday)}<span>${escHtml(subLabel)}</span></div>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">${right}</div>
+          </div>
+          <div class="mobile-calendar-day-items">${itemsHtml || `<div class="mobile-calendar-empty-day">${escHtml(empty)}</div>`}</div>
+        </section>`;
+    }
+
+    function restoreMobileCalendarScroll(body, previousScrollTop = 0, forceTop = false) {
+      if (!body) return;
+      const schedule = window.requestAnimationFrame || (fn => setTimeout(fn, 0));
+      schedule(() => {
+        if (previousScrollTop > 8 && !forceTop) {
+          body.scrollTop = Math.min(previousScrollTop, Math.max(0, body.scrollHeight - body.clientHeight));
+        } else {
+          body.scrollTop = 0;
+        }
+      });
+    }
+
+    function renderMobileCalendarTaskItem(task, date, todayStr) {
+      const isDueToday = toLocalDateStr(task.due) === todayStr;
+      const doneClass = task.done ? 'completed' : '';
+      const assignedClass = task.assignedDeadline ? 'assigned-deadline' : '';
+      const readOnly = !!task.readOnly || !task.jobId;
+      const completeCb = !readOnly && (task.canComplete || task.done)
+        ? `<input class="calendar-complete-cb" type="checkbox" ${task.done ? 'checked' : ''} onclick="event.stopPropagation()" onchange="completeCalendarTask(event,'${task.jobId}',${task.taskIdx})" title="${task.done ? 'Undo complete' : 'Mark complete'}">`
+        : '';
+      const hoursBadge = task.done && task.completedHours
+        ? `<span class="calendar-hours-badge">${escHtml(task.completedHours)}h</span>`
+        : '';
+      const deadlineBadge = task.assignedDeadline ? '<span class="calendar-hours-badge">Deadline</span>' : '';
+      const clickAttr = readOnly
+        ? `onclick="showAssignedDeadlineDetails(event,'${encodeCalendarDetailParam(task.label)}','${encodeCalendarDetailParam(task.ownerName || '')}','${encodeCalendarDetailParam(toLocalDateStr(task.due))}','${encodeCalendarDetailParam(task.assignedSummary || '')}')"`
+        : `onclick="showCalendarJobDetails(event,'${task.jobId}',${task.taskIdx})"`;
+      const note = [
+        mobileCalendarItemDateRange(task.start, task.due, date),
+        task.assignedSummary || '',
+        task.ownerName ? `from ${task.ownerName}` : ''
+      ].filter(Boolean).join(' - ');
+      return `
+        <div class="calendar-task-bar mobile-calendar-item ${isDueToday ? 'due-today' : ''} ${doneClass} ${assignedClass}" ${clickAttr}
+          style="--job-color:${escHtml(task.color)};" title="${escHtml(task.label)}">
+          ${completeCb}<span class="mobile-calendar-kind">${task.assignedDeadline ? 'Deadline' : 'Task'}</span>
+          <span class="calendar-task-label">${escHtml(task.label)}</span>${hoursBadge}${deadlineBadge}
+          ${note ? `<span class="mobile-calendar-item-note">${escHtml(note)}</span>` : ''}
+        </div>`;
+    }
+
+    function renderMobileOutgoingAssignmentItem(item, todayStr) {
+      const isDueToday = toLocalDateStr(item.due) === todayStr;
+      const jobParam = encodeCalendarDetailParam(item.jobId);
+      const taskParam = encodeCalendarDetailParam(item.taskIdx);
+      const subParam = encodeCalendarDetailParam(item.subIdx);
+      const note = [`Assigned to ${item.assigneeName || 'team member'}`, `Due ${shortDateLabel(item.due)}`, item.taskLabel || ''].filter(Boolean).join(' - ');
+      return `
+        <div class="calendar-task-bar mobile-calendar-item ${isDueToday ? 'due-today' : ''} assigned-deadline"
+          onclick="showOutgoingAssignedTaskDetails(event,'${jobParam}','${taskParam}','${subParam}')"
+          style="--job-color:${escHtml(item.color)};" title="${escHtml(item.label)}">
+          <span class="mobile-calendar-kind">Assigned</span>
+          <span class="calendar-task-label">${escHtml(item.label)}</span>
+          <span class="calendar-hours-badge">${escHtml(item.assigneeName || 'Assigned')}</span>
+          <span class="mobile-calendar-item-note">${escHtml(note)}</span>
+        </div>`;
+    }
+
+    function renderMobileLogItem(entry) {
+      const refParam = encodeURIComponent(entry.sourceLogRef || '');
+      const linkedClass = entry.hasJob ? 'has-job' : '';
+      return `
+        <div class="calendar-log-bar mobile-calendar-item ${linkedClass}" data-log-ref="${escHtml(entry.sourceLogRef || '')}"
+          onclick="showCalendarLogEditor(event,decodeURIComponent('${refParam}'))"
+          style="--job-color:${escHtml(entry.color || '#4a90c4')};" title="${escHtml(entry.label)}">
+          <span class="calendar-log-time">${escHtml(formatWeekLogHours(entry.time))}</span>
+          <span class="calendar-meeting-label">${escHtml(entry.label)}</span>
+          <span class="mobile-calendar-item-note">Logged work</span>
+        </div>`;
+    }
+
+    function renderMobileReminderItem(item) {
+      const idParam = encodeURIComponent(item.id || '');
+      const occurrence = item.occurrenceDate || toLocalDateStr(item.date);
+      const occurrenceParam = encodeURIComponent(occurrence);
+      return `
+        <div class="calendar-reminder-bar mobile-calendar-item ${item.hasJob ? 'has-job' : ''}" data-reminder-id="${escHtml(item.id || '')}" data-reminder-date="${escHtml(occurrence)}"
+          onclick="showCalendarReminderDetails(event,decodeURIComponent('${idParam}'),decodeURIComponent('${occurrenceParam}'))"
+          style="--job-color:${escHtml(item.color || '#bb6bd9')};" title="${escHtml(item.label)}">
+          <span class="calendar-reminder-type">${escHtml(calendarReminderRepeatShort(item.repeat))}</span>
+          <span class="calendar-meeting-label">${escHtml(item.label)}</span>
+          <span class="mobile-calendar-item-note">${escHtml(calendarReminderRepeatLabel(item.repeat))} reminder</span>
+        </div>`;
+    }
+
+    function renderMobileMeetingItem(ev) {
+      const title = ev.location
+        ? `${ev.subject || '(No title)'} - ${ev.location}`
+        : (ev.subject || '(No title)');
+      return `
+        <div class="calendar-meeting-bar mobile-calendar-item" title="${escHtml(title)}">
+          <span class="calendar-meeting-time">${formatCalendarMeetingTime(ev)}</span>
+          <span class="calendar-meeting-label">${escHtml(ev.subject || '(No title)')}</span>
+          ${ev.location ? `<span class="mobile-calendar-item-note">${escHtml(ev.location)}</span>` : ''}
+        </div>`;
+    }
+
+    function renderMobileRmGanttItem(item, date, todayStr) {
+      const itemId = encodeCalendarDetailParam(item.id);
+      const isDueToday = toLocalDateStr(item.due) === todayStr;
+      const doneClass = item.done ? 'completed' : '';
+      const priorityClass = item.priority ? `priority-${item.priority}` : '';
+      const badges = [
+        item.priority === 'urgent' ? '<span class="calendar-hours-badge">Urgent</span>' : '',
+        item.priority === 'hold' ? '<span class="calendar-hours-badge">Hold</span>' : '',
+        item.milestone ? '<span class="calendar-hours-badge">Milestone</span>' : ''
+      ].join('');
+      const meta = [
+        mobileCalendarItemDateRange(item.start, item.due, date),
+        item.rmReference ? `RM ${item.rmReference}` : '',
+        item.conditionNumber ? `Condition ${item.conditionNumber}` : '',
+        item.conditionStage || ''
+      ].filter(Boolean).join(' - ');
+      return `
+        <div class="calendar-task-bar mobile-calendar-item rc-gantt-task ${isDueToday ? 'due-today' : ''} ${doneClass} ${priorityClass}"
+          onclick="showRmGanttTaskDetails(event,decodeURIComponent('${itemId}'))"
+          style="--job-color:${escHtml(item.color)};" title="${escHtml(item.label)}">
+          <span class="mobile-calendar-kind">RC</span>
+          <span class="calendar-task-label">${escHtml(item.label)}</span>${badges}
+          ${meta ? `<span class="mobile-calendar-item-note">${escHtml(meta)}</span>` : ''}
+        </div>`;
+    }
+
+    function renderMobileGmailItem(item, date, todayStr) {
+      const sourceDate = formatOutlookMessageDate(item.sourceDate);
+      const source = [item.sourceFrom, sourceDate].filter(Boolean).join(' - ');
+      const kind = gmailCalendarKindShort(item.kind);
+      const displayTitle = gmailDisplayTitle(item);
+      const isPast = toLocalDateStr(item.displayEndDate) < todayStr;
+      const barKindClass = gmailCalendarBarKindClass(item.kind);
+      const note = [
+        item.time || '',
+        mobileCalendarItemDateRange(item.displayDate, item.displayEndDate, date),
+        source,
+        item.context || ''
+      ].filter(Boolean).join(' - ');
+      return `
+        <div class="calendar-gmail-bar mobile-calendar-item ${barKindClass} ${isPast ? 'past' : ''}"
+          onclick="showGmailCalendarEditor(event,'${item.id}')"
+          title="${escHtml(displayTitle)}">
+          <span class="calendar-gmail-type">${escHtml(kind)}</span>
+          <span class="calendar-meeting-label">${escHtml(displayTitle)}</span>
+          <button class="calendar-gmail-delete" type="button"
+            onclick="deleteGmailCalendarCell(event,'${item.id}')"
+            onmousedown="event.stopPropagation()"
+            title="Delete from Gmail calendar"
+            aria-label="Delete from Gmail calendar">x</button>
+          ${note ? `<span class="mobile-calendar-item-note">${escHtml(note)}</span>` : ''}
+        </div>`;
+    }
+
+    function renderMobileReadonlyTaskItem(task, owner, date) {
+      const doneClass = task.done ? 'completed' : '';
+      const assignedClass = task.assignedDeadline ? 'assigned-deadline' : '';
+      const hours = task.done && task.completedHours ? `<span class="calendar-hours-badge">${escHtml(task.completedHours)}h</span>` : '';
+      const marker = task.assignedDeadline ? '<span class="calendar-hours-badge">Deadline</span>' : '';
+      const ownerId = task.assignedDeadline ? (task.sourceOwnerId || task.ownerId || '') : (task.ownerId || owner.user_id || '');
+      const jobId = task.assignedDeadline ? (task.sourceJobId || '') : (task.jobId || '');
+      const jobIdx = task.assignedDeadline ? task.sourceJobIdx : task.jobIdx;
+      const taskIdx = task.assignedDeadline ? task.sourceTaskIdx : task.taskIdx;
+      const note = [
+        mobileCalendarItemDateRange(task.start || task.fullStart, task.due || task.fullDue, date),
+        task.assignedDeadline ? (task.assignedSummary || 'Assigned subtask') : '',
+        task.ownerName || owner.user_name || ''
+      ].filter(Boolean).join(' - ');
+      return `
+        <div class="calendar-task-bar mobile-calendar-item ${doneClass} ${assignedClass}"
+          onclick="showSharedCalendarTaskDetails(event,'${encodeCalendarDetailParam(ownerId)}','${encodeCalendarDetailParam(jobId)}','${encodeCalendarDetailParam(taskIdx)}','${encodeCalendarDetailParam(jobIdx)}','${task.assignedDeadline ? 'assigned' : 'task'}')"
+          style="--job-color:${escHtml(task.color)};" title="${escHtml(task.label)}">
+          <span class="mobile-calendar-kind">${task.assignedDeadline ? 'Deadline' : 'Task'}</span>
+          <span class="calendar-task-label">${escHtml(task.label)}</span>${hours}${marker}
+          ${note ? `<span class="mobile-calendar-item-note">${escHtml(note)}</span>` : ''}
+        </div>`;
+    }
+
+    function renderMobileReadonlyLogItem(entry) {
+      return `
+        <div class="calendar-log-bar mobile-calendar-item ${entry.hasJob ? 'has-job' : ''}"
+          style="--job-color:${escHtml(entry.color || '#4a90c4')}; cursor:default;" title="${escHtml(entry.label)}">
+          <span class="calendar-log-time">${escHtml(formatWeekLogHours(entry.time))}</span>
+          <span class="calendar-meeting-label">${escHtml(entry.label)}</span>
+          <span class="mobile-calendar-item-note">Logged work</span>
+        </div>`;
+    }
+
+    function renderMobileReadonlyReminderItem(item) {
+      return `
+        <div class="calendar-reminder-bar mobile-calendar-item ${item.hasJob ? 'has-job' : ''}"
+          style="--job-color:${escHtml(item.color || '#bb6bd9')}; cursor:default;" title="${escHtml(item.label)}">
+          <span class="calendar-reminder-type">${escHtml(calendarReminderRepeatShort(item.repeat))}</span>
+          <span class="calendar-meeting-label">${escHtml(item.label)}</span>
+          <span class="mobile-calendar-item-note">${escHtml(calendarReminderRepeatLabel(item.repeat))} reminder</span>
+        </div>`;
+    }
+
+    function renderMobileYourWorkCalendar(body, previousScrollTop = 0, shouldScrollPreviousWeek = false) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todayStr = toLocalDateStr(today);
+      const firstMonday = getMonday(today);
+      const dates = mobileCalendarVisibleDates(firstMonday);
+      const tasks = collectCalendarTasks();
+      const assignedByYou = collectOutgoingAssignedTasks();
+      const visibleAssignedByYou = yourWorkAssignedVisible ? assignedByYou : [];
+      const weekCache = new Map();
+      const weekData = date => {
+        const key = toLocalDateStr(getMonday(date));
+        if (!weekCache.has(key)) {
+          const weekStart = parseTaskDate(key);
+          weekCache.set(key, {
+            hours: collectCalendarDayHours(weekStart),
+            logs: collectCalendarLogEntriesForWeek(weekStart),
+            reminders: collectCalendarRemindersForWeek(weekStart),
+            meetings: collectCalendarMeetingsForWeek(weekStart)
+          });
+        }
+        return weekCache.get(key);
+      };
+      const daySections = dates.map(date => {
+        const dateStr = toLocalDateStr(date);
+        const data = weekData(date);
+        const dayTasks = tasks.filter(task => calendarTaskOverlapsDate(task.start, task.due, date));
+        const dayAssigned = visibleAssignedByYou.filter(item => toLocalDateStr(item.due) === dateStr);
+        const dayReminders = data.reminders.filter(item => toLocalDateStr(item.date) === dateStr);
+        const dayLogs = data.logs.filter(item => toLocalDateStr(item.date) === dateStr);
+        const dayMeetings = data.meetings.filter(ev => toLocalDateStr(ev.startDt) === dateStr);
+        const html = [
+          ...dayTasks.map(task => renderMobileCalendarTaskItem(task, date, todayStr)),
+          ...dayAssigned.map(item => renderMobileOutgoingAssignmentItem(item, todayStr)),
+          ...dayReminders.map(renderMobileReminderItem),
+          ...dayLogs.map(renderMobileLogItem),
+          ...dayMeetings.map(renderMobileMeetingItem)
+        ].join('');
+        const count = dayTasks.length + dayAssigned.length + dayReminders.length + dayLogs.length + dayMeetings.length;
+        const total = formatTaskHours(data.hours.get(dateStr) || 0);
+        return renderMobileCalendarDay(date, todayStr, html, count, {
+          rightLabel: total ? `${total}h` : '',
+          logButton: true,
+          emptyLabel: 'No scheduled tasks, logs, reminders, or meetings.'
+        });
+      }).join('');
+      body.innerHTML = renderYourWorkAssignedToggle(assignedByYou.length) + `<div class="mobile-calendar-days">${daySections}</div>`;
+      restoreMobileCalendarScroll(body, previousScrollTop, shouldScrollPreviousWeek);
+    }
+
+    function renderMobileAssignedOutCalendarView(body, previousScrollTop = 0, shouldScrollPreviousWeek = false) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todayStr = toLocalDateStr(today);
+      const firstMonday = getMonday(today);
+      const assignments = collectOutgoingAssignedTasks();
+      const peopleCount = new Set(assignments.map(item => item.assigneeId)).size;
+      const summary = assignments.length
+        ? `${assignments.length} open delegated task${assignments.length === 1 ? '' : 's'} assigned to ${peopleCount} ${peopleCount === 1 ? 'person' : 'people'}.`
+        : 'No open tasks assigned to others yet.';
+      const daySections = mobileCalendarVisibleDates(firstMonday).map(date => {
+        const dateStr = toLocalDateStr(date);
+        const dayItems = assignments.filter(item => toLocalDateStr(item.due) === dateStr);
+        const html = dayItems.map(item => renderMobileOutgoingAssignmentItem(item, todayStr)).join('');
+        return renderMobileCalendarDay(date, todayStr, html, dayItems.length, { emptyLabel: 'No delegated tasks due this day.' });
+      }).join('');
+      body.innerHTML = `<div class="calendar-empty-week">${escHtml(summary)}</div><div class="mobile-calendar-days">${daySections}</div>`;
+      restoreMobileCalendarScroll(body, previousScrollTop, shouldScrollPreviousWeek);
+    }
+
+    function renderMobileRmGanttCalendarView(body, previousScrollTop = 0, shouldScrollPreviousWeek = false) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todayStr = toLocalDateStr(today);
+      const firstMonday = getMonday(today);
+      const items = collectRmGanttCalendarItems();
+      const dated = items.filter(item => item.start && item.due);
+      const unscheduled = items.filter(item => !item.start || !item.due);
+
+      if (!items.length) {
+        body.innerHTML = '<div class="calendar-empty-week">No linked Resource Consent trackers are set to show surveyor tasks or all Gantt tasks on Taska yet.</div>';
+        return;
+      }
+
+      const daySections = mobileCalendarVisibleDates(firstMonday).map(date => {
+        const dayItems = dated.filter(item => calendarTaskOverlapsDate(item.start, item.due, date));
+        const html = dayItems.map(item => renderMobileRmGanttItem(item, date, todayStr)).join('');
+        return renderMobileCalendarDay(date, todayStr, html, dayItems.length, { emptyLabel: 'No matching RM Gantt work this day.' });
+      }).join('');
+      body.innerHTML = renderRmGanttCalendarSummary(items, dated, unscheduled) + renderRmGanttUnscheduled(unscheduled) + `<div class="mobile-calendar-days">${daySections}</div>`;
+      restoreMobileCalendarScroll(body, previousScrollTop, shouldScrollPreviousWeek);
+    }
+
+    function renderMobileGmailCalendar(body, previousScrollTop = 0, shouldScrollPreviousWeek = false) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todayStr = toLocalDateStr(today);
+      const firstMonday = getMonday(today);
+      const weeks = calendarVisibleWeekStarts(firstMonday);
+      const items = weeks.flatMap(weekStart => collectGmailCalendarItemsForWeek(weekStart));
+      const unique = new Map();
+      items.forEach(item => unique.set(item.id, item));
+      const allItems = Array.from(unique.values());
+      const daySections = mobileCalendarVisibleDates(firstMonday, GMAIL_CALENDAR_DAYS).map(date => {
+        const dayItems = allItems
+          .filter(item => item.displayDate && item.displayEndDate && item.displayDate <= date && item.displayEndDate >= date)
+          .sort((a, b) => (a.time || '').localeCompare(b.time || '') || gmailDisplayTitle(a).localeCompare(gmailDisplayTitle(b)));
+        const html = dayItems.map(item => renderMobileGmailItem(item, date, todayStr)).join('');
+        return renderMobileCalendarDay(date, todayStr, html, dayItems.length, { emptyLabel: 'No Gmail dates this day.' });
+      }).join('');
+      body.innerHTML = `<div class="mobile-calendar-days">${daySections}</div>`;
+      restoreMobileCalendarScroll(body, previousScrollTop, shouldScrollPreviousWeek);
+    }
+
+    function renderMobileTeamWorkCalendars(firstMonday, todayStr) {
+      if (!supabaseConfigured()) return '';
+      const peopleRows = teamCalendarPeople();
+      const selected = selectedTeamCalendarPerson(peopleRows);
+      const assignmentRows = teamCalendarAssignmentRows();
+      const assignedCountsByUser = new Map();
+      peopleRows.forEach(person => {
+        const assignedCount = collectAssignedParentDeadlineTasksForUser(person.user_id, null, assignmentRows, person.user_id).length;
+        if (assignedCount) assignedCountsByUser.set(person.user_id, assignedCount);
+      });
+      const updated = localStorage.getItem(SUPABASE_LAST_SYNC_KEY);
+      const syncedCount = peopleRows.filter(person => person.row && person.row.state).length;
+      const status = `${peopleRows.length} team calendar${peopleRows.length === 1 ? '' : 's'} available${syncedCount ? ` | ${syncedCount} synced` : ''}${updated ? ` | refreshed ${outlookScanDateLabel(updated)}` : ''}`;
+      const refresh = `<button class="email-scan-action" style="margin-left:8px" onclick="refreshTeamCalendars()">Refresh Team</button>`;
+      if (!peopleRows.length) {
+        return `<div class="team-calendar-section"><div class="team-calendar-heading">Shared Work Calendars ${refresh}</div><div class="calendar-empty-week">No team calendars loaded yet. ${escHtml(status)}</div></div>`;
+      }
+      const tabs = peopleRows.map(person => {
+        const synced = !!(person.row && person.row.state);
+        const active = selected && person.user_id === selected.user_id;
+        const assignedCount = assignedCountsByUser.get(person.user_id) || 0;
+        const assignedLabel = assignedCount ? ` (${assignedCount} assigned)` : '';
+        const label = `${person.user_name || 'Team member'}${person.isCurrent ? ' (you)' : ''}${assignedLabel}`;
+        const title = synced
+          ? `Synced ${outlookScanDateLabel(person.row.updated_at)}${assignedCount ? ` | ${assignedCount} task${assignedCount === 1 ? '' : 's'} assigned to them` : ''}`
+          : (assignedCount ? `${assignedCount} assigned task${assignedCount === 1 ? '' : 's'}, no saved calendar yet` : 'No saved calendar yet');
+        return `<button class="team-person-tab ${active ? 'active' : ''} ${synced ? '' : 'waiting'}" onclick="setTeamCalendarPerson('${encodeCalendarDetailParam(person.user_id)}')" title="${escHtml(title)}">${escHtml(label)}</button>`;
+      }).join('');
+
+      if (!selected) {
+        return `<div class="team-calendar-section"><div class="team-calendar-heading">Shared Work Calendars ${refresh}</div><div class="team-person-tabs">${tabs}</div><div class="calendar-empty-week">${escHtml(status)}. Select a team member to see their work calendar.</div></div>`;
+      }
+
+      const selectedAssignedCount = assignedCountsByUser.get(selected.user_id) || 0;
+      const hasSelectedState = !!(selected.row && selected.row.state);
+      if (!hasSelectedState && !selectedAssignedCount) {
+        return `<div class="team-calendar-section"><div class="team-calendar-heading">Shared Work Calendars ${refresh}</div><div class="team-person-tabs">${tabs}</div><div class="calendar-empty-week">${escHtml(status)}. ${escHtml(selected.user_name || 'This person')} has no saved calendar or assigned work yet.</div></div>`;
+      }
+
+      const state = hasSelectedState ? (selected.row.state || {}) : { jobs: [], weeks: [], calendarReminders: [] };
+      const selectedUpdated = hasSelectedState
+        ? (selected.row.updated_at ? `Synced ${outlookScanDateLabel(selected.row.updated_at)}` : 'Live on this browser')
+        : `${selectedAssignedCount} assigned task${selectedAssignedCount === 1 ? '' : 's'} - no saved calendar yet`;
+      const selectedLabel = `${selected.user_name || 'Team member'}${selected.isCurrent ? ' (you)' : ''}`;
+      const assignedOnlyNotice = hasSelectedState
+        ? ''
+        : `<div class="calendar-empty-week">${escHtml(selected.user_name || 'This person')} has assigned work from the team, but has not synced their own calendar yet.</div>`;
+      const weekCache = new Map();
+      const weekData = date => {
+        const key = toLocalDateStr(getMonday(date));
+        if (!weekCache.has(key)) {
+          const weekStart = parseTaskDate(key);
+          const assignedDeadlines = collectAssignedParentDeadlineTasksForUser(selected.user_id, weekStart, assignmentRows, selected.user_id);
+          weekCache.set(key, {
+            hours: collectSnapshotDayHours(state, weekStart),
+            tasks: [...collectSnapshotCalendarTasks(state, weekStart, selected), ...assignedDeadlines]
+              .sort((a, b) => a.due - b.due || a.start - b.start || a.label.localeCompare(b.label)),
+            logs: collectSnapshotLogEntriesForWeek(state, weekStart),
+            reminders: collectSnapshotRemindersForWeek(state, weekStart)
+          });
+        }
+        return weekCache.get(key);
+      };
+      const daySections = mobileCalendarVisibleDates(firstMonday, TASK_CALENDAR_DAYS, TEAM_CALENDAR_WEEK_COUNT).map(date => {
+        const dateStr = toLocalDateStr(date);
+        const data = weekData(date);
+        const dayTasks = data.tasks.filter(task => calendarTaskOverlapsDate(task.start, task.due, date));
+        const dayLogs = data.logs.filter(entry => toLocalDateStr(entry.date) === dateStr);
+        const dayReminders = data.reminders.filter(item => toLocalDateStr(item.date) === dateStr);
+        const html = [
+          ...dayTasks.map(task => renderMobileReadonlyTaskItem(task, selected, date)),
+          ...dayReminders.map(renderMobileReadonlyReminderItem),
+          ...dayLogs.map(renderMobileReadonlyLogItem)
+        ].join('');
+        const count = dayTasks.length + dayReminders.length + dayLogs.length;
+        const total = formatTaskHours(data.hours.get(dateStr) || 0);
+        return renderMobileCalendarDay(date, todayStr, html, count, {
+          rightLabel: total ? `${total}h` : '',
+          emptyLabel: 'No shared work this day.'
+        });
+      }).join('');
+
+      return `
+        <div class="team-calendar-section">
+          <div class="team-calendar-heading">Shared Work Calendars ${refresh}</div>
+          <div class="team-person-tabs">${tabs}</div>
+          <div class="calendar-empty-week">${escHtml(status)}</div>
+          <div class="team-calendar-person">${escHtml(selectedLabel)} - ${escHtml(selectedUpdated)}</div>
+          ${assignedOnlyNotice}
+          <div class="mobile-calendar-days">${daySections}</div>
+        </div>`;
     }
 
     function calendarVisibleWeekStarts(firstMonday, futureWeekCount = TASK_CALENDAR_WEEK_COUNT) {
@@ -15938,6 +16394,10 @@
 
     function renderRmGanttCalendarView(body, shouldScrollPreviousWeek = false) {
       const previousScrollTop = body ? body.scrollTop : 0;
+      if (isMobileDevice()) {
+        renderMobileRmGanttCalendarView(body, previousScrollTop, shouldScrollPreviousWeek);
+        return;
+      }
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const todayStr = toLocalDateStr(today);
@@ -15971,7 +16431,7 @@
       updateCalendarViewTabs();
 
       if (calendarViewTab === 'gmail') {
-        renderGmailCalendar(body);
+        renderGmailCalendar(body, shouldScrollPreviousWeek);
         return;
       }
       if (calendarViewTab === 'assigned') {
@@ -15990,6 +16450,10 @@
       const tasks = collectCalendarTasks();
       const assignedByYou = collectOutgoingAssignedTasks();
       const visibleAssignedByYou = yourWorkAssignedVisible ? assignedByYou : [];
+      if (isMobileDevice()) {
+        renderMobileYourWorkCalendar(body, previousScrollTop, shouldScrollPreviousWeek);
+        return;
+      }
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const todayStr = toLocalDateStr(today);
@@ -16030,8 +16494,12 @@
         .sort((a, b) => a.displayDate - b.displayDate || a.displayEndDate - b.displayEndDate || (a.time || '').localeCompare(b.time || '') || a.title.localeCompare(b.title));
     }
 
-    function renderGmailCalendar(body) {
+    function renderGmailCalendar(body, shouldScrollPreviousWeek = false) {
       const previousScrollTop = body ? body.scrollTop : 0;
+      if (isMobileDevice()) {
+        renderMobileGmailCalendar(body, previousScrollTop, shouldScrollPreviousWeek);
+        return;
+      }
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const todayStr = toLocalDateStr(today);

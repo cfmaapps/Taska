@@ -8,7 +8,7 @@
 // Never put a Supabase secret key or service role key in this file.
 window.CFMA_TASKA_CONFIG = {
   appUrl: 'https://cfmaapps.github.io/Taska/',
-  appVersion: '2026.06.19.6',
+  appVersion: '2026.06.19.7',
   updateCheckUrl: 'https://cfmaapps.github.io/Taska/version.json',
   downloadUrl: 'https://github.com/cfmaapps/Taska',
   aiKeyOwner: 'Lachlan',

@@ -20,6 +20,23 @@ http://localhost:8080/
 
 No visible terminal needs to stay open for normal use.
 
+If the app icon changes later, run `Install Taska App.bat` again to refresh the Desktop and Start Menu shortcuts.
+
+## Updates
+
+The app checks the hosted `version.json` file from `cfma-public-config.js`. If the hosted version is newer than the local copy, users see an update popup after the app starts.
+
+For most bug fixes, users only need to sync or replace the local `Taska` folder and reopen `CFMA TASKA`. They only need to run `Install Taska App.bat` again when shortcut/launcher/icon files change.
+
+## Mobile App
+
+The hosted URL can be installed on mobile as a Progressive Web App.
+
+- On Android/Chrome, the app can show an install prompt after the user opens the hosted URL.
+- On iPhone/iPad, Safari does not allow a custom one-tap install prompt, so Taska shows Add to Home Screen instructions instead.
+
+The mobile layout hides the right sidebar and uses two bottom tabs: `Calendar` and `Tasks`.
+
 Supabase handles shared users, autosave snapshots, jobs, tasks, and work calendars. The hidden local server only handles local desktop access that the browser and Supabase cannot access directly.
 
 Local/private folders such as `Backups/`, `Job Emails/`, `RM Sessions/`, and `Useful Documents/` are stored beside `Start Server.bat` by default. They are ignored by Git through `.gitignore`, so GitHub Desktop should not try to push them.

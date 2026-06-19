@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CFMA TASKA</title>
+  <link rel="icon" href="assets/cfma-taska-icon.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="assets/cfma-taska-icon.ico">
+  <link rel="apple-touch-icon" href="assets/cfma-taska-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#164e63">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Taska">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <style>
     * {
       box-sizing: border-box;
@@ -2222,6 +2231,42 @@
     .modal-actions .btn-save:hover { background: #3a78aa; }
     .modal-actions .btn-cancel { background: #162030; color: #a8c4e0; }
     .modal-actions .btn-cancel:hover { background: #1e3050; }
+
+    .update-modal-box {
+      width: min(430px, calc(100vw - 32px));
+    }
+
+    .update-modal-box p {
+      color: #b9c7d8;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      margin: 0 0 12px;
+    }
+
+    .update-version-pill {
+      display: inline-flex;
+      align-items: center;
+      background: #162030;
+      border: 1px solid #2e3d55;
+      border-radius: 999px;
+      color: #dbeafe;
+      font-size: 0.72rem;
+      font-weight: 700;
+      gap: 6px;
+      margin-bottom: 12px;
+      padding: 5px 9px;
+    }
+
+    .update-note {
+      background: rgba(15, 118, 110, 0.16);
+      border: 1px solid rgba(34, 197, 94, 0.25);
+      border-radius: 8px;
+      color: #d6f7e3;
+      font-size: 0.76rem;
+      line-height: 1.45;
+      margin-top: 10px;
+      padding: 10px;
+    }
 
     /* Custom tile delete button */
     .ql-thumb-custom {
@@ -5725,6 +5770,184 @@
         grid-template-columns: 1fr;
       }
     }
+
+    .mobile-app-tabs {
+      display: none;
+    }
+
+    .mobile-install-box {
+      width: min(430px, calc(100vw - 32px));
+    }
+
+    .mobile-install-box p {
+      color: #b9c7d8;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      margin: 0 0 12px;
+    }
+
+    .mobile-install-hint {
+      background: rgba(15, 118, 110, 0.16);
+      border: 1px solid rgba(34, 197, 94, 0.25);
+      border-radius: 8px;
+      color: #d6f7e3;
+      font-size: 0.76rem;
+      line-height: 1.45;
+      padding: 10px;
+    }
+
+    @media (max-width: 760px) {
+      body:not(.auth-locked) {
+        height: 100dvh;
+        min-height: 100dvh;
+        overflow: hidden;
+        padding: 0 0 calc(64px + env(safe-area-inset-bottom, 0px));
+      }
+
+      body:not(.auth-locked) > header {
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+        padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 8px;
+        min-height: 54px;
+      }
+
+      body:not(.auth-locked) header h1 {
+        font-size: 0.82rem;
+      }
+
+      body:not(.auth-locked) .notepad-actions,
+      body:not(.auth-locked) #last-saved-label,
+      body:not(.auth-locked) .theme-toggle-btn,
+      body:not(.auth-locked) footer,
+      body:not(.auth-locked) #right-sidebar {
+        display: none !important;
+      }
+
+      body:not(.auth-locked) #current-user-label {
+        margin-left: auto;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      body:not(.auth-locked) .layout {
+        display: block;
+        height: calc(100dvh - 118px - env(safe-area-inset-bottom, 0px));
+        overflow: hidden;
+        padding: 0;
+        width: 100%;
+      }
+
+      body:not(.auth-locked) .calendar-col,
+      body:not(.auth-locked) .notepad-col {
+        height: 100%;
+        overflow: auto;
+        padding: 10px;
+        width: 100%;
+      }
+
+      body.mobile-view-calendar:not(.auth-locked) .notepad-col,
+      body.mobile-view-tasks:not(.auth-locked) .calendar-col {
+        display: none;
+      }
+
+      body:not(.auth-locked) .task-calendar-panel {
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        min-height: 100%;
+        padding: 0;
+      }
+
+      body:not(.auth-locked) .task-calendar-head {
+        align-items: stretch;
+        gap: 8px;
+      }
+
+      body:not(.auth-locked) .task-calendar-title {
+        font-size: 0.86rem;
+      }
+
+      body:not(.auth-locked) .task-calendar-close {
+        display: none;
+      }
+
+      body:not(.auth-locked) .calendar-view-tabs {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+      }
+
+      body:not(.auth-locked) .calendar-view-tab {
+        min-height: 36px;
+      }
+
+      body:not(.auth-locked) .work-tabs {
+        display: none;
+      }
+
+      body:not(.auth-locked) .work-tab-panel {
+        display: none !important;
+        height: 100%;
+        overflow: visible;
+      }
+
+      body.mobile-view-tasks:not(.auth-locked) #work-tab-jobs {
+        display: block !important;
+      }
+
+      body:not(.auth-locked) .today-job-card,
+      body:not(.auth-locked) .job-card {
+        border-radius: 7px;
+      }
+
+      body:not(.auth-locked) .job-summary-row {
+        grid-template-columns: 24px minmax(0, 1fr);
+      }
+
+      body:not(.auth-locked) .todo-item-wrap {
+        padding: 8px 0;
+      }
+
+      .mobile-app-tabs {
+        align-items: center;
+        background: rgba(15, 23, 42, 0.96);
+        border-top: 1px solid #2e3d55;
+        bottom: 0;
+        box-shadow: 0 -10px 30px rgba(0,0,0,0.28);
+        display: grid;
+        gap: 8px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        left: 0;
+        padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+        position: fixed;
+        right: 0;
+        z-index: 900;
+      }
+
+      body.auth-locked .mobile-app-tabs {
+        display: none;
+      }
+
+      .mobile-app-tab {
+        background: #162030;
+        border: 1px solid #2e3d55;
+        border-radius: 8px;
+        color: #a8c4e0;
+        cursor: pointer;
+        font: inherit;
+        font-size: 0.82rem;
+        font-weight: 800;
+        min-height: 44px;
+      }
+
+      .mobile-app-tab.active {
+        background: #f0a500;
+        border-color: #f0a500;
+        color: #172033;
+      }
+    }
   </style>
 </head>
 <body class="auth-locked">
@@ -6151,6 +6374,11 @@
 
   </div>
 
+  <nav class="mobile-app-tabs" aria-label="Mobile app views">
+    <button type="button" class="mobile-app-tab active" id="mobile-tab-calendar" onclick="setMobileAppView('calendar')">Calendar</button>
+    <button type="button" class="mobile-app-tab" id="mobile-tab-tasks" onclick="setMobileAppView('tasks')">Tasks</button>
+  </nav>
+
   <!-- Add Link Modal -->
   <div id="add-link-modal" class="modal-overlay" style="display:none" onclick="modalOverlayClick(event)">
     <div class="modal-box">
@@ -6177,6 +6405,33 @@
     </div>
   </div>
 
+  <div id="taska-update-modal" class="modal-overlay" style="display:none" onclick="taskaUpdateOverlayClick(event)">
+    <div class="modal-box update-modal-box">
+      <h3 id="taska-update-title">CFMA TASKA update available</h3>
+      <div class="update-version-pill" id="taska-update-version">New version available</div>
+      <p id="taska-update-summary">A newer version of Taska is available.</p>
+      <div class="update-note">
+        To update this desktop copy, replace or sync the Taska folder from the latest source. If launcher files or the icon changed, run Install Taska App.bat again.
+      </div>
+      <div class="modal-actions">
+        <button class="btn-save" onclick="openLatestTaskaVersion()">Open latest</button>
+        <button class="btn-cancel" onclick="dismissTaskaUpdate()">Later</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="mobile-install-modal" class="modal-overlay" style="display:none" onclick="mobileInstallOverlayClick(event)">
+    <div class="modal-box mobile-install-box">
+      <h3 id="mobile-install-title">Install CFMA TASKA</h3>
+      <p id="mobile-install-message">Install Taska on this phone for a full-screen app shortcut.</p>
+      <div class="mobile-install-hint" id="mobile-install-hint">It will open from your home screen like a normal app.</div>
+      <div class="modal-actions">
+        <button class="btn-save" id="mobile-install-action" onclick="installMobileTaska()">Install</button>
+        <button class="btn-cancel" onclick="dismissMobileInstallPrompt()">Not now</button>
+      </div>
+    </div>
+  </div>
+
   <footer>
     CFMA TASKA &mdash; C:\Claude Workspace\Projects
     <br>
@@ -6188,6 +6443,13 @@
   <script src="gmail-analysis-core.js"></script>
   <script src="cfma-public-config.js"></script>
   <script>
+    const TASKA_APP_VERSION = String(window.CFMA_TASKA_CONFIG?.appVersion || '2026.06.19.2');
+    const TASKA_UPDATE_DISMISS_KEY = 'cfma-taska-update-dismissed';
+    const TASKA_MOBILE_VIEW_KEY = 'cfma-taska-mobile-view';
+    const TASKA_INSTALL_DISMISS_KEY = 'cfma-taska-install-dismissed';
+    let latestTaskaUpdateInfo = null;
+    let deferredTaskaInstallPrompt = null;
+
     // ── Dropdown ──────────────────────────────────────────
     function toggleDropdown(id) {
       const target = document.getElementById(id);
@@ -6206,6 +6468,17 @@
       if (outlookAssignDatePickerEl && !e.target.closest('.email-time-picker') && !e.target.closest('.email-time-date-btn')) {
         closeOutlookAssignDatePicker();
       }
+    });
+
+    window.addEventListener('beforeinstallprompt', event => {
+      event.preventDefault();
+      deferredTaskaInstallPrompt = event;
+      setTimeout(() => showMobileInstallPrompt('browser'), 1500);
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredTaskaInstallPrompt = null;
+      hideMobileInstallPrompt();
     });
 
     function moveQuickLinksToSidebarPopout() {
@@ -6277,6 +6550,119 @@
 
     function aiNotConfiguredMessage(fallback = '') {
       return /not configured|api key/i.test(fallback || '') ? aiApiKeyOwnerMessage() : fallback;
+    }
+
+    function isMobileAppViewport() {
+      return window.matchMedia && window.matchMedia('(max-width: 760px)').matches;
+    }
+
+    function setMobileAppView(view) {
+      const next = view === 'tasks' ? 'tasks' : 'calendar';
+      document.body.classList.toggle('mobile-view-calendar', next === 'calendar');
+      document.body.classList.toggle('mobile-view-tasks', next === 'tasks');
+      document.getElementById('mobile-tab-calendar')?.classList.toggle('active', next === 'calendar');
+      document.getElementById('mobile-tab-tasks')?.classList.toggle('active', next === 'tasks');
+      if (next === 'tasks' && activeWorkTab !== 'jobs') setWorkTab('jobs');
+      if (next === 'calendar') renderTaskCalendar();
+      try { localStorage.setItem(TASKA_MOBILE_VIEW_KEY, next); } catch (_) {}
+    }
+
+    function initMobileAppView() {
+      let saved = 'calendar';
+      try { saved = localStorage.getItem(TASKA_MOBILE_VIEW_KEY) || saved; } catch (_) {}
+      setMobileAppView(saved === 'tasks' ? 'tasks' : 'calendar');
+    }
+
+    function registerTaskaServiceWorker() {
+      if (!('serviceWorker' in navigator)) return;
+      if (!window.location.protocol.startsWith('http')) return;
+      navigator.serviceWorker.register('service-worker.js').catch(() => {});
+    }
+
+    function isTaskaStandaloneApp() {
+      return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
+        || window.navigator.standalone === true;
+    }
+
+    function isIosMobile() {
+      return /iphone|ipad|ipod/i.test(navigator.userAgent || '');
+    }
+
+    function isMobileDevice() {
+      return isMobileAppViewport() || /android|iphone|ipad|ipod/i.test(navigator.userAgent || '');
+    }
+
+    function installPromptDismissed() {
+      try {
+        const dismissedAt = Number(localStorage.getItem(TASKA_INSTALL_DISMISS_KEY) || 0);
+        return dismissedAt && Date.now() - dismissedAt < 7 * 24 * 60 * 60 * 1000;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    function showMobileInstallPrompt(mode = 'browser') {
+      if (!isMobileDevice() || isTaskaStandaloneApp() || installPromptDismissed()) return;
+      if (document.getElementById('taska-update-modal')?.style.display === 'flex') return;
+      const modal = document.getElementById('mobile-install-modal');
+      const message = document.getElementById('mobile-install-message');
+      const hint = document.getElementById('mobile-install-hint');
+      const action = document.getElementById('mobile-install-action');
+      if (!modal) return;
+      if (mode === 'ios') {
+        if (message) message.textContent = 'Install Taska on this iPhone or iPad from Safari.';
+        if (hint) hint.textContent = 'Tap Share, then Add to Home Screen. It will open full-screen like an app.';
+        if (action) {
+          action.textContent = 'Got it';
+          action.style.display = '';
+        }
+      } else {
+        if (message) message.textContent = 'Install Taska on this phone for a full-screen app shortcut.';
+        if (hint) hint.textContent = 'It will open from your home screen and keep the mobile Calendar and Tasks layout.';
+        if (action) {
+          action.textContent = 'Install';
+          action.style.display = deferredTaskaInstallPrompt ? '' : 'none';
+        }
+      }
+      modal.style.display = 'flex';
+    }
+
+    async function installMobileTaska() {
+      if (deferredTaskaInstallPrompt) {
+        const promptEvent = deferredTaskaInstallPrompt;
+        deferredTaskaInstallPrompt = null;
+        promptEvent.prompt();
+        try { await promptEvent.userChoice; } catch (_) {}
+        hideMobileInstallPrompt();
+        return;
+      }
+      if (isIosMobile()) {
+        dismissMobileInstallPrompt();
+        return;
+      }
+      hideMobileInstallPrompt();
+    }
+
+    function hideMobileInstallPrompt() {
+      const modal = document.getElementById('mobile-install-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function dismissMobileInstallPrompt() {
+      try { localStorage.setItem(TASKA_INSTALL_DISMISS_KEY, String(Date.now())); } catch (_) {}
+      hideMobileInstallPrompt();
+    }
+
+    function mobileInstallOverlayClick(event) {
+      if (event && event.target === document.getElementById('mobile-install-modal')) {
+        dismissMobileInstallPrompt();
+      }
+    }
+
+    function maybeShowMobileInstallPrompt() {
+      if (!isMobileDevice() || isTaskaStandaloneApp() || installPromptDismissed()) return;
+      if (deferredTaskaInstallPrompt) showMobileInstallPrompt('browser');
+      else if (isIosMobile()) showMobileInstallPrompt('ios');
     }
 
     function askMoveSessionToLocal(featureName = 'This feature') {
@@ -6351,6 +6737,115 @@
     }
 
     // ── Log task to week ───────────────────────────────────
+    function taskaVersionParts(version) {
+      return String(version || '')
+        .split(/[^0-9]+/)
+        .filter(Boolean)
+        .map(part => parseInt(part, 10))
+        .filter(num => Number.isFinite(num));
+    }
+
+    function compareTaskaVersions(a, b) {
+      const aa = taskaVersionParts(a);
+      const bb = taskaVersionParts(b);
+      const len = Math.max(aa.length, bb.length);
+      for (let i = 0; i < len; i++) {
+        const av = aa[i] || 0;
+        const bv = bb[i] || 0;
+        if (av > bv) return 1;
+        if (av < bv) return -1;
+      }
+      return 0;
+    }
+
+    function taskaUpdateCheckUrl() {
+      const cfg = window.CFMA_TASKA_CONFIG || {};
+      const explicit = String(cfg.updateCheckUrl || '').trim();
+      if (explicit) return explicit;
+      const appUrl = String(cfg.appUrl || '').trim();
+      if (!appUrl) return '';
+      try {
+        return new URL('version.json', appUrl).toString();
+      } catch (_) {
+        return '';
+      }
+    }
+
+    function cacheBustUrl(url) {
+      const out = new URL(url, window.location.href);
+      out.searchParams.set('_', Date.now().toString());
+      return out.toString();
+    }
+
+    function taskaUpdateDismissed(version) {
+      try {
+        const dismissed = JSON.parse(localStorage.getItem(TASKA_UPDATE_DISMISS_KEY) || '{}');
+        if (dismissed.version !== version) return false;
+        return Date.now() - Number(dismissed.at || 0) < 12 * 60 * 60 * 1000;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    async function checkForTaskaUpdate() {
+      const url = taskaUpdateCheckUrl();
+      if (!url) return;
+      try {
+        const resp = await fetch(cacheBustUrl(url), { cache: 'no-store' });
+        if (!resp.ok) return;
+        const info = await resp.json();
+        const latestVersion = String(info.version || info.appVersion || '').trim();
+        if (!latestVersion || compareTaskaVersions(latestVersion, TASKA_APP_VERSION) <= 0) return;
+        if (taskaUpdateDismissed(latestVersion)) return;
+        showTaskaUpdateModal(info);
+      } catch (_) {
+        // Offline, blocked, or no hosted version manifest yet: no interruption.
+      }
+    }
+
+    function showTaskaUpdateModal(info) {
+      latestTaskaUpdateInfo = info || {};
+      const latestVersion = String(latestTaskaUpdateInfo.version || latestTaskaUpdateInfo.appVersion || '').trim();
+      const title = latestTaskaUpdateInfo.title || 'CFMA TASKA update available';
+      const summary = latestTaskaUpdateInfo.summary || 'A newer version of Taska is available.';
+      const modal = document.getElementById('taska-update-modal');
+      const titleEl = document.getElementById('taska-update-title');
+      const versionEl = document.getElementById('taska-update-version');
+      const summaryEl = document.getElementById('taska-update-summary');
+      if (titleEl) titleEl.textContent = title;
+      if (versionEl) versionEl.textContent = `Current ${TASKA_APP_VERSION} -> Latest ${latestVersion}`;
+      if (summaryEl) summaryEl.textContent = summary;
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function hideTaskaUpdateModal() {
+      const modal = document.getElementById('taska-update-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function dismissTaskaUpdate() {
+      const version = String(latestTaskaUpdateInfo?.version || latestTaskaUpdateInfo?.appVersion || '').trim();
+      if (version) {
+        try {
+          localStorage.setItem(TASKA_UPDATE_DISMISS_KEY, JSON.stringify({ version, at: Date.now() }));
+        } catch (_) {}
+      }
+      hideTaskaUpdateModal();
+    }
+
+    function openLatestTaskaVersion() {
+      const cfg = window.CFMA_TASKA_CONFIG || {};
+      const target = latestTaskaUpdateInfo?.appUrl || latestTaskaUpdateInfo?.downloadUrl || cfg.downloadUrl || cfg.appUrl;
+      if (target) window.open(target, '_blank', 'noopener');
+      dismissTaskaUpdate();
+    }
+
+    function taskaUpdateOverlayClick(event) {
+      if (event && event.target === document.getElementById('taska-update-modal')) {
+        dismissTaskaUpdate();
+      }
+    }
+
     let logMenuEl = null;
 
     function showLogToWeekMenu(jobId, taskIdx, btn) {
@@ -17982,6 +18477,10 @@
     loadGmailDebugRecords();
     loadOutlookAiState();
     initSupabaseLoginGate();
+    registerTaskaServiceWorker();
+    initMobileAppView();
+    setTimeout(checkForTaskaUpdate, 3500);
+    setTimeout(maybeShowMobileInstallPrompt, 4500);
     setWorkTab('jobs');
     runStartupActions();
     renderTaskCalendar();

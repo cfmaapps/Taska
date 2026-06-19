@@ -2,6 +2,7 @@ $ErrorActionPreference = 'Stop'
 
 $scriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
 $launcherScript = Join-Path $scriptRoot 'Open Taska.ps1'
+$iconPath = Join-Path $scriptRoot 'assets\cfma-taska-icon.ico'
 $powershell = (Get-Command powershell.exe -ErrorAction Stop).Source
 
 function Get-TaskaBrowserPath {
@@ -35,11 +36,15 @@ function New-TaskaShortcut {
     $shortcut.WorkingDirectory = $scriptRoot
     $shortcut.Description = 'Open CFMA TASKA'
 
-    $browser = Get-TaskaBrowserPath
-    if ($browser) {
-        $shortcut.IconLocation = $browser
+    if (Test-Path -LiteralPath $iconPath -PathType Leaf) {
+        $shortcut.IconLocation = $iconPath
     } else {
-        $shortcut.IconLocation = "$env:SystemRoot\System32\imageres.dll,109"
+        $browser = Get-TaskaBrowserPath
+        if ($browser) {
+            $shortcut.IconLocation = $browser
+        } else {
+            $shortcut.IconLocation = "$env:SystemRoot\System32\imageres.dll,109"
+        }
     }
 
     $shortcut.Save()

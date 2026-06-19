@@ -1,8 +1,8 @@
 {
-  "version": "2026.06.19.2",
+  "version": "2026.06.19.6",
   "releasedAt": "2026-06-19",
   "title": "CFMA TASKA update available",
-  "summary": "Mobile installable app view, Calendar/Tasks mobile tabs, desktop launcher, pinned app icon, useful-document opening, and resource consent tracker improvements.",
+  "summary": "Mobile Taska now hides desktop-only local server actions and keeps the phone app focused on browser-safe Calendar, Today, and Tasks views.",
   "appUrl": "https://cfmaapps.github.io/Taska/",
   "downloadUrl": "https://github.com/cfmaapps/Taska"
 }

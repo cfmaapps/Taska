@@ -35,7 +35,7 @@ The hosted URL can be installed on mobile as a Progressive Web App.
 - On Android/Chrome, the app can show an install prompt after the user opens the hosted URL.
 - On iPhone/iPad, Safari does not allow a custom one-tap install prompt, so Taska shows Add to Home Screen instructions instead.
 
-The mobile layout hides the right sidebar and uses two bottom tabs: `Calendar` and `Tasks`.
+The mobile layout hides the right sidebar and uses three bottom tabs: `Calendar`, `Today`, and `Tasks`. It also hides desktop-only local file/server actions such as job folders, Outlook email saving/opening, Useful Documents, and the local RM analyser.
 
 Supabase handles shared users, autosave snapshots, jobs, tasks, and work calendars. The hidden local server only handles local desktop access that the browser and Supabase cannot access directly.
 

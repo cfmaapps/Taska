@@ -3491,6 +3491,32 @@
       background: rgba(15, 23, 34, 0.35);
     }
 
+    .calendar-day-head span.today-day {
+      background: linear-gradient(180deg, rgba(240, 165, 0, 0.28), rgba(240, 165, 0, 0.12));
+      box-shadow: inset 0 -3px 0 #f0a500, inset 0 0 0 1px rgba(240, 165, 0, 0.46);
+      color: #ffe0a3;
+      position: relative;
+      text-decoration: none;
+    }
+
+    .calendar-day-head span.today-day::after {
+      align-self: flex-start;
+      background: #f0a500;
+      border-radius: 999px;
+      color: #162030;
+      content: "Today";
+      font-size: 0.53rem;
+      font-weight: 900;
+      line-height: 1;
+      margin-top: 2px;
+      padding: 3px 5px;
+      text-transform: uppercase;
+    }
+
+    .calendar-day-head span.today-day .calendar-day-total {
+      color: #ffe0a3;
+    }
+
     .calendar-day-title {
       align-items: center;
       display: flex;
@@ -3587,6 +3613,17 @@
           rgba(13, 20, 31, 0.22) 12px
         ),
         rgba(13, 20, 31, 0.34);
+    }
+
+    .calendar-today-day {
+      background: linear-gradient(180deg, rgba(240, 165, 0, 0.16), rgba(240, 165, 0, 0.05));
+      bottom: 0;
+      box-shadow: inset 0 0 0 2px rgba(240, 165, 0, 0.74), inset 0 0 22px rgba(240, 165, 0, 0.14);
+      pointer-events: none;
+      position: absolute;
+      top: 0;
+      width: 20%;
+      z-index: 0;
     }
 
     .calendar-task-bar {
@@ -4052,6 +4089,145 @@
       padding: 6px 10px;
       position: relative;
       z-index: 1;
+    }
+
+    .mobile-calendar-days {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .mobile-calendar-day {
+      background: #111a27;
+      border: 1px solid #2e3d55;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .mobile-calendar-day.today {
+      border-color: rgba(240, 165, 0, 0.78);
+      box-shadow: 0 0 0 1px rgba(240, 165, 0, 0.28), 0 0 24px rgba(240, 165, 0, 0.16);
+    }
+
+    .mobile-calendar-day.past {
+      opacity: 0.72;
+    }
+
+    .mobile-calendar-day-head {
+      align-items: center;
+      background: #162030;
+      border-bottom: 1px solid #243044;
+      display: flex;
+      gap: 8px;
+      justify-content: space-between;
+      padding: 8px 10px;
+    }
+
+    .mobile-calendar-day-title {
+      color: #dbe8f6;
+      font-size: 0.86rem;
+      font-weight: 900;
+      min-width: 0;
+    }
+
+    .mobile-calendar-day-title span {
+      color: #7a9bbf;
+      display: block;
+      font-size: 0.66rem;
+      font-weight: 800;
+      margin-top: 2px;
+      text-transform: uppercase;
+    }
+
+    .mobile-calendar-day-pill {
+      background: rgba(74, 144, 196, 0.14);
+      border: 1px solid rgba(74, 144, 196, 0.32);
+      border-radius: 999px;
+      color: #a8c4e0;
+      flex: 0 0 auto;
+      font-size: 0.62rem;
+      font-weight: 900;
+      padding: 3px 7px;
+      text-transform: uppercase;
+    }
+
+    .mobile-calendar-day.today .mobile-calendar-day-pill {
+      background: #f0a500;
+      border-color: #f0a500;
+      color: #172033;
+    }
+
+    .mobile-calendar-day-items {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      padding: 8px;
+    }
+
+    .mobile-calendar-empty-day {
+      color: #4a7fa8;
+      font-size: 0.72rem;
+      line-height: 1.4;
+      padding: 3px 2px;
+    }
+
+    .mobile-calendar-item {
+      box-sizing: border-box;
+      cursor: pointer;
+      flex-wrap: wrap;
+      font-size: 0.76rem;
+      line-height: 1.25;
+      margin: 0;
+      min-height: 38px;
+      padding: 8px;
+      width: 100%;
+    }
+
+    .mobile-calendar-item .calendar-task-label,
+    .mobile-calendar-item .calendar-meeting-label {
+      flex: 1 1 100%;
+      min-width: 0;
+      overflow: visible;
+      text-overflow: clip;
+      white-space: normal;
+    }
+
+    .mobile-calendar-item .calendar-gmail-delete {
+      margin-left: 0;
+    }
+
+    .mobile-calendar-kind,
+    .mobile-calendar-item-meta {
+      background: rgba(22, 32, 48, 0.75);
+      border: 1px solid rgba(168, 196, 224, 0.22);
+      border-radius: 999px;
+      color: #a8c4e0;
+      flex: 0 0 auto;
+      font-size: 0.61rem;
+      font-weight: 900;
+      padding: 2px 6px;
+      text-transform: uppercase;
+    }
+
+    .mobile-calendar-item-note {
+      color: #9cb3c8;
+      flex: 1 1 100%;
+      font-size: 0.67rem;
+      line-height: 1.3;
+      min-width: 0;
+    }
+
+    .mobile-calendar-day-log {
+      background: rgba(104, 211, 145, 0.13);
+      border: 1px solid rgba(104, 211, 145, 0.35);
+      border-radius: 6px;
+      color: #a7f3c3;
+      cursor: pointer;
+      flex: 0 0 auto;
+      font-family: inherit;
+      font-size: 0.68rem;
+      font-weight: 900;
+      padding: 5px 8px;
     }
 
     .calendar-job-popover {
@@ -4974,6 +5150,28 @@
       color: #9aa5b1 !important;
     }
 
+    .calendar-day-head span.today-day {
+      background: linear-gradient(180deg, rgba(240, 165, 0, 0.2), rgba(255, 255, 255, 0.92)) !important;
+      border-color: rgba(240, 165, 0, 0.62) !important;
+      box-shadow: inset 0 -3px 0 #f0a500, inset 0 0 0 1px rgba(240, 165, 0, 0.38) !important;
+      color: #8a4f10 !important;
+      text-decoration: none !important;
+    }
+
+    .calendar-day-head span.today-day::after {
+      background: #f0a500 !important;
+      color: #172033 !important;
+    }
+
+    .calendar-day-head span.today-day .calendar-day-total {
+      color: #8a4f10 !important;
+    }
+
+    .calendar-today-day {
+      background: linear-gradient(180deg, rgba(240, 165, 0, 0.16), rgba(240, 165, 0, 0.05)) !important;
+      box-shadow: inset 0 0 0 2px rgba(240, 165, 0, 0.62), inset 0 0 20px rgba(240, 165, 0, 0.14) !important;
+    }
+
     .calendar-bars::before {
       background: repeating-linear-gradient(
         to right,
@@ -5071,6 +5269,51 @@
       background: var(--danger-l) !important;
       border-color: #efb0a8 !important;
       color: var(--danger) !important;
+    }
+
+    .mobile-calendar-day {
+      background: #ffffff !important;
+      border-color: var(--border) !important;
+    }
+
+    .mobile-calendar-day.today {
+      border-color: rgba(240, 165, 0, 0.72) !important;
+      box-shadow: 0 0 0 1px rgba(240, 165, 0, 0.2), 0 0 20px rgba(240, 165, 0, 0.12) !important;
+    }
+
+    .mobile-calendar-day-head {
+      background: #f8fafc !important;
+      border-color: var(--border) !important;
+    }
+
+    .mobile-calendar-day-title {
+      color: var(--text) !important;
+    }
+
+    .mobile-calendar-day-title span,
+    .mobile-calendar-empty-day,
+    .mobile-calendar-item-note {
+      color: var(--muted) !important;
+    }
+
+    .mobile-calendar-day-pill,
+    .mobile-calendar-kind,
+    .mobile-calendar-item-meta {
+      background: var(--primary-xl) !important;
+      border-color: #a8c4e0 !important;
+      color: var(--primary) !important;
+    }
+
+    .mobile-calendar-day.today .mobile-calendar-day-pill {
+      background: #f0a500 !important;
+      border-color: #f0a500 !important;
+      color: #172033 !important;
+    }
+
+    .mobile-calendar-day-log {
+      background: var(--success-l) !important;
+      border-color: #9ad3ad !important;
+      color: var(--success) !important;
     }
 
     .task-date-day.today,
@@ -5557,6 +5800,23 @@
       color: #2f4963 !important;
     }
 
+    body.night-mode .calendar-day-head span.today-day {
+      background: linear-gradient(180deg, rgba(240,165,0,.32), rgba(240,165,0,.12)) !important;
+      border-color: rgba(240,165,0,.62) !important;
+      box-shadow: inset 0 -3px 0 #f0a500, inset 0 0 0 1px rgba(240,165,0,.48) !important;
+      color: #ffe7b3 !important;
+      text-decoration: none !important;
+    }
+
+    body.night-mode .calendar-day-head span.today-day::after {
+      background: #f0a500 !important;
+      color: #172033 !important;
+    }
+
+    body.night-mode .calendar-day-head span.today-day .calendar-day-total {
+      color: #ffe7b3 !important;
+    }
+
     body.night-mode .calendar-bars::before {
       background: repeating-linear-gradient(
         to right,
@@ -5581,6 +5841,11 @@
           rgba(13,20,31,.22) 12px
         ),
         rgba(13,20,31,.34) !important;
+    }
+
+    body.night-mode .calendar-today-day {
+      background: linear-gradient(180deg, rgba(240,165,0,.18), rgba(240,165,0,.06)) !important;
+      box-shadow: inset 0 0 0 2px rgba(240,165,0,.8), inset 0 0 24px rgba(240,165,0,.18) !important;
     }
 
     body.night-mode .calendar-day-total,
@@ -5654,6 +5919,51 @@
       background: rgba(22,32,48,.72) !important;
       border-color: rgba(141,168,194,.34) !important;
       color: #8da8c2 !important;
+    }
+
+    body.night-mode .mobile-calendar-day {
+      background: #111a27 !important;
+      border-color: #2e3d55 !important;
+    }
+
+    body.night-mode .mobile-calendar-day.today {
+      border-color: rgba(240,165,0,.82) !important;
+      box-shadow: 0 0 0 1px rgba(240,165,0,.3), 0 0 24px rgba(240,165,0,.18) !important;
+    }
+
+    body.night-mode .mobile-calendar-day-head {
+      background: #162030 !important;
+      border-color: #243044 !important;
+    }
+
+    body.night-mode .mobile-calendar-day-title {
+      color: #dbe8f6 !important;
+    }
+
+    body.night-mode .mobile-calendar-day-title span,
+    body.night-mode .mobile-calendar-empty-day,
+    body.night-mode .mobile-calendar-item-note {
+      color: #7a9bbf !important;
+    }
+
+    body.night-mode .mobile-calendar-day-pill,
+    body.night-mode .mobile-calendar-kind,
+    body.night-mode .mobile-calendar-item-meta {
+      background: rgba(22,32,48,.75) !important;
+      border-color: rgba(168,196,224,.22) !important;
+      color: #a8c4e0 !important;
+    }
+
+    body.night-mode .mobile-calendar-day.today .mobile-calendar-day-pill {
+      background: #f0a500 !important;
+      border-color: #f0a500 !important;
+      color: #172033 !important;
+    }
+
+    body.night-mode .mobile-calendar-day-log {
+      background: rgba(104,211,145,.13) !important;
+      border-color: rgba(104,211,145,.35) !important;
+      color: #a7f3c3 !important;
     }
 
     body.night-mode .task-date-day.today,
@@ -5775,6 +6085,10 @@
       display: none;
     }
 
+    body.mobile-device .local-desktop-only {
+      display: none !important;
+    }
+
     .mobile-install-box {
       width: min(430px, calc(100vw - 32px));
     }
@@ -5848,7 +6162,8 @@
       }
 
       body.mobile-view-calendar:not(.auth-locked) .notepad-col,
-      body.mobile-view-tasks:not(.auth-locked) .calendar-col {
+      body.mobile-view-tasks:not(.auth-locked) .calendar-col,
+      body.mobile-view-today:not(.auth-locked) .calendar-col {
         display: none;
       }
 
@@ -5887,6 +6202,10 @@
         display: none;
       }
 
+      body:not(.auth-locked) .local-desktop-only {
+        display: none !important;
+      }
+
       body:not(.auth-locked) .work-tab-panel {
         display: none !important;
         height: 100%;
@@ -5894,6 +6213,10 @@
       }
 
       body.mobile-view-tasks:not(.auth-locked) #work-tab-jobs {
+        display: block !important;
+      }
+
+      body.mobile-view-today:not(.auth-locked) #work-tab-today {
         display: block !important;
       }
 
@@ -5918,7 +6241,7 @@
         box-shadow: 0 -10px 30px rgba(0,0,0,0.28);
         display: grid;
         gap: 8px;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         left: 0;
         padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
         position: fixed;
@@ -5953,8 +6276,10 @@
 <body class="auth-locked">
   <script>
     try {
-      if (localStorage.getItem('ljm-theme-mode') === 'night') document.body.classList.add('night-mode');
-    } catch(e) {}
+      if (localStorage.getItem('ljm-theme-mode') !== 'light') document.body.classList.add('night-mode');
+    } catch(e) {
+      document.body.classList.add('night-mode');
+    }
   </script>
 
   <div class="login-screen" id="login-screen">
@@ -6376,6 +6701,7 @@
 
   <nav class="mobile-app-tabs" aria-label="Mobile app views">
     <button type="button" class="mobile-app-tab active" id="mobile-tab-calendar" onclick="setMobileAppView('calendar')">Calendar</button>
+    <button type="button" class="mobile-app-tab" id="mobile-tab-today" onclick="setMobileAppView('today')">Today</button>
     <button type="button" class="mobile-app-tab" id="mobile-tab-tasks" onclick="setMobileAppView('tasks')">Tasks</button>
   </nav>
 
@@ -6410,7 +6736,7 @@
       <h3 id="taska-update-title">CFMA TASKA update available</h3>
       <div class="update-version-pill" id="taska-update-version">New version available</div>
       <p id="taska-update-summary">A newer version of Taska is available.</p>
-      <div class="update-note">
+      <div class="update-note" id="taska-update-note">
         To update this desktop copy, replace or sync the Taska folder from the latest source. If launcher files or the icon changed, run Install Taska App.bat again.
       </div>
       <div class="modal-actions">
@@ -6443,7 +6769,7 @@
   <script src="gmail-analysis-core.js"></script>
   <script src="cfma-public-config.js"></script>
   <script>
-    const TASKA_APP_VERSION = String(window.CFMA_TASKA_CONFIG?.appVersion || '2026.06.19.2');
+    const TASKA_APP_VERSION = String(window.CFMA_TASKA_CONFIG?.appVersion || '2026.06.19.6');
     const TASKA_UPDATE_DISMISS_KEY = 'cfma-taska-update-dismissed';
     const TASKA_MOBILE_VIEW_KEY = 'cfma-taska-mobile-view';
     const TASKA_INSTALL_DISMISS_KEY = 'cfma-taska-install-dismissed';
@@ -6531,7 +6857,23 @@
       return 'A browser cannot start Start Server.bat for you. Open your synced Taska folder, double-click Start Server.bat, wait for the black server window to stay open, then open http://localhost:8080/.';
     }
 
+    function isMobileLocalFeatureBlocked() {
+      return isMobileDevice();
+    }
+
+    function mobileLocalFeatureUnavailableMessage(featureName = 'This feature') {
+      const cleanName = String(featureName || 'This feature')
+        .replace(/Start Server\.bat\s+to\s+/ig, '')
+        .replace(/keep Start Server\.bat running,?\s*/ig, '')
+        .replace(/restart Start Server\.bat[^.]*\.?/ig, '')
+        .replace(/\s+/g, ' ')
+        .replace(/[.:;\s]+$/g, '')
+        .trim() || 'This feature';
+      return `${cleanName} is only available in the desktop Taska app. The mobile app only uses browser-safe Taska features and cannot access local computer files.`;
+    }
+
     function localSessionUnavailableMessage(featureName = 'This feature') {
+      if (isMobileLocalFeatureBlocked()) return mobileLocalFeatureUnavailableMessage(featureName);
       return `${featureName} isn't available without a local session. ${localSessionStartInstructions()}`;
     }
 
@@ -6557,12 +6899,16 @@
     }
 
     function setMobileAppView(view) {
-      const next = view === 'tasks' ? 'tasks' : 'calendar';
+      const next = ['calendar', 'today', 'tasks'].includes(view) ? view : 'calendar';
       document.body.classList.toggle('mobile-view-calendar', next === 'calendar');
+      document.body.classList.toggle('mobile-view-today', next === 'today');
       document.body.classList.toggle('mobile-view-tasks', next === 'tasks');
       document.getElementById('mobile-tab-calendar')?.classList.toggle('active', next === 'calendar');
+      document.getElementById('mobile-tab-today')?.classList.toggle('active', next === 'today');
       document.getElementById('mobile-tab-tasks')?.classList.toggle('active', next === 'tasks');
       if (next === 'tasks' && activeWorkTab !== 'jobs') setWorkTab('jobs');
+      if (next === 'today' && activeWorkTab !== 'today') setWorkTab('today');
+      if (next === 'today') renderTodayTasks();
       if (next === 'calendar') renderTaskCalendar();
       try { localStorage.setItem(TASKA_MOBILE_VIEW_KEY, next); } catch (_) {}
     }
@@ -6570,7 +6916,7 @@
     function initMobileAppView() {
       let saved = 'calendar';
       try { saved = localStorage.getItem(TASKA_MOBILE_VIEW_KEY) || saved; } catch (_) {}
-      setMobileAppView(saved === 'tasks' ? 'tasks' : 'calendar');
+      setMobileAppView(['calendar', 'today', 'tasks'].includes(saved) ? saved : 'calendar');
     }
 
     function registerTaskaServiceWorker() {
@@ -6591,6 +6937,12 @@
     function isMobileDevice() {
       return isMobileAppViewport() || /android|iphone|ipad|ipod/i.test(navigator.userAgent || '');
     }
+
+    function applyMobileDeviceMode() {
+      document.body.classList.toggle('mobile-device', isMobileDevice());
+    }
+
+    window.addEventListener('resize', applyMobileDeviceMode);
 
     function installPromptDismissed() {
       try {
@@ -6618,7 +6970,7 @@
         }
       } else {
         if (message) message.textContent = 'Install Taska on this phone for a full-screen app shortcut.';
-        if (hint) hint.textContent = 'It will open from your home screen and keep the mobile Calendar and Tasks layout.';
+        if (hint) hint.textContent = 'It will open from your home screen and keep the mobile Calendar, Today, and Tasks layout.';
         if (action) {
           action.textContent = 'Install';
           action.style.display = deferredTaskaInstallPrompt ? '' : 'none';
@@ -6666,6 +7018,7 @@
     }
 
     function askMoveSessionToLocal(featureName = 'This feature') {
+      if (isMobileLocalFeatureBlocked()) return false;
       return confirm(`${featureName} requires Start Server.bat and the local app session.\n\n${localSessionStartInstructions()}\n\nIf Start Server.bat is already running, click OK to open the local session now. If it is not running yet, click Cancel and start it first.`);
     }
 
@@ -6677,6 +7030,12 @@
     }
 
     function requireLocalSessionForFeature(featureName, params = {}, onUnavailable = null, onMoved = null) {
+      if (isMobileLocalFeatureBlocked()) {
+        const message = mobileLocalFeatureUnavailableMessage(featureName);
+        if (onUnavailable) onUnavailable(message);
+        else alert(message);
+        return false;
+      }
       if (isLocalAppHost()) return true;
       if (askMoveSessionToLocal(featureName)) {
         const target = openLocalSession(params);
@@ -6697,6 +7056,7 @@
     }
 
     function localServerErrorMessage(error, fallback) {
+      if (isMobileLocalFeatureBlocked()) return mobileLocalFeatureUnavailableMessage(fallback || 'This feature');
       if (error && error.name === 'AbortError') {
         return 'The local server did not answer in time. Restart Start Server.bat, make sure Outlook is open, then try again.';
       }
@@ -6708,6 +7068,10 @@
 
     async function openUsefulDocumentsFolder(event) {
       if (event) event.preventDefault();
+      if (isMobileLocalFeatureBlocked()) {
+        alert(mobileLocalFeatureUnavailableMessage('Useful Documents'));
+        return;
+      }
       try {
         const resp = await fetchWithTimeout(localApiUrl('/api/open-useful-documents-folder'), {}, 30000);
         const data = await resp.json().catch(() => ({}));
@@ -6721,6 +7085,10 @@
 
     async function openUsefulDocument(event, relativePath) {
       if (event) event.preventDefault();
+      if (isMobileLocalFeatureBlocked()) {
+        alert(mobileLocalFeatureUnavailableMessage('Useful Documents'));
+        return;
+      }
       const file = String(relativePath || '').trim();
       if (!file) return;
       try {
@@ -6812,9 +7180,15 @@
       const titleEl = document.getElementById('taska-update-title');
       const versionEl = document.getElementById('taska-update-version');
       const summaryEl = document.getElementById('taska-update-summary');
+      const noteEl = document.getElementById('taska-update-note');
       if (titleEl) titleEl.textContent = title;
       if (versionEl) versionEl.textContent = `Current ${TASKA_APP_VERSION} -> Latest ${latestVersion}`;
       if (summaryEl) summaryEl.textContent = summary;
+      if (noteEl) {
+        noteEl.textContent = isMobileDevice()
+          ? 'The mobile app updates from the hosted version. Tap Open latest, or close and reopen Taska if it does not refresh automatically.'
+          : 'To update this desktop copy, replace or sync the Taska folder from the latest source. If launcher files or the icon changed, run Install Taska App.bat again.';
+      }
       if (modal) modal.style.display = 'flex';
     }
 
@@ -7550,7 +7924,7 @@
       'job', 'task', 'email', 'site', 'plan', 'plans', 'survey', 'update', 'please',
       'thanks', 'regards', 'hello', 'about', 'attached', 'attachment'
     ]);
-    const TASK_CALENDAR_PAST_WEEK_COUNT = 12;
+    const TASK_CALENDAR_PAST_WEEK_COUNT = 1;
     const TASK_CALENDAR_WEEK_COUNT = 16;
     const TEAM_CALENDAR_WEEK_COUNT = 8;
     const TASK_CALENDAR_DAYS = [
@@ -7590,9 +7964,9 @@
     }
 
     function applyThemeMode() {
-      let mode = 'light';
+      let mode = 'night';
       try {
-        mode = localStorage.getItem(THEME_MODE_KEY) === 'night' ? 'night' : 'light';
+        mode = localStorage.getItem(THEME_MODE_KEY) === 'light' ? 'light' : 'night';
       } catch(e) {}
       const night = mode === 'night';
       document.body.classList.toggle('night-mode', night);
@@ -7906,8 +8280,11 @@
       }
       try {
         await copyTextToClipboard(path);
-        if (jobId) flashJobStatus(jobId, 'Folder path copied. Opening folders needs a local session.');
-        else alert('Folder path copied. Opening folders needs a local session.');
+        const message = isMobileLocalFeatureBlocked()
+          ? 'Folder path copied. Opening folders is desktop-only.'
+          : 'Folder path copied. Opening folders needs a local session.';
+        if (jobId) flashJobStatus(jobId, message);
+        else alert(message);
       } catch(e) {
         window.prompt('Copy this folder path:', path);
       }
@@ -8407,7 +8784,7 @@
       const title = ref
         ? `Open ${link.shared ? 'shared ' : ''}linked Resource Consent ${ref}.${saved}${link.shared ? ` Shared by ${link.sharedFromUserName || 'team member'}.` : ''}`
         : 'Link a Resource Consent to this job';
-      return `<button class="job-rm-btn ${ref ? 'linked' : ''}" onclick="openJobRmTool('${job.id}')" oncontextmenu="return showJobLinkMenu(event,'${job.id}','rm')" title="${escHtml(title)}">${escHtml(label)}</button>`;
+      return `<button class="job-rm-btn local-desktop-only ${ref ? 'linked' : ''}" onclick="openJobRmTool('${job.id}')" oncontextmenu="return showJobLinkMenu(event,'${job.id}','rm')" title="${escHtml(title)}">${escHtml(label)}</button>`;
     }
 
     function normalizeDivideUrlInput(value) {
@@ -8797,6 +9174,7 @@
     }
 
     async function scanEmailSentDate(job, email) {
+      if (isMobileLocalFeatureBlocked()) return;
       if (!job || !email || email.sentAt || !email.path) return;
       const key = emailSentDateScanKey(email);
       if (!key || emailSentDateScanInFlight.has(key) || emailSentDateScanTried.has(key)) return;
@@ -8873,7 +9251,7 @@
       );
       const attachSelectedButton = `<button class="job-email-select-btn" onclick="saveSelectedOutlookEmailsToJob('${job.id}')" title="Save the currently selected classic Outlook email to this job">Selected Outlook</button>`;
       if (emails.length === 0) {
-        return `<div class="job-email-panel">
+        return `<div class="job-email-panel local-desktop-only">
           <div class="job-email-actions">${attachSelectedButton}</div>
           <div class="job-email-empty">Drop saved .msg or .eml emails here, or select an email in classic Outlook and click Selected Outlook.</div>
         </div>`;
@@ -8890,11 +9268,12 @@
             <button class="job-email-task-btn" onclick="addTaskFromEmail('${job.id}','${email.id}')" title="Create task from email">+ task</button>
           </div>`;
       }).join('');
-      return `<div class="job-email-panel"><div class="job-email-actions">${attachSelectedButton}</div>${rows}</div>`;
+      return `<div class="job-email-panel local-desktop-only"><div class="job-email-actions">${attachSelectedButton}</div>${rows}</div>`;
     }
 
     function wireJobEmailDrop(card, jobId) {
       if (!card || card.dataset.emailDropWired === '1') return;
+      if (isMobileLocalFeatureBlocked()) return;
       card.dataset.emailDropWired = '1';
       card.addEventListener('dragover', event => {
         if (!dragMayHaveOutlookEmail(event)) return;
@@ -9571,10 +9950,10 @@
           <div class="job-header">
             <input class="job-num-input" type="text" placeholder="Job #" value="${escHtml(job.jobNum)}"
               oninput="updateJob('${job.id}','jobNum',this.value)">
-            <button class="job-folder-btn" onclick="openJobFolder('${job.id}', this)" oncontextmenu="return copyJobFolderPath(event,'${job.id}')"
+            <button class="job-folder-btn local-desktop-only" onclick="openJobFolder('${job.id}', this)" oncontextmenu="return copyJobFolderPath(event,'${job.id}')"
               style="opacity:${folderPath ? '1' : '0.2'}"
               title="${folderPath ? 'Open folder: ' + folderPath : 'Enter a job number first'}">📁</button>
-            <button class="job-email-btn ${openEmailPanelJobId === job.id ? 'active' : ''}" onclick="toggleJobEmails('${job.id}')"
+            <button class="job-email-btn local-desktop-only ${openEmailPanelJobId === job.id ? 'active' : ''}" onclick="toggleJobEmails('${job.id}')"
               title="${emailCount ? 'Show emails for this job' : 'Drop emails onto this job'}">Email${emailCount ? ' ' + emailCount : ''}</button>
             <input class="job-desc-input" type="text" placeholder="Description" value="${escHtml(job.desc)}"
               oninput="updateJob('${job.id}','desc',this.value)">
@@ -9596,7 +9975,7 @@
                   placeholder="Task…" value="${escHtml(t.text)}"
                   oninput="updateTask('${job.id}',${i},this.value)">
                 ${taskEmailDate ? `<span class="task-email-date" title="${escHtml(taskEmailTitle)}">${escHtml(taskEmailDate)}</span>` : ''}
-                <button class="task-email-btn ${taskEmailCount ? 'attached' : ''}" onclick="handleTaskEmailButton('${job.id}',${i},this)"
+                <button class="task-email-btn local-desktop-only ${taskEmailCount ? 'attached' : ''}" onclick="handleTaskEmailButton('${job.id}',${i},this)"
                   title="${taskEmailCount ? 'Manage attached emails' : 'Attach email'}">Mail${taskEmailCount > 1 ? ' ' + taskEmailCount : ''}</button>
                 <button class="task-subtask-btn" onclick="addSubtask('${job.id}',${i})" title="Add or manage subtasks">${escHtml(subtaskButtonLabel(t))}</button>
                 <button class="task-log-btn" onclick="showTaskDayLogForm(event,'${job.id}',${i},this)" title="Log to day">📅</button>
@@ -9723,7 +10102,7 @@
               placeholder="Task..." value="${escHtml(task.text)}"
               oninput="updateTask('${job.id}',${taskIdx},this.value)">
             ${taskEmailDate ? `<span class="task-email-date" title="${escHtml(taskEmailTitle)}">${escHtml(taskEmailDate)}</span>` : ''}
-            <button class="task-email-btn ${taskEmailCount ? 'attached' : ''}" onclick="handleTaskEmailButton('${job.id}',${taskIdx},this)"
+            <button class="task-email-btn local-desktop-only ${taskEmailCount ? 'attached' : ''}" onclick="handleTaskEmailButton('${job.id}',${taskIdx},this)"
               title="${taskEmailCount ? 'Manage attached emails' : 'Attach email'}">Mail${taskEmailCount > 1 ? ' ' + taskEmailCount : ''}</button>
             <button class="task-subtask-btn" onclick="addSubtask('${job.id}',${taskIdx})" title="Add or manage subtasks">${escHtml(subtaskButtonLabel(task))}</button>
             <button class="task-log-btn" onclick="showTaskDayLogForm(event,'${job.id}',${taskIdx},this)" title="Log to day">📅</button>
@@ -9757,7 +10136,7 @@
         <div class="today-job-card" style="--job-color:${escHtml(job.color || '#4a90c4')};" data-job="${job.id}">
           <div class="today-job-head">
             <div>
-              <div class="today-job-title"><span class="today-job-number">${escHtml(title.number)}</span><button class="job-folder-btn" onclick="event.stopPropagation(); openJobFolder('${job.id}', this)" oncontextmenu="return copyJobFolderPath(event,'${job.id}')"
+              <div class="today-job-title"><span class="today-job-number">${escHtml(title.number)}</span><button class="job-folder-btn local-desktop-only" onclick="event.stopPropagation(); openJobFolder('${job.id}', this)" oncontextmenu="return copyJobFolderPath(event,'${job.id}')"
                 style="opacity:${folderPath ? '1' : '0.2'}" title="${escHtml(folderTitle)}">📁</button>${escHtml(title.text)}</div>
               <div class="today-job-meta">${todayCount} for today${otherCount ? ` | ${otherCount} other open` : ''}</div>
             </div>
@@ -14657,8 +15036,9 @@
       const dayHeads = TASK_CALENDAR_DAYS.map(day => {
         const d = addCalendarDays(weekStart, day.offset);
         const total = formatTaskHours(dayHours.get(toLocalDateStr(d)) || 0);
-        return `<span class="${toLocalDateStr(d) < todayStr ? 'past-day' : ''}">${day.label} ${shortDateLabel(d)}<em class="calendar-day-total">${total ? total + 'h total' : ''}</em></span>`;
+        return `<span class="${calendarDayHeadClass(d, todayStr)}">${day.label} ${shortDateLabel(d)}<em class="calendar-day-total">${total ? total + 'h total' : ''}</em></span>`;
       }).join('');
+      const dayOverlays = renderCalendarDayOverlays(weekStart, todayStr);
       const readonlyTasks = [...collectSnapshotCalendarTasks(state, weekStart, owner), ...(extraTasks || [])]
         .sort((a, b) => a.due - b.due || a.start - b.start || a.label.localeCompare(b.label));
       const taskBars = readonlyTasks.map(task => {
@@ -14692,7 +15072,7 @@
         <div class="calendar-week"${calendarCurrentWeekAttr(weekStart)}>
           <div class="calendar-week-label">Week of ${shortDateLabel(weekStart)} - ${shortDateLabel(weekEnd)}</div>
           <div class="calendar-day-head">${dayHeads}</div>
-          <div class="calendar-bars" data-team-week="${weekStartStr}">${reminderBars + logBars + taskBars || '<div class="calendar-empty-week">No shared work this week.</div>'}</div>
+          <div class="calendar-bars" data-team-week="${weekStartStr}">${dayOverlays}${reminderBars + logBars + taskBars || '<div class="calendar-empty-week">No shared work this week.</div>'}</div>
         </div>`;
     }
 
@@ -14901,15 +15281,9 @@
       const label = `Assigned week of ${shortDateLabel(weekStart)} - ${shortDateLabel(weekEnd)}`;
       const dayHeads = TASK_CALENDAR_DAYS.map(day => {
         const d = addCalendarDays(weekStart, day.offset);
-        const isPast = toLocalDateStr(d) < todayStr;
-        return `<span class="${isPast ? 'past-day' : ''}">${day.label} ${shortDateLabel(d)}<em class="calendar-day-total"></em></span>`;
+        return `<span class="${calendarDayHeadClass(d, todayStr)}">${day.label} ${shortDateLabel(d)}<em class="calendar-day-total"></em></span>`;
       }).join('');
-      const pastDayOverlays = TASK_CALENDAR_DAYS.map(day => {
-        const d = addCalendarDays(weekStart, day.offset);
-        return toLocalDateStr(d) < todayStr
-          ? `<div class="calendar-past-day" style="left:${day.offset * 20}%;"></div>`
-          : '';
-      }).join('');
+      const pastDayOverlays = renderCalendarDayOverlays(weekStart, todayStr);
 
       const visible = (assignments || []).filter(item => item.due >= weekStart && item.due <= weekEnd);
       const taskBars = visible.map(item => {
@@ -15260,7 +15634,7 @@
         dateBits.slice(0, 2).join(', ')
       ].filter(Boolean).join(' - ');
       const buttons = emails.map((email, idx) =>
-        `<button class="calendar-job-email-link" title="${escHtml(email.name || email.fileName || 'Email')}" onclick="event.stopPropagation(); openJobEmail('${job.id}','${email.id}',this)">Mail${emails.length > 1 ? ' ' + (idx + 1) : ''}</button>`
+        `<button class="calendar-job-email-link local-desktop-only" title="${escHtml(email.name || email.fileName || 'Email')}" onclick="event.stopPropagation(); openJobEmail('${job.id}','${email.id}',this)">Mail${emails.length > 1 ? ' ' + (idx + 1) : ''}</button>`
       ).join('');
       return `
         <div class="calendar-job-section-title">Linked Email</div>
@@ -15458,7 +15832,7 @@
         </div>
         ${rmGanttConditionDetailsHtml(entry)}
         <div class="calendar-job-email-actions">
-          <button class="calendar-job-email-link" onclick="event.stopPropagation(); openRmGanttFromCalendar(decodeURIComponent('${itemId}'))">Open RM Gantt</button>
+          <button class="calendar-job-email-link local-desktop-only" onclick="event.stopPropagation(); openRmGanttFromCalendar(decodeURIComponent('${itemId}'))">Open RM Gantt</button>
           <button class="calendar-job-email-link" onclick="event.stopPropagation(); createTaskaItemFromRmGanttCalendar(decodeURIComponent('${itemId}'))">Make Taska Item</button>
           <button class="calendar-job-email-link" onclick="event.stopPropagation(); focusJobInTasksToDoIfActive(decodeURIComponent('${jobId}'))">Open Job</button>
         </div>`;
@@ -16207,9 +16581,9 @@
         const emails = findTaskEmails(job, task);
         const schedule = calendarTaskScheduleLabel(task);
         const emailLinks = emails.map((email, idx) =>
-          `<button class="calendar-job-email-link" title="${escHtml(email.name || email.fileName || 'Email')}" onclick="event.stopPropagation(); openJobEmail('${job.id}','${email.id}',this)">Mail${emails.length > 1 ? ' ' + (idx + 1) : ''}</button>`
-        ).join('');
-        const addEmailButton = `<button class="calendar-job-email-link" onclick="event.stopPropagation(); showTaskEmailMenu('${job.id}',${taskIdx},this)" title="${emails.length ? 'Add or manage task emails' : 'Attach email to this task'}">+ Email</button>`;
+        `<button class="calendar-job-email-link local-desktop-only" title="${escHtml(email.name || email.fileName || 'Email')}" onclick="event.stopPropagation(); openJobEmail('${job.id}','${email.id}',this)">Mail${emails.length > 1 ? ' ' + (idx + 1) : ''}</button>`
+      ).join('');
+        const addEmailButton = `<button class="calendar-job-email-link local-desktop-only" onclick="event.stopPropagation(); showTaskEmailMenu('${job.id}',${taskIdx},this)" title="${emails.length ? 'Add or manage task emails' : 'Attach email to this task'}">+ Email</button>`;
         const addSubtaskButton = `<button class="calendar-job-email-link" onclick="event.stopPropagation(); addSubtask('${job.id}',${taskIdx})" title="Add subtask">${escHtml(subtaskButtonLabel(task))}</button>`;
         const addTimeButton = `<button class="calendar-job-time-btn" onclick="event.stopPropagation(); addCalendarTaskTimeToday('${job.id}',${taskIdx},this)" title="Add time for this task to today">Add Time Today</button>`;
         const focusedClass = focused ? ' focused' : '';
@@ -16247,10 +16621,10 @@
               <div class="calendar-job-task-text">${escHtml(email.name || email.fileName || 'Email')}</div>
               ${dateLabel ? `<div class="calendar-job-submeta">${escHtml(kind)} ${escHtml(dateLabel)}</div>` : ''}
           </div>
-          <button class="calendar-job-email-link" onclick="event.stopPropagation(); openJobEmail('${job.id}','${email.id}',this)">Open</button>
+          <button class="calendar-job-email-link local-desktop-only" onclick="event.stopPropagation(); openJobEmail('${job.id}','${email.id}',this)">Open</button>
         </div>`;
       }).join('') || '<div class="calendar-job-empty">No emails attached.</div>';
-      const emailSection = `<details class="calendar-job-collapse"><summary>Emails (${(job.emails || []).length})</summary>${emailRows}</details>`;
+      const emailSection = `<details class="calendar-job-collapse local-desktop-only"><summary>Emails (${(job.emails || []).length})</summary>${emailRows}</details>`;
       const jobTimeButton = `<button class="calendar-job-time-btn" onclick="event.stopPropagation(); addCalendarJobTimeToday('${job.id}',this)" title="Add time for this job to today">Add Time Today</button>`;
 
       return `
@@ -16258,7 +16632,7 @@
           <div>
             <div class="calendar-job-title-row">
               <div class="calendar-job-popover-title">${escHtml(job.jobNum || 'No job #')}</div>
-              <button class="job-folder-btn" onclick="event.stopPropagation(); openJobFolder('${job.id}', this)" oncontextmenu="return copyJobFolderPath(event,'${job.id}')"
+              <button class="job-folder-btn local-desktop-only" onclick="event.stopPropagation(); openJobFolder('${job.id}', this)" oncontextmenu="return copyJobFolderPath(event,'${job.id}')"
                 style="opacity:${folderPath ? '1' : '0.2'}" title="${escHtml(folderTitle)}">📁</button>
               ${jobTimeButton}
             </div>
@@ -16690,22 +17064,37 @@
       return entries.sort((a, b) => a.date - b.date || a.label.localeCompare(b.label));
     }
 
+    function calendarDayHeadClass(date, todayStr) {
+      const dateStr = toLocalDateStr(date);
+      if (dateStr < todayStr) return 'past-day';
+      if (dateStr === todayStr) return 'today-day';
+      return '';
+    }
+
     function renderBasicCalendarDayHeads(weekStart, todayStr, days = TASK_CALENDAR_DAYS) {
       return days.map(day => {
         const d = addCalendarDays(weekStart, day.offset);
-        const isPast = toLocalDateStr(d) < todayStr;
-        return `<span class="${isPast ? 'past-day' : ''}">${day.label} ${shortDateLabel(d)}<em class="calendar-day-total"></em></span>`;
+        return `<span class="${calendarDayHeadClass(d, todayStr)}">${day.label} ${shortDateLabel(d)}<em class="calendar-day-total"></em></span>`;
+      }).join('');
+    }
+
+    function renderCalendarDayOverlays(weekStart, todayStr, days = TASK_CALENDAR_DAYS) {
+      const width = 100 / days.length;
+      return days.map(day => {
+        const d = addCalendarDays(weekStart, day.offset);
+        const dateStr = toLocalDateStr(d);
+        if (dateStr < todayStr) {
+          return `<div class="calendar-past-day" style="left:${day.offset * width}%;width:${width}%;"></div>`;
+        }
+        if (dateStr === todayStr) {
+          return `<div class="calendar-today-day" style="left:${day.offset * width}%;width:${width}%;"></div>`;
+        }
+        return '';
       }).join('');
     }
 
     function renderCalendarPastDayOverlays(weekStart, todayStr, days = TASK_CALENDAR_DAYS) {
-      const width = 100 / days.length;
-      return days.map(day => {
-        const d = addCalendarDays(weekStart, day.offset);
-        return toLocalDateStr(d) < todayStr
-          ? `<div class="calendar-past-day" style="left:${day.offset * width}%;width:${width}%;"></div>`
-          : '';
-      }).join('');
+      return renderCalendarDayOverlays(weekStart, todayStr, days);
     }
 
     function renderGmailCalendarWeek(weekStart, items, todayStr) {
@@ -16760,9 +17149,8 @@
       const dayHeads = TASK_CALENDAR_DAYS.map(day => {
         const d = addCalendarDays(weekStart, day.offset);
         const dayKey = toLocalDateStr(d);
-        const isPast = toLocalDateStr(d) < todayStr;
         const total = formatTaskHours(dayHours.get(dayKey) || 0);
-        return `<span class="${isPast ? 'past-day' : ''}">
+        return `<span class="${calendarDayHeadClass(d, todayStr)}">
           <div class="calendar-day-title">
             <strong>${day.label} ${shortDateLabel(d)}</strong>
             <button class="calendar-day-log-btn" onclick="showCalendarDayLogForm(event,'${dayKey}')" title="Log work to this day" aria-label="Log work to this day">&#128197;</button>
@@ -16770,12 +17158,7 @@
           <em class="calendar-day-total">${total ? total + 'h total' : ''}</em>
         </span>`;
       }).join('');
-      const pastDayOverlays = TASK_CALENDAR_DAYS.map(day => {
-        const d = addCalendarDays(weekStart, day.offset);
-        return toLocalDateStr(d) < todayStr
-          ? `<div class="calendar-past-day" style="left:${day.offset * 20}%;"></div>`
-          : '';
-      }).join('');
+      const pastDayOverlays = renderCalendarDayOverlays(weekStart, todayStr);
 
       const visibleTasks = tasks.filter(task => task.start <= weekEnd && task.due >= weekStart);
       const taskBars = visibleTasks.map(task => {
@@ -18471,6 +18854,7 @@
     // ── Init ──────────────────────────────────────────────────────────────────
 
     applyThemeMode();
+    applyMobileDeviceMode();
     loadFromStorage();
     loadCodingTasks();
     loadGmailCalendarItems();

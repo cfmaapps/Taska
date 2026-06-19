@@ -10,6 +10,12 @@ package.json
 cfma-public-config.js
 server.ps1
 Start Server.bat
+Open Taska.bat
+Open Taska.ps1
+Install Taska App.bat
+Install Taska App.ps1
+Stop Taska Server.bat
+Stop Taska Server.ps1
 surveyors-toolbox.html
 gmail-analysis-core.js
 gmail-analysis-tests.js
@@ -57,6 +63,6 @@ Anything you commit should be from the upload list above.
 ## Suggested First Commit
 
 ```powershell
-git add .gitignore README.md index.html package.json cfma-public-config.js server.ps1 "Start Server.bat" surveyors-toolbox.html gmail-analysis-core.js gmail-analysis-tests.js gmail-scanner-apps-script.js gmail-scanner-appsscript-manifest.json supabase docs
+git add .gitignore README.md index.html package.json cfma-public-config.js server.ps1 "Start Server.bat" "Open Taska.bat" "Open Taska.ps1" "Install Taska App.bat" "Install Taska App.ps1" "Stop Taska Server.bat" "Stop Taska Server.ps1" surveyors-toolbox.html gmail-analysis-core.js gmail-analysis-tests.js gmail-scanner-apps-script.js gmail-scanner-appsscript-manifest.json supabase docs
 git commit -m "Prepare CFMA TASKA for GitHub"
 ```

@@ -14,9 +14,15 @@ It currently supports:
 
 ## Local Use
 
-1. Open `Start Server.bat`.
-2. Open `http://localhost:8080/`.
-3. Keep the server window open for Outlook, Gmail proxy, local backups, and file-opening features.
+For normal desktop-style use:
+
+1. Double-click `Install Taska App.bat` once.
+2. Open `CFMA TASKA` from the Desktop or Start Menu shortcut.
+3. Pin `CFMA TASKA` to the taskbar from the Start Menu if desired.
+
+The shortcut starts the local server hidden, then opens `http://localhost:8080/` in an app-style browser window.
+
+For troubleshooting, open `Start Server.bat` instead. That keeps the server window visible so errors can be read.
 
 The app stores working data in browser `localStorage` and writes local JSON backups through `server.ps1`.
 Local/private files are saved beside `Start Server.bat` by default and protected from Git by `.gitignore`.
@@ -77,6 +83,9 @@ The included Supabase policies are intentionally permissive for a private protot
 - `surveyors-toolbox.html` - main app
 - `cfma-public-config.js` - public deployment defaults for Team Sync
 - `server.ps1` - local helper server
+- `Open Taska.bat` / `Open Taska.ps1` - app-style hidden-server launcher
+- `Install Taska App.bat` / `Install Taska App.ps1` - creates Desktop and Start Menu shortcuts
+- `Stop Taska Server.bat` / `Stop Taska Server.ps1` - stops the hidden local server for restart/troubleshooting
 - `gmail-analysis-core.js` - deterministic Gmail analysis
 - `gmail-analysis-tests.js` - fixtures/tests
 - `supabase/schema.sql` - Team Sync schema

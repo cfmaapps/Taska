@@ -7,19 +7,24 @@ After the app is uploaded to GitHub, these are the only setup items to remember.
 For the current hybrid setup, each user does this:
 
 1. Open the hosted CFMA TASKA link for normal browser use.
-2. If they need Outlook desktop scanning, local attachment opening, or local backups, download/clone the GitHub repo.
-3. Double-click `Start Server.bat` on their own Windows computer.
-4. Open:
+2. If they need Outlook desktop scanning, local attachment opening, local backups, useful documents, or the RC analyser AI proxy, download/clone the GitHub repo.
+3. Double-click `Install Taska App.bat` once.
+4. Open `CFMA TASKA` from the Desktop or Start Menu shortcut.
+5. To pin it, open Start, search `CFMA TASKA`, right-click it, then choose `Pin to taskbar`.
+
+The `CFMA TASKA` shortcut starts the local server hidden and opens:
 
 ```text
 http://localhost:8080/
 ```
 
-5. Keep the `.bat`/PowerShell window open while using local Outlook or file features.
+No visible terminal needs to stay open for normal use.
 
-Supabase handles shared users, autosave snapshots, jobs, tasks, and work calendars. The `.bat` only handles local desktop access that the browser and Supabase cannot access directly.
+Supabase handles shared users, autosave snapshots, jobs, tasks, and work calendars. The hidden local server only handles local desktop access that the browser and Supabase cannot access directly.
 
 Local/private folders such as `Backups/`, `Job Emails/`, `RM Sessions/`, and `Useful Documents/` are stored beside `Start Server.bat` by default. They are ignored by Git through `.gitignore`, so GitHub Desktop should not try to push them.
+
+For troubleshooting, use `Start Server.bat` instead of the shortcut so the server window is visible. Use `Stop Taska Server.bat` to stop the hidden server before restarting it.
 
 ## GitHub Pages
 
@@ -67,7 +72,7 @@ If `Invalid Gmail scanner token` appears, re-save the latest Apps Script deploym
 
 ## Local Features
 
-These features still need `Start Server.bat` running locally:
+These features still need the local server running:
 
 ```text
 Outlook desktop scanning
@@ -75,3 +80,5 @@ Opening local Outlook attachments
 Local backup writing
 Local PowerShell AI helper endpoints
 ```
+
+When users launch from the `CFMA TASKA` shortcut, that local server is started hidden automatically, so they do not need to keep a terminal window open.

@@ -1842,6 +1842,83 @@
       color: #f0a500;
     }
 
+    .mobile-add-reminder-btn,
+    .mobile-reminder-card {
+      display: none;
+    }
+
+    .mobile-add-reminder-btn {
+      background: #173427;
+      border: 1px dashed rgba(104, 211, 145, 0.42);
+      border-radius: 10px;
+      color: #a7f3c3;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 800;
+      padding: 10px;
+      width: 100%;
+    }
+
+    .mobile-add-reminder-btn:hover {
+      border-color: #68d391;
+      color: #e4f5eb;
+    }
+
+    .mobile-reminder-card {
+      background: #111a27;
+      border: 1px solid #2e3d55;
+      border-radius: 8px;
+      flex-direction: column;
+      gap: 8px;
+      margin: 0 0 10px;
+      padding: 10px;
+    }
+
+    .mobile-reminder-card.open {
+      display: flex;
+    }
+
+    .mobile-reminder-title {
+      color: #dbe8f6;
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .mobile-reminder-grid {
+      display: grid;
+      gap: 7px;
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .mobile-reminder-grid input,
+    .mobile-reminder-grid select,
+    .mobile-reminder-grid textarea {
+      background: #162030;
+      border: 1px solid #2e3d55;
+      border-radius: 7px;
+      color: #dce8f5;
+      font-family: inherit;
+      font-size: 0.76rem;
+      padding: 8px;
+      width: 100%;
+    }
+
+    .mobile-reminder-grid textarea {
+      min-height: 58px;
+      resize: vertical;
+    }
+
+    .mobile-reminder-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .mobile-reminder-actions button {
+      flex: 1;
+    }
+
     .add-job-form {
       position: fixed;
       background: #1e2d42;
@@ -4130,6 +4207,13 @@
       min-width: 0;
     }
 
+    .mobile-calendar-day-title-row {
+      align-items: center;
+      display: flex;
+      gap: 7px;
+      min-width: 0;
+    }
+
     .mobile-calendar-day-title span {
       color: #7a9bbf;
       display: block;
@@ -4137,6 +4221,33 @@
       font-weight: 800;
       margin-top: 2px;
       text-transform: uppercase;
+    }
+
+    .mobile-calendar-reminder-add {
+      align-items: center;
+      background: rgba(104, 211, 145, 0.13);
+      border: 1px solid rgba(104, 211, 145, 0.36);
+      border-radius: 50%;
+      color: #a7f3c3;
+      cursor: pointer;
+      display: inline-flex;
+      flex: 0 0 auto;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 900;
+      height: 28px;
+      justify-content: center;
+      line-height: 1;
+      padding: 0;
+      width: 28px;
+    }
+
+    .mobile-calendar-reminder-add:hover,
+    .mobile-calendar-reminder-add:focus {
+      background: rgba(104, 211, 145, 0.2);
+      border-color: #68d391;
+      color: #e4f5eb;
+      outline: none;
     }
 
     .mobile-calendar-day-pill {
@@ -4858,6 +4969,9 @@
     .reminder-form input,
     .reminder-form select,
     .reminder-form textarea,
+    .mobile-reminder-grid input,
+    .mobile-reminder-grid select,
+    .mobile-reminder-grid textarea,
     .coding-task-input,
     .add-meeting-input {
       background: #fff !important;
@@ -4876,7 +4990,10 @@
     .email-scan-input:focus,
     .reminder-form input:focus,
     .reminder-form select:focus,
-    .reminder-form textarea:focus {
+    .reminder-form textarea:focus,
+    .mobile-reminder-grid input:focus,
+    .mobile-reminder-grid select:focus,
+    .mobile-reminder-grid textarea:focus {
       border-color: var(--primary) !important;
       box-shadow: 0 0 0 3px rgba(27,79,138,.08) !important;
       outline: none;
@@ -5290,6 +5407,12 @@
       color: var(--text) !important;
     }
 
+    .mobile-calendar-reminder-add {
+      background: var(--success-l) !important;
+      border-color: #9ad3ad !important;
+      color: var(--success) !important;
+    }
+
     .mobile-calendar-day-title span,
     .mobile-calendar-empty-day,
     .mobile-calendar-item-note {
@@ -5339,7 +5462,8 @@
     .email-saved-summary,
     .completed-empty,
     .calendar-reminder-full-text,
-    .calendar-rm-condition {
+    .calendar-rm-condition,
+    .mobile-reminder-card {
       background: #f8fafc !important;
       border-color: var(--border) !important;
       color: var(--muted) !important;
@@ -5347,6 +5471,16 @@
 
     .calendar-rm-condition strong {
       color: var(--primary) !important;
+    }
+
+    .mobile-reminder-title {
+      color: var(--text) !important;
+    }
+
+    .mobile-add-reminder-btn {
+      background: var(--success-l) !important;
+      border-color: #9ad3ad !important;
+      color: var(--success) !important;
     }
 
     .calendar-rm-condition span {
@@ -5940,6 +6074,12 @@
       color: #dbe8f6 !important;
     }
 
+    body.night-mode .mobile-calendar-reminder-add {
+      background: rgba(104,211,145,.13) !important;
+      border-color: rgba(104,211,145,.36) !important;
+      color: #a7f3c3 !important;
+    }
+
     body.night-mode .mobile-calendar-day-title span,
     body.night-mode .mobile-calendar-empty-day,
     body.night-mode .mobile-calendar-item-note {
@@ -6233,6 +6373,11 @@
         padding: 8px 0;
       }
 
+      body:not(.auth-locked) .mobile-add-reminder-btn {
+        display: block;
+        margin: 0 0 8px;
+      }
+
       .mobile-app-tabs {
         align-items: center;
         background: rgba(15, 23, 42, 0.96);
@@ -6522,6 +6667,26 @@
           <option value="date-desc">Recently Edited</option>
         </select>
       </div>
+      <button class="mobile-add-reminder-btn" id="mobile-add-reminder-btn" onclick="toggleMobileReminderForm(this)">+ Add Reminder</button>
+      <div class="mobile-reminder-card" id="mobile-reminder-card">
+        <div class="mobile-reminder-title">New Reminder</div>
+        <div class="mobile-reminder-grid">
+          <input id="mobile-reminder-job-num" placeholder="Job # optional">
+          <input id="mobile-reminder-date" type="date" title="Reminder date">
+          <select id="mobile-reminder-repeat" title="Repeat reminder">
+            <option value="none">Does not repeat</option>
+            <option value="weekly">Weekly</option>
+            <option value="fortnightly">Fortnightly</option>
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
+          </select>
+          <textarea id="mobile-reminder-text" placeholder="Reminder text"></textarea>
+        </div>
+        <div class="mobile-reminder-actions">
+          <button type="button" class="email-scan-action primary" onclick="addMobileCalendarReminder()">Add Reminder</button>
+          <button type="button" class="email-scan-action" onclick="toggleMobileReminderForm(null,false)">Cancel</button>
+        </div>
+      </div>
       <button class="add-job-btn" id="add-job-btn" onclick="showAddJobForm(this)">+ Add Job</button>
       <div id="jobs-container"></div>
       </div>
@@ -6769,7 +6934,7 @@
   <script src="gmail-analysis-core.js"></script>
   <script src="cfma-public-config.js"></script>
   <script>
-    const TASKA_APP_VERSION = String(window.CFMA_TASKA_CONFIG?.appVersion || '2026.06.19.7');
+    const TASKA_APP_VERSION = String(window.CFMA_TASKA_CONFIG?.appVersion || '2026.06.19.11');
     const TASKA_UPDATE_DISMISS_KEY = 'cfma-taska-update-dismissed';
     const TASKA_MOBILE_VIEW_KEY = 'cfma-taska-mobile-view';
     const TASKA_INSTALL_DISMISS_KEY = 'cfma-taska-install-dismissed';
@@ -6909,7 +7074,10 @@
       if (next === 'tasks' && activeWorkTab !== 'jobs') setWorkTab('jobs');
       if (next === 'today' && activeWorkTab !== 'today') setWorkTab('today');
       if (next === 'today') renderTodayTasks();
-      if (next === 'calendar') renderTaskCalendar();
+      if (next === 'calendar') {
+        if (isMobileDevice()) calendarForcePreviousWeekTop = true;
+        renderTaskCalendar();
+      }
       try { localStorage.setItem(TASKA_MOBILE_VIEW_KEY, next); } catch (_) {}
     }
 
@@ -7891,6 +8059,8 @@
     let supabaseSyncTimer = null;
     let supabaseDebounceTimer = null;
     let supabaseSyncBusy = false;
+    let supabaseRefreshBusy = false;
+    let supabaseLastRefreshAt = 0;
     let startupOutlookScanHandled = false;
     let startupOpenFolderHandled = false;
     let emailSentDateScanInFlight = new Set();
@@ -7915,10 +8085,13 @@
     const SUPABASE_USER_ID_KEY = 'timewrap-supabase-user-id';
     const SUPABASE_USER_NAME_KEY = 'timewrap-supabase-user-name';
     const SUPABASE_LAST_SYNC_KEY = 'timewrap-supabase-last-sync';
+    const SUPABASE_LOCAL_DIRTY_KEY = 'timewrap-supabase-local-dirty-at';
     const SUPABASE_SESSION_TOKEN_KEY = 'cfma-taska-session-token';
     const SUPABASE_LOGIN_USERNAME_KEY = 'cfma-taska-login-username';
     const SUPABASE_LOGIN_ROLE_KEY = 'cfma-taska-login-role';
     const SUPABASE_SYNC_INTERVAL_MS = 3 * 60 * 1000;
+    const SUPABASE_PULL_INTERVAL_MS = 30 * 1000;
+    const SUPABASE_CHANGE_SYNC_DELAY_MS = 5000;
     const OUTLOOK_MATCH_STOP_WORDS = new Set([
       'and', 'the', 'for', 'with', 'from', 'that', 'this', 'your', 'you', 'are', 'our',
       'job', 'task', 'email', 'site', 'plan', 'plans', 'survey', 'update', 'please',
@@ -10483,6 +10656,23 @@
         cursor.setDate(cursor.getDate() + 1);
       }
       return Math.max(1, count);
+    }
+
+    function calendarTaskDayBadge(startDate, endDate, currentDate = null) {
+      if (!startDate && !endDate) return '';
+      let start = toBusinessDay(startDate || endDate);
+      let end = toBusinessDay(endDate || startDate);
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) return '';
+      if (end < start) {
+        const swap = start;
+        start = end;
+        end = swap;
+      }
+      let current = currentDate ? toBusinessDay(currentDate) : start;
+      if (isNaN(current.getTime())) current = start;
+      if (current < start) current = start;
+      if (current > end) current = end;
+      return `Day ${businessDaysInclusive(start, current)}/${businessDaysInclusive(start, end)}`;
     }
 
     function taskDateRange(task) {
@@ -15048,6 +15238,8 @@
         const assignedClass = task.assignedDeadline ? 'assigned-deadline' : '';
         const hours = task.done && task.completedHours ? `<span class="calendar-hours-badge">${escHtml(task.completedHours)}h</span>` : '';
         const marker = task.assignedDeadline ? '<span class="calendar-hours-badge">Deadline</span>' : '';
+        const dayBadge = calendarTaskDayBadge(task.fullStart || task.start, task.fullDue || task.due, task.start);
+        const dayBadgeHtml = dayBadge ? `<span class="calendar-hours-badge">${escHtml(dayBadge)}</span>` : '';
         const ownerId = task.assignedDeadline ? (task.sourceOwnerId || task.ownerId || '') : (task.ownerId || owner.user_id || '');
         const jobId = task.assignedDeadline ? (task.sourceJobId || '') : (task.jobId || '');
         const jobIdx = task.assignedDeadline ? task.sourceJobIdx : task.jobIdx;
@@ -15056,7 +15248,7 @@
         const title = task.assignedDeadline
           ? `${task.label} | ${task.assignedSummary || 'Assigned subtask'} | from ${task.ownerName || 'team member'}`
           : `${task.label} | ${task.ownerName || owner.user_name || 'Team member'}`;
-        return `<div class="calendar-task-bar ${doneClass} ${assignedClass}" ${clickAttr} style="grid-column:${colStart} / ${colEnd}; --job-color:${escHtml(task.color)};" title="${escHtml(title)}"><span class="calendar-task-label">${escHtml(task.label)}</span>${hours}${marker}</div>`;
+        return `<div class="calendar-task-bar ${doneClass} ${assignedClass}" ${clickAttr} style="grid-column:${colStart} / ${colEnd}; --job-color:${escHtml(task.color)};" title="${escHtml(title)}"><span class="calendar-task-label">${escHtml(task.label)}</span>${dayBadgeHtml}${hours}${marker}</div>`;
       }).join('');
       const logBars = collectSnapshotLogEntriesForWeek(state, weekStart).map(entry => {
         const colStart = businessDayColumn(entry.date) + 1;
@@ -15404,6 +15596,9 @@
       const weekday = date.toLocaleDateString('en-NZ', { weekday: 'long' });
       const subLabel = dateStr === todayStr ? `${shortDateLabel(date)} - Today` : shortDateLabel(date);
       const countLabel = options.countLabel || (itemCount ? `${itemCount} item${itemCount === 1 ? '' : 's'}` : 'No items');
+      const reminderButton = weekDayKeyForDate(date)
+        ? `<button type="button" class="mobile-calendar-reminder-add" onclick="openMobileReminderForDate(event,'${dateStr}')" title="Add reminder for ${escHtml(shortDateLabel(date))}" aria-label="Add reminder for ${escHtml(shortDateLabel(date))}">+</button>`
+        : '';
       const logButton = options.logButton
         ? `<button type="button" class="mobile-calendar-day-log" onclick="showCalendarDayLogForm(event,'${dateStr}')" title="Log work to this day">Log</button>`
         : '';
@@ -15412,22 +15607,32 @@
       return `
         <section class="${classes.join(' ')}" data-mobile-date="${dateStr}"${dateStr === todayStr ? ' data-current-day="true"' : ''}>
           <div class="mobile-calendar-day-head">
-            <div class="mobile-calendar-day-title">${escHtml(weekday)}<span>${escHtml(subLabel)}</span></div>
+            <div class="mobile-calendar-day-title-row">
+              <div class="mobile-calendar-day-title">${escHtml(weekday)}<span>${escHtml(subLabel)}</span></div>
+              ${reminderButton}
+            </div>
             <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">${right}</div>
           </div>
           <div class="mobile-calendar-day-items">${itemsHtml || `<div class="mobile-calendar-empty-day">${escHtml(empty)}</div>`}</div>
         </section>`;
     }
 
-    function restoreMobileCalendarScroll(body, previousScrollTop = 0, forceTop = false) {
+    function restoreMobileCalendarScroll(body, previousScrollTop = 0, forceCurrentDay = false) {
       if (!body) return;
       const schedule = window.requestAnimationFrame || (fn => setTimeout(fn, 0));
       schedule(() => {
-        if (previousScrollTop > 8 && !forceTop) {
+        if (previousScrollTop > 8 && !forceCurrentDay) {
           body.scrollTop = Math.min(previousScrollTop, Math.max(0, body.scrollHeight - body.clientHeight));
-        } else {
-          body.scrollTop = 0;
+          return;
         }
+        const todayCard = body.querySelector('[data-current-day="true"]');
+        if (todayCard) {
+          const bodyRect = body.getBoundingClientRect();
+          const dayRect = todayCard.getBoundingClientRect();
+          body.scrollTop = Math.max(0, body.scrollTop + dayRect.top - bodyRect.top - 8);
+          return;
+        }
+        body.scrollTop = 0;
       });
     }
 
@@ -15443,6 +15648,8 @@
         ? `<span class="calendar-hours-badge">${escHtml(task.completedHours)}h</span>`
         : '';
       const deadlineBadge = task.assignedDeadline ? '<span class="calendar-hours-badge">Deadline</span>' : '';
+      const dayBadge = calendarTaskDayBadge(task.start, task.due, date);
+      const dayBadgeHtml = dayBadge ? `<span class="calendar-hours-badge">${escHtml(dayBadge)}</span>` : '';
       const clickAttr = readOnly
         ? `onclick="showAssignedDeadlineDetails(event,'${encodeCalendarDetailParam(task.label)}','${encodeCalendarDetailParam(task.ownerName || '')}','${encodeCalendarDetailParam(toLocalDateStr(task.due))}','${encodeCalendarDetailParam(task.assignedSummary || '')}')"`
         : `onclick="showCalendarJobDetails(event,'${task.jobId}',${task.taskIdx})"`;
@@ -15455,7 +15662,7 @@
         <div class="calendar-task-bar mobile-calendar-item ${isDueToday ? 'due-today' : ''} ${doneClass} ${assignedClass}" ${clickAttr}
           style="--job-color:${escHtml(task.color)};" title="${escHtml(task.label)}">
           ${completeCb}<span class="mobile-calendar-kind">${task.assignedDeadline ? 'Deadline' : 'Task'}</span>
-          <span class="calendar-task-label">${escHtml(task.label)}</span>${hoursBadge}${deadlineBadge}
+          <span class="calendar-task-label">${escHtml(task.label)}</span>${dayBadgeHtml}${hoursBadge}${deadlineBadge}
           ${note ? `<span class="mobile-calendar-item-note">${escHtml(note)}</span>` : ''}
         </div>`;
     }
@@ -15521,7 +15728,9 @@
       const isDueToday = toLocalDateStr(item.due) === todayStr;
       const doneClass = item.done ? 'completed' : '';
       const priorityClass = item.priority ? `priority-${item.priority}` : '';
+      const dayBadge = calendarTaskDayBadge(item.start, item.due, date);
       const badges = [
+        dayBadge ? `<span class="calendar-hours-badge">${escHtml(dayBadge)}</span>` : '',
         item.priority === 'urgent' ? '<span class="calendar-hours-badge">Urgent</span>' : '',
         item.priority === 'hold' ? '<span class="calendar-hours-badge">Hold</span>' : '',
         item.milestone ? '<span class="calendar-hours-badge">Milestone</span>' : ''
@@ -15575,6 +15784,8 @@
       const assignedClass = task.assignedDeadline ? 'assigned-deadline' : '';
       const hours = task.done && task.completedHours ? `<span class="calendar-hours-badge">${escHtml(task.completedHours)}h</span>` : '';
       const marker = task.assignedDeadline ? '<span class="calendar-hours-badge">Deadline</span>' : '';
+      const dayBadge = calendarTaskDayBadge(task.fullStart || task.start, task.fullDue || task.due, date);
+      const dayBadgeHtml = dayBadge ? `<span class="calendar-hours-badge">${escHtml(dayBadge)}</span>` : '';
       const ownerId = task.assignedDeadline ? (task.sourceOwnerId || task.ownerId || '') : (task.ownerId || owner.user_id || '');
       const jobId = task.assignedDeadline ? (task.sourceJobId || '') : (task.jobId || '');
       const jobIdx = task.assignedDeadline ? task.sourceJobIdx : task.jobIdx;
@@ -15589,7 +15800,7 @@
           onclick="showSharedCalendarTaskDetails(event,'${encodeCalendarDetailParam(ownerId)}','${encodeCalendarDetailParam(jobId)}','${encodeCalendarDetailParam(taskIdx)}','${encodeCalendarDetailParam(jobIdx)}','${task.assignedDeadline ? 'assigned' : 'task'}')"
           style="--job-color:${escHtml(task.color)};" title="${escHtml(task.label)}">
           <span class="mobile-calendar-kind">${task.assignedDeadline ? 'Deadline' : 'Task'}</span>
-          <span class="calendar-task-label">${escHtml(task.label)}</span>${hours}${marker}
+          <span class="calendar-task-label">${escHtml(task.label)}</span>${dayBadgeHtml}${hours}${marker}
           ${note ? `<span class="mobile-calendar-item-note">${escHtml(note)}</span>` : ''}
         </div>`;
     }
@@ -16370,7 +16581,9 @@
         const isDueToday = toLocalDateStr(item.due) === todayStr;
         const doneClass = item.done ? 'completed' : '';
         const priorityClass = item.priority ? `priority-${item.priority}` : '';
+        const dayBadge = calendarTaskDayBadge(item.start, item.due, segmentStart);
         const badges = [
+          dayBadge ? `<span class="calendar-hours-badge">${escHtml(dayBadge)}</span>` : '',
           item.priority === 'urgent' ? '<span class="calendar-hours-badge">Urgent</span>' : '',
           item.priority === 'hold' ? '<span class="calendar-hours-badge">Hold</span>' : '',
           item.milestone ? '<span class="calendar-hours-badge">Milestone</span>' : ''
@@ -17399,11 +17612,7 @@
       return reminder && reminder.jobNum ? findJobByJobNumber(reminder.jobNum) : null;
     }
 
-    function addCalendarReminder() {
-      const jobNumEl = document.getElementById('reminder-job-num');
-      const dateEl = document.getElementById('reminder-date');
-      const repeatEl = document.getElementById('reminder-repeat');
-      const textEl = document.getElementById('reminder-text');
+    function addCalendarReminderFromFields(jobNumEl, dateEl, repeatEl, textEl) {
       const jobNum = (jobNumEl?.value || '').trim();
       const date = dateEl?.value || '';
       const repeat = calendarReminderRepeat(repeatEl?.value || 'none');
@@ -17412,17 +17621,17 @@
       if (!text) {
         alert('Enter reminder text first.');
         textEl?.focus();
-        return;
+        return false;
       }
       if (!parseTaskDate(date)) {
         alert('Choose a reminder date.');
         dateEl?.focus();
-        return;
+        return false;
       }
       if (!weekDayKeyForDate(parseTaskDate(date))) {
         alert('Choose a weekday so the reminder can appear on the work calendar.');
         dateEl?.focus();
-        return;
+        return false;
       }
 
       if (jobNum) offerCreateActiveJobForLoggedTime(jobNum, text);
@@ -17433,6 +17642,61 @@
       if (dateEl) dateEl.value = toLocalDateStr(new Date());
       if (repeatEl) repeatEl.value = 'none';
       saveCalendarReminders();
+      return true;
+    }
+
+    function addCalendarReminder() {
+      return addCalendarReminderFromFields(
+        document.getElementById('reminder-job-num'),
+        document.getElementById('reminder-date'),
+        document.getElementById('reminder-repeat'),
+        document.getElementById('reminder-text')
+      );
+    }
+
+    function setMobileReminderDefaults() {
+      const dateEl = document.getElementById('mobile-reminder-date');
+      const repeatEl = document.getElementById('mobile-reminder-repeat');
+      if (dateEl && !dateEl.value) dateEl.value = toLocalDateStr(new Date());
+      if (repeatEl && !repeatEl.value) repeatEl.value = 'none';
+    }
+
+    function toggleMobileReminderForm(btn = null, forceOpen = null) {
+      const card = document.getElementById('mobile-reminder-card');
+      if (!card) return;
+      const opening = typeof forceOpen === 'boolean' ? forceOpen : !card.classList.contains('open');
+      card.classList.toggle('open', opening);
+      if (opening) {
+        setMobileReminderDefaults();
+        setTimeout(() => document.getElementById('mobile-reminder-text')?.focus(), 0);
+      }
+    }
+
+    function openMobileReminderForDate(event, dateStr) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      const date = parseTaskDate(dateStr);
+      if (!date || !weekDayKeyForDate(date)) {
+        alert('Choose a weekday so the reminder can appear on the work calendar.');
+        return;
+      }
+      setMobileAppView('tasks');
+      setMobileReminderDefaults();
+      const dateEl = document.getElementById('mobile-reminder-date');
+      if (dateEl) dateEl.value = toLocalDateStr(date);
+      toggleMobileReminderForm(null, true);
+    }
+
+    function addMobileCalendarReminder() {
+      const saved = addCalendarReminderFromFields(
+        document.getElementById('mobile-reminder-job-num'),
+        document.getElementById('mobile-reminder-date'),
+        document.getElementById('mobile-reminder-repeat'),
+        document.getElementById('mobile-reminder-text')
+      );
+      if (saved) toggleMobileReminderForm(null, false);
     }
 
     function deleteCalendarReminder(id) {
@@ -17649,6 +17913,8 @@
           ? `<span class="calendar-hours-badge">${escHtml(task.completedHours)}h</span>`
           : '';
         const deadlineBadge = task.assignedDeadline ? '<span class="calendar-hours-badge">Deadline</span>' : '';
+        const dayBadge = calendarTaskDayBadge(task.start, task.due, segmentStart);
+        const dayBadgeHtml = dayBadge ? `<span class="calendar-hours-badge">${escHtml(dayBadge)}</span>` : '';
         const clickAttr = readOnly
           ? `onclick="showAssignedDeadlineDetails(event,'${encodeCalendarDetailParam(task.label)}','${encodeCalendarDetailParam(task.ownerName || '')}','${encodeCalendarDetailParam(toLocalDateStr(task.due))}','${encodeCalendarDetailParam(task.assignedSummary || '')}')"`
           : `onclick="showCalendarJobDetails(event,'${task.jobId}',${task.taskIdx})"`;
@@ -17665,7 +17931,7 @@
             ${clickAttr}
             style="grid-column:${colStart} / ${colEnd}; --job-color:${escHtml(task.color)};"
             title="${escHtml(title)}">
-            ${completeCb}<span class="calendar-task-label">${escHtml(task.label)}</span>${hoursBadge}${deadlineBadge}${mailBtn}
+            ${completeCb}<span class="calendar-task-label">${escHtml(task.label)}</span>${dayBadgeHtml}${hoursBadge}${deadlineBadge}${mailBtn}
           </div>`;
       }).join('');
 
@@ -18198,16 +18464,17 @@
 
     function scheduleSupabaseSyncSoon() {
       if (!supabaseConfigured()) return;
+      localStorage.setItem(SUPABASE_LOCAL_DIRTY_KEY, String(Date.now()));
       clearTimeout(supabaseDebounceTimer);
-      supabaseDebounceTimer = setTimeout(() => syncSupabaseSnapshot('change'), 45000);
+      supabaseDebounceTimer = setTimeout(() => syncSupabaseSnapshot('change'), SUPABASE_CHANGE_SYNC_DELAY_MS);
     }
 
     function startSupabaseSyncTimer() {
       stopSupabaseSyncTimer();
       if (!supabaseConfigured()) return;
-      supabaseSyncTimer = setInterval(() => loadSupabaseTeamSnapshots(true), SUPABASE_SYNC_INTERVAL_MS);
+      supabaseSyncTimer = setInterval(() => refreshSupabaseCloudState(true), SUPABASE_PULL_INTERVAL_MS);
       loadSupabaseOrgUsers();
-      loadSupabaseTeamSnapshots();
+      refreshSupabaseCloudState();
     }
 
     function stopSupabaseSyncTimer() {
@@ -18219,6 +18486,10 @@
 
     async function syncSupabaseSnapshot(reason = 'manual') {
       if (!supabaseConfigured() || supabaseSyncBusy) return;
+      const uploadStartedAt = Date.now();
+      const localDirtyAt = Number(localStorage.getItem(SUPABASE_LOCAL_DIRTY_KEY) || 0);
+      const forceUploadReasons = new Set(['setup', 'login', 'manual']);
+      if (!localDirtyAt && !forceUploadReasons.has(reason)) return;
       supabaseSyncBusy = true;
       const cfg = supabaseConfig();
       const nowIso = new Date().toISOString();
@@ -18236,6 +18507,10 @@
           body: JSON.stringify(payload)
         });
         if (!resp.ok) throw new Error(`Supabase returned ${resp.status}`);
+        const latestDirtyAt = Number(localStorage.getItem(SUPABASE_LOCAL_DIRTY_KEY) || 0);
+        if (!latestDirtyAt || latestDirtyAt <= uploadStartedAt) {
+          localStorage.removeItem(SUPABASE_LOCAL_DIRTY_KEY);
+        }
         localStorage.setItem(SUPABASE_LAST_SYNC_KEY, nowIso);
         updateLastSavedLabel();
         if (reason !== 'load-only') await loadSupabaseTeamSnapshots(true);
@@ -18345,8 +18620,9 @@
       return true;
     }
 
-    async function loadSupabaseOwnSnapshot() {
+    async function loadSupabaseOwnSnapshot(options = {}) {
       if (!supabaseConfigured()) return false;
+      if (options.skipIfLocalDirty && localStorage.getItem(SUPABASE_LOCAL_DIRTY_KEY)) return false;
       const cfg = supabaseConfig();
       try {
         const query = `timewrap_snapshots?workspace_id=eq.${encodeURIComponent(cfg.workspaceId)}&user_id=eq.${encodeURIComponent(cfg.userId)}&select=workspace_id,user_id,user_name,state,updated_at&limit=1`;
@@ -18372,6 +18648,20 @@
         const label = document.getElementById('last-saved-label');
         if (label) label.textContent = `Own snapshot load failed: ${e.message || 'check setup'}`;
         return false;
+      }
+    }
+
+    async function refreshSupabaseCloudState(shouldRender = true, options = {}) {
+      if (!supabaseConfigured() || supabaseRefreshBusy) return;
+      const now = Date.now();
+      if (!options.force && supabaseLastRefreshAt && now - supabaseLastRefreshAt < 10000) return;
+      supabaseLastRefreshAt = now;
+      supabaseRefreshBusy = true;
+      try {
+        await loadSupabaseOwnSnapshot({ skipIfLocalDirty: true });
+        await loadSupabaseTeamSnapshots(shouldRender);
+      } finally {
+        supabaseRefreshBusy = false;
       }
     }
 
@@ -18403,6 +18693,7 @@
         return;
       }
       await loadSupabaseOrgUsers();
+      await refreshSupabaseCloudState(true, { force: true });
       await syncSupabaseSnapshot('manual-refresh');
       await loadSupabaseTeamSnapshots(true);
       const cfg = supabaseConfig();
@@ -19290,6 +19581,18 @@
 
     setInterval(checkAutoSave, 60000); // check every minute
     setInterval(autoSaveEveryFewMinutes, SUPABASE_SYNC_INTERVAL_MS);
+
+    window.addEventListener('focus', () => refreshSupabaseCloudState(true));
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        syncSupabaseSnapshot('hide');
+      } else {
+        refreshSupabaseCloudState(true, { force: true });
+      }
+    });
+    window.addEventListener('pagehide', () => {
+      syncSupabaseSnapshot('pagehide');
+    });
 
     window.addEventListener('message', event => {
       const data = event && event.data;

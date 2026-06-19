@@ -1,8 +1,8 @@
 {
-  "version": "2026.06.19.7",
+  "version": "2026.06.19.11",
   "releasedAt": "2026-06-19",
   "title": "CFMA TASKA update available",
-  "summary": "Mobile calendars now show work day by day with full-width task rows so longer task text is easier to read.",
+  "summary": "Desktop and mobile now sync the current user's Taska changes more quickly.",
   "appUrl": "https://cfmaapps.github.io/Taska/",
   "downloadUrl": "https://github.com/cfmaapps/Taska"
 }

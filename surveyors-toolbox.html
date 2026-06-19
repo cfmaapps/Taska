@@ -6934,7 +6934,7 @@
   <script src="gmail-analysis-core.js"></script>
   <script src="cfma-public-config.js"></script>
   <script>
-    const TASKA_APP_VERSION = String(window.CFMA_TASKA_CONFIG?.appVersion || '2026.06.19.11');
+    const TASKA_APP_VERSION = String(window.CFMA_TASKA_CONFIG?.appVersion || '2026.06.19.12');
     const TASKA_UPDATE_DISMISS_KEY = 'cfma-taska-update-dismissed';
     const TASKA_MOBILE_VIEW_KEY = 'cfma-taska-mobile-view';
     const TASKA_INSTALL_DISMISS_KEY = 'cfma-taska-install-dismissed';
@@ -15238,8 +15238,6 @@
         const assignedClass = task.assignedDeadline ? 'assigned-deadline' : '';
         const hours = task.done && task.completedHours ? `<span class="calendar-hours-badge">${escHtml(task.completedHours)}h</span>` : '';
         const marker = task.assignedDeadline ? '<span class="calendar-hours-badge">Deadline</span>' : '';
-        const dayBadge = calendarTaskDayBadge(task.fullStart || task.start, task.fullDue || task.due, task.start);
-        const dayBadgeHtml = dayBadge ? `<span class="calendar-hours-badge">${escHtml(dayBadge)}</span>` : '';
         const ownerId = task.assignedDeadline ? (task.sourceOwnerId || task.ownerId || '') : (task.ownerId || owner.user_id || '');
         const jobId = task.assignedDeadline ? (task.sourceJobId || '') : (task.jobId || '');
         const jobIdx = task.assignedDeadline ? task.sourceJobIdx : task.jobIdx;
@@ -15248,7 +15246,7 @@
         const title = task.assignedDeadline
           ? `${task.label} | ${task.assignedSummary || 'Assigned subtask'} | from ${task.ownerName || 'team member'}`
           : `${task.label} | ${task.ownerName || owner.user_name || 'Team member'}`;
-        return `<div class="calendar-task-bar ${doneClass} ${assignedClass}" ${clickAttr} style="grid-column:${colStart} / ${colEnd}; --job-color:${escHtml(task.color)};" title="${escHtml(title)}"><span class="calendar-task-label">${escHtml(task.label)}</span>${dayBadgeHtml}${hours}${marker}</div>`;
+        return `<div class="calendar-task-bar ${doneClass} ${assignedClass}" ${clickAttr} style="grid-column:${colStart} / ${colEnd}; --job-color:${escHtml(task.color)};" title="${escHtml(title)}"><span class="calendar-task-label">${escHtml(task.label)}</span>${hours}${marker}</div>`;
       }).join('');
       const logBars = collectSnapshotLogEntriesForWeek(state, weekStart).map(entry => {
         const colStart = businessDayColumn(entry.date) + 1;
@@ -16581,9 +16579,7 @@
         const isDueToday = toLocalDateStr(item.due) === todayStr;
         const doneClass = item.done ? 'completed' : '';
         const priorityClass = item.priority ? `priority-${item.priority}` : '';
-        const dayBadge = calendarTaskDayBadge(item.start, item.due, segmentStart);
         const badges = [
-          dayBadge ? `<span class="calendar-hours-badge">${escHtml(dayBadge)}</span>` : '',
           item.priority === 'urgent' ? '<span class="calendar-hours-badge">Urgent</span>' : '',
           item.priority === 'hold' ? '<span class="calendar-hours-badge">Hold</span>' : '',
           item.milestone ? '<span class="calendar-hours-badge">Milestone</span>' : ''
@@ -17913,8 +17909,6 @@
           ? `<span class="calendar-hours-badge">${escHtml(task.completedHours)}h</span>`
           : '';
         const deadlineBadge = task.assignedDeadline ? '<span class="calendar-hours-badge">Deadline</span>' : '';
-        const dayBadge = calendarTaskDayBadge(task.start, task.due, segmentStart);
-        const dayBadgeHtml = dayBadge ? `<span class="calendar-hours-badge">${escHtml(dayBadge)}</span>` : '';
         const clickAttr = readOnly
           ? `onclick="showAssignedDeadlineDetails(event,'${encodeCalendarDetailParam(task.label)}','${encodeCalendarDetailParam(task.ownerName || '')}','${encodeCalendarDetailParam(toLocalDateStr(task.due))}','${encodeCalendarDetailParam(task.assignedSummary || '')}')"`
           : `onclick="showCalendarJobDetails(event,'${task.jobId}',${task.taskIdx})"`;
@@ -17931,7 +17925,7 @@
             ${clickAttr}
             style="grid-column:${colStart} / ${colEnd}; --job-color:${escHtml(task.color)};"
             title="${escHtml(title)}">
-            ${completeCb}<span class="calendar-task-label">${escHtml(task.label)}</span>${dayBadgeHtml}${hoursBadge}${deadlineBadge}${mailBtn}
+            ${completeCb}<span class="calendar-task-label">${escHtml(task.label)}</span>${hoursBadge}${deadlineBadge}${mailBtn}
           </div>`;
       }).join('');
 

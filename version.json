@@ -1,8 +1,8 @@
 {
-  "version": "2026.06.19.11",
+  "version": "2026.06.19.12",
   "releasedAt": "2026-06-19",
   "title": "CFMA TASKA update available",
-  "summary": "Desktop and mobile now sync the current user's Taska changes more quickly.",
+  "summary": "Task day badges now show on mobile calendar items only.",
   "appUrl": "https://cfmaapps.github.io/Taska/",
   "downloadUrl": "https://github.com/cfmaapps/Taska"
 }

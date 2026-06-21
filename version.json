@@ -1,8 +1,8 @@
 {
-  "version": "2026.06.22.01",
+  "version": "2026.06.22.02",
   "releasedAt": "2026-06-22",
   "title": "CFMA TASKA update available",
-  "summary": "Desktop updates now install from the popup and the launcher opens Taska as an app window instead of a normal browser tab.",
+  "summary": "Desktop calendar now has a scrolling Daily view with optional 224(c), assigned, and team items.",
   "appUrl": "https://cfmaapps.github.io/Taska/",
   "downloadUrl": "https://github.com/cfmaapps/Taska",
   "desktopUpdateUrl": "https://github.com/cfmaapps/Taska/archive/refs/heads/main.zip"

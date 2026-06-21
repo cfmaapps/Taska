@@ -1,4 +1,4 @@
-const TASKA_CACHE = 'cfma-taska-static-2026-06-22-01';
+const TASKA_CACHE = 'cfma-taska-static-2026-06-22-02';
 const STATIC_ASSETS = [
   './',
   './index.html',

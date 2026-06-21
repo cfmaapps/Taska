@@ -2841,6 +2841,188 @@
       font-weight: 700;
     }
 
+    .calendar-daily-options {
+      align-items: center;
+      background: #1e2d42;
+      border-bottom: 1px solid #2e3d55;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: -12px -14px 12px;
+      padding: 10px 14px;
+      position: sticky;
+      top: -12px;
+      z-index: 5;
+    }
+
+    .calendar-daily-option {
+      align-items: center;
+      background: #162030;
+      border: 1px solid #2e3d55;
+      border-radius: 8px;
+      color: #a8c4e0;
+      cursor: pointer;
+      display: inline-flex;
+      gap: 8px;
+      font-size: 0.7rem;
+      font-weight: 900;
+      min-height: 32px;
+      padding: 7px 10px;
+    }
+
+    .calendar-daily-option input {
+      accent-color: #f0a500;
+      cursor: pointer;
+      height: 14px;
+      width: 14px;
+    }
+
+    .calendar-daily-option em {
+      color: #6f91b2;
+      font-size: 0.64rem;
+      font-style: normal;
+      font-weight: 800;
+    }
+
+    .calendar-daily-days {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .calendar-daily-day {
+      background: #111a27;
+      border: 1px solid #2e3d55;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .calendar-daily-day.today {
+      border-color: rgba(240, 165, 0, 0.78);
+      box-shadow: 0 0 0 1px rgba(240, 165, 0, 0.28), 0 0 24px rgba(240, 165, 0, 0.16);
+    }
+
+    .calendar-daily-day.past {
+      opacity: 0.74;
+    }
+
+    .calendar-daily-day.drag-over {
+      border-color: #68d391;
+      box-shadow: 0 0 0 1px rgba(104, 211, 145, 0.42), 0 0 18px rgba(104, 211, 145, 0.18);
+    }
+
+    .calendar-daily-head {
+      align-items: center;
+      background: #162030;
+      border-bottom: 1px solid #243044;
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+      padding: 9px 11px;
+    }
+
+    .calendar-daily-title {
+      color: #dbe8f6;
+      font-size: 0.86rem;
+      font-weight: 900;
+      min-width: 0;
+    }
+
+    .calendar-daily-title span {
+      color: #7a9bbf;
+      display: block;
+      font-size: 0.66rem;
+      font-weight: 800;
+      margin-top: 2px;
+      text-transform: uppercase;
+    }
+
+    .calendar-daily-meta {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: flex-end;
+    }
+
+    .calendar-daily-pill {
+      background: rgba(74, 144, 196, 0.14);
+      border: 1px solid rgba(74, 144, 196, 0.32);
+      border-radius: 999px;
+      color: #a8c4e0;
+      flex: 0 0 auto;
+      font-size: 0.62rem;
+      font-weight: 900;
+      padding: 3px 7px;
+      text-transform: uppercase;
+    }
+
+    .calendar-daily-day.today .calendar-daily-pill {
+      background: #f0a500;
+      border-color: #f0a500;
+      color: #172033;
+    }
+
+    .calendar-daily-items {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      padding: 9px;
+    }
+
+    .calendar-daily-empty {
+      color: #4a7fa8;
+      font-size: 0.72rem;
+      line-height: 1.4;
+      padding: 4px 2px;
+    }
+
+    .calendar-daily-bar {
+      box-sizing: border-box;
+      cursor: pointer;
+      flex-wrap: wrap;
+      font-size: 0.74rem;
+      line-height: 1.24;
+      margin: 0;
+      min-height: 36px;
+      padding: 7px 8px;
+      width: 100%;
+    }
+
+    .calendar-daily-bar .calendar-task-label,
+    .calendar-daily-bar .calendar-meeting-label {
+      flex: 1 1 auto;
+      min-width: 160px;
+      overflow: visible;
+      text-overflow: clip;
+      white-space: normal;
+    }
+
+    .calendar-daily-kind,
+    .calendar-daily-note {
+      background: rgba(22, 32, 48, 0.72);
+      border: 1px solid rgba(168, 196, 224, 0.22);
+      border-radius: 999px;
+      color: #a8c4e0;
+      flex: 0 0 auto;
+      font-size: 0.61rem;
+      font-weight: 900;
+      padding: 2px 6px;
+      text-transform: uppercase;
+    }
+
+    .calendar-daily-note {
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      color: #9cb3c8;
+      flex: 1 1 100%;
+      font-size: 0.67rem;
+      line-height: 1.3;
+      padding: 1px 0 0;
+      text-transform: none;
+    }
+
     .task-calendar-close {
       background: none;
       border: none;
@@ -4921,6 +5103,8 @@
     .team-member-card,
     .email-scan-empty,
     .calendar-week,
+    .calendar-daily-options,
+    .calendar-daily-day,
     .calendar-job-popover,
     .calendar-gmail-popover,
     .calendar-job-collapse,
@@ -4951,6 +5135,8 @@
     .week-block,
     .meeting-row td,
     .calendar-week-label,
+    .calendar-daily-options,
+    .calendar-daily-head,
     .calendar-job-collapse .calendar-job-task-row:first-of-type,
     .calendar-job-collapse .calendar-job-email-row:first-of-type {
       border-color: var(--border) !important;
@@ -5003,6 +5189,7 @@
     .dropdown-btn,
     .calendar-toggle-btn,
     .calendar-view-tab,
+    .calendar-daily-option,
     .email-scan-action,
     .email-scan-tab,
     .job-expand-btn,
@@ -5048,6 +5235,7 @@
     .dropdown.open .dropdown-btn,
     .calendar-toggle-btn:hover,
     .calendar-view-tab:hover,
+    .calendar-daily-option:hover,
     .email-scan-action:hover,
     .email-scan-tab:hover,
     .job-expand-btn:hover,
@@ -5116,6 +5304,7 @@
     .today-job-number,
     .week-block-title,
     .calendar-week-label,
+    .calendar-daily-title,
     .calendar-job-popover-title,
     .calendar-job-section-title,
     .calendar-gmail-type,
@@ -5148,6 +5337,10 @@
     .email-attachment-summary,
     .gmail-briefing-tile span,
     .team-member-meta,
+    .calendar-daily-title span,
+    .calendar-daily-option em,
+    .calendar-daily-empty,
+    .calendar-daily-note,
     .calendar-job-popover-desc,
     .calendar-job-meta,
     .calendar-job-pill,
@@ -5190,6 +5383,8 @@
 
     .job-summary-pill,
     .calendar-job-pill,
+    .calendar-daily-pill,
+    .calendar-daily-kind,
     .gmail-kind-pill,
     .gmail-score-pill,
     .gmail-status-pill,
@@ -6635,6 +6830,7 @@
           <div class="task-calendar-title">Your Work Calendar</div>
           <div class="calendar-view-tabs">
             <button class="calendar-view-tab active" id="calendar-view-jobs" onclick="setCalendarView('jobs')">Your Work</button>
+            <button class="calendar-view-tab" id="calendar-view-daily" onclick="setCalendarView('daily')">Daily</button>
             <button class="calendar-view-tab" id="calendar-view-rm" onclick="setCalendarView('rm')">RC 224(c)</button>
             <button class="calendar-view-tab" id="calendar-view-assigned" onclick="setCalendarView('assigned')">Assigned</button>
             <button class="calendar-view-tab" id="calendar-view-gmail" onclick="setCalendarView('gmail')" hidden>Gmail</button>
@@ -6934,7 +7130,7 @@
   <script src="gmail-analysis-core.js"></script>
   <script src="cfma-public-config.js"></script>
   <script>
-    const TASKA_APP_VERSION = String(window.CFMA_TASKA_CONFIG?.appVersion || '2026.06.22.01');
+    const TASKA_APP_VERSION = String(window.CFMA_TASKA_CONFIG?.appVersion || '2026.06.22.02');
     const TASKA_UPDATE_DISMISS_KEY = 'cfma-taska-update-dismissed';
     const TASKA_MOBILE_VIEW_KEY = 'cfma-taska-mobile-view';
     const TASKA_INSTALL_DISMISS_KEY = 'cfma-taska-install-dismissed';
@@ -8103,12 +8299,26 @@
     let emailMenuEl = null;
     let jobLinkMenuEl = null;
     let taskCalendarOpen = true;
-    let calendarViewTab = ['jobs', 'assigned', 'rm', 'gmail', 'team'].includes(localStorage.getItem('ljm-calendar-view-tab'))
+    let calendarViewTab = ['jobs', 'daily', 'assigned', 'rm', 'gmail', 'team'].includes(localStorage.getItem('ljm-calendar-view-tab'))
       ? localStorage.getItem('ljm-calendar-view-tab')
       : 'jobs';
     const GMAIL_CALENDAR_ENABLED = false;
     const YOUR_WORK_ASSIGNED_VISIBLE_KEY = 'cfma-taska-your-work-assigned-visible';
     let yourWorkAssignedVisible = localStorage.getItem(YOUR_WORK_ASSIGNED_VISIBLE_KEY) === '1';
+    const DAILY_CALENDAR_FILTERS_KEY = 'cfma-taska-daily-calendar-filters';
+    function loadDailyCalendarFilters() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(DAILY_CALENDAR_FILTERS_KEY) || '{}');
+        return {
+          rm: saved.rm === true,
+          assigned: saved.assigned === true,
+          team: saved.team === true
+        };
+      } catch (_) {
+        return { rm: false, assigned: false, team: false };
+      }
+    }
+    let dailyCalendarFilters = loadDailyCalendarFilters();
     const TEAM_SELECTED_USER_KEY = 'cfma-taska-team-selected-user';
     let selectedTeamCalendarUserId = localStorage.getItem(TEAM_SELECTED_USER_KEY) || '';
     let calendarForcePreviousWeekTop = true;
@@ -11478,7 +11688,7 @@
 
     function setCalendarView(tab) {
       const previousTab = calendarViewTab;
-      const allowedTabs = GMAIL_CALENDAR_ENABLED ? ['jobs', 'assigned', 'rm', 'gmail', 'team'] : ['jobs', 'assigned', 'rm', 'team'];
+      const allowedTabs = GMAIL_CALENDAR_ENABLED ? ['jobs', 'daily', 'assigned', 'rm', 'gmail', 'team'] : ['jobs', 'daily', 'assigned', 'rm', 'team'];
       calendarViewTab = allowedTabs.includes(tab) ? tab : 'jobs';
       if (previousTab !== calendarViewTab) calendarForcePreviousWeekTop = true;
       localStorage.setItem('ljm-calendar-view-tab', calendarViewTab);
@@ -11502,13 +11712,26 @@
       renderTaskCalendar();
     }
 
+    function setDailyCalendarFilter(name, checked) {
+      if (!['rm', 'assigned', 'team'].includes(name)) return;
+      dailyCalendarFilters[name] = !!checked;
+      try { localStorage.setItem(DAILY_CALENDAR_FILTERS_KEY, JSON.stringify(dailyCalendarFilters)); } catch (_) {}
+      hideCalendarJobDetails();
+      hideCalendarLogEditor();
+      hideCalendarReminderDetails();
+      hideGmailCalendarEditor();
+      renderTaskCalendar();
+    }
+
     function updateCalendarViewTabs() {
       const jobsBtn = document.getElementById('calendar-view-jobs');
+      const dailyBtn = document.getElementById('calendar-view-daily');
       const rmBtn = document.getElementById('calendar-view-rm');
       const assignedBtn = document.getElementById('calendar-view-assigned');
       const gmailBtn = document.getElementById('calendar-view-gmail');
       const teamBtn = document.getElementById('calendar-view-team');
       if (jobsBtn) jobsBtn.classList.toggle('active', calendarViewTab === 'jobs');
+      if (dailyBtn) dailyBtn.classList.toggle('active', calendarViewTab === 'daily');
       if (rmBtn) {
         const pendingRcCount = collectRmGanttCalendarItems().filter(item => !item.done).length;
         rmBtn.classList.toggle('active', calendarViewTab === 'rm');
@@ -16138,6 +16361,365 @@
         </div>`;
     }
 
+    function dailyCalendarCountLabel(count, noun = 'item') {
+      return count ? `${count} ${noun}${count === 1 ? '' : 's'}` : `0 ${noun}s`;
+    }
+
+    function renderDailyCalendarFilters(counts) {
+      const teamLabel = supabaseConfigured()
+        ? dailyCalendarCountLabel(counts.team || 0)
+        : 'Sign in';
+      return `
+        <div class="calendar-daily-options">
+          <label class="calendar-daily-option">
+            <input type="checkbox" ${dailyCalendarFilters.rm ? 'checked' : ''} onchange="setDailyCalendarFilter('rm',this.checked)">
+            <span>224(c) items</span>
+            <em>${escHtml(dailyCalendarCountLabel(counts.rm || 0))}</em>
+          </label>
+          <label class="calendar-daily-option">
+            <input type="checkbox" ${dailyCalendarFilters.assigned ? 'checked' : ''} onchange="setDailyCalendarFilter('assigned',this.checked)">
+            <span>Assigned items</span>
+            <em>${escHtml(dailyCalendarCountLabel(counts.assigned || 0))}</em>
+          </label>
+          <label class="calendar-daily-option">
+            <input type="checkbox" ${dailyCalendarFilters.team ? 'checked' : ''} onchange="setDailyCalendarFilter('team',this.checked)">
+            <span>Team items</span>
+            <em>${escHtml(teamLabel)}</em>
+          </label>
+        </div>`;
+    }
+
+    function renderDailyBadge(value) {
+      return value ? `<span class="calendar-hours-badge">${escHtml(value)}</span>` : '';
+    }
+
+    function renderDesktopDailyBar(options = {}) {
+      const classes = ['calendar-daily-bar', options.classes || ''].filter(Boolean).join(' ');
+      const style = `--job-color:${escHtml(options.color || '#4a90c4')};${options.style || ''}`;
+      const title = options.title || options.label || '';
+      const badges = (options.badges || []).filter(Boolean).join('');
+      const prefix = options.prefixHtml || '';
+      const labelClass = options.labelClass || 'calendar-task-label';
+      const note = options.note ? `<span class="calendar-daily-note">${escHtml(options.note)}</span>` : '';
+      return `
+        <div class="${classes}" ${options.attrs || ''} style="${style}" title="${escHtml(title)}">
+          ${prefix}<span class="calendar-daily-kind">${escHtml(options.kind || 'Item')}</span>
+          <span class="${labelClass}">${escHtml(options.label || 'Untitled')}</span>${badges}${note}
+        </div>`;
+    }
+
+    function renderDesktopDailyTaskBar(task, date, todayStr) {
+      const dateStr = toLocalDateStr(date);
+      const isDueToday = toLocalDateStr(task.due) === todayStr;
+      const doneClass = task.done ? 'completed' : '';
+      const assignedClass = task.assignedDeadline ? 'assigned-deadline' : '';
+      const readOnly = !!task.readOnly || !task.jobId;
+      const completeCb = !readOnly && (task.canComplete || task.done)
+        ? `<input class="calendar-complete-cb" type="checkbox" ${task.done ? 'checked' : ''} onclick="event.stopPropagation()" onchange="completeCalendarTask(event,'${task.jobId}',${task.taskIdx})" title="${task.done ? 'Undo complete' : 'Mark complete'}">`
+        : '';
+      const emailCount = !readOnly && Array.isArray(task.emailIds) ? task.emailIds.length : 0;
+      const mailBtn = emailCount
+        ? `<button class="calendar-mail-btn" onclick="handleCalendarTaskEmailButton(event,'${task.jobId}',${task.taskIdx},this)" title="${emailCount === 1 ? 'Open attached email' : 'Show attached emails'}">Mail${emailCount > 1 ? ' ' + emailCount : ''}</button>`
+        : '';
+      const dayBadge = calendarTaskDayBadge(task.start, task.due, date);
+      const clickAttr = readOnly
+        ? `onclick="showAssignedDeadlineDetails(event,'${encodeCalendarDetailParam(task.label)}','${encodeCalendarDetailParam(task.ownerName || '')}','${encodeCalendarDetailParam(toLocalDateStr(task.due))}','${encodeCalendarDetailParam(task.assignedSummary || '')}')"`
+        : `onclick="showCalendarJobDetails(event,'${task.jobId}',${task.taskIdx})"`;
+      const dragAttrs = readOnly
+        ? ''
+        : `draggable="true" ondragstart="startCalendarTaskDrag(event,'${task.jobId}',${task.taskIdx})" ondragend="endCalendarTaskDrag(event)"`;
+      const note = [
+        mobileCalendarItemDateRange(task.start, task.due, date),
+        task.assignedSummary || '',
+        task.ownerName ? `from ${task.ownerName}` : ''
+      ].filter(Boolean).join(' - ');
+      return renderDesktopDailyBar({
+        classes: `calendar-task-bar ${isDueToday ? 'due-today' : ''} ${doneClass} ${assignedClass}`,
+        attrs: `${dragAttrs} ${clickAttr}`,
+        color: task.color,
+        kind: task.assignedDeadline ? 'Deadline' : 'Task',
+        label: task.label,
+        title: `${task.label} - ${note || dateStr}`,
+        prefixHtml: completeCb,
+        badges: [renderDailyBadge(dayBadge), task.done && task.completedHours ? renderDailyBadge(`${task.completedHours}h`) : '', task.assignedDeadline ? renderDailyBadge('Deadline') : '', mailBtn],
+        note
+      });
+    }
+
+    function renderDesktopDailyAssignmentBar(item, todayStr) {
+      const isDueToday = toLocalDateStr(item.due) === todayStr;
+      const jobParam = encodeCalendarDetailParam(item.jobId);
+      const taskParam = encodeCalendarDetailParam(item.taskIdx);
+      const subParam = encodeCalendarDetailParam(item.subIdx);
+      const due = item.subtaskDueDate || item.parentDueDate || toLocalDateStr(item.due);
+      const note = [`Assigned to ${item.assigneeName || 'team member'}`, due ? `Due ${formatTaskDateInput(due)}` : '', item.taskLabel || ''].filter(Boolean).join(' - ');
+      return renderDesktopDailyBar({
+        classes: `calendar-task-bar ${isDueToday ? 'due-today' : ''} assigned-deadline assigned-by-you`,
+        attrs: `onclick="showOutgoingAssignedTaskDetails(event,'${jobParam}','${taskParam}','${subParam}')"`,
+        color: item.color,
+        kind: 'Assigned',
+        label: item.label,
+        title: `${item.label} - ${note}`,
+        badges: [renderDailyBadge(item.assigneeName || 'Assigned')],
+        note
+      });
+    }
+
+    function renderDesktopDailyRmBar(item, date, todayStr) {
+      const itemId = encodeCalendarDetailParam(item.id);
+      const isDueToday = toLocalDateStr(item.due) === todayStr;
+      const doneClass = item.done ? 'completed' : '';
+      const priorityClass = item.priority ? `priority-${item.priority}` : '';
+      const dayBadge = calendarTaskDayBadge(item.start, item.due, date);
+      const badges = [
+        renderDailyBadge(dayBadge),
+        item.priority === 'urgent' ? renderDailyBadge('Urgent') : '',
+        item.priority === 'hold' ? renderDailyBadge('Hold') : '',
+        item.milestone ? renderDailyBadge('Milestone') : ''
+      ];
+      const meta = [rmGanttCalendarDateLabel(item), item.rmReference ? `RM ${item.rmReference}` : '', item.conditionNumber ? `Cond ${item.conditionNumber}` : ''].filter(Boolean).join(' - ');
+      return renderDesktopDailyBar({
+        classes: `calendar-task-bar rc-gantt-task ${isDueToday ? 'due-today' : ''} ${doneClass} ${priorityClass}`,
+        attrs: `onclick="showRmGanttTaskDetails(event,decodeURIComponent('${itemId}'))"`,
+        color: item.color,
+        kind: '224(c)',
+        label: item.label,
+        title: `${item.label} - ${meta}`,
+        badges,
+        note: meta
+      });
+    }
+
+    function renderDesktopDailyReminderBar(item) {
+      const linkedClass = item.hasJob ? 'has-job' : '';
+      const idParam = encodeURIComponent(item.id || '');
+      const occurrenceParam = encodeURIComponent(item.occurrenceDate || toLocalDateStr(item.date));
+      return renderDesktopDailyBar({
+        classes: `calendar-reminder-bar ${linkedClass}`,
+        attrs: `data-reminder-id="${escHtml(item.id || '')}" data-reminder-date="${escHtml(item.occurrenceDate || toLocalDateStr(item.date))}" draggable="true" onclick="showCalendarReminderDetails(event,decodeURIComponent('${idParam}'),decodeURIComponent('${occurrenceParam}'))" ondragstart="startCalendarReminderDrag(event,'${escHtml(item.id || '')}','${escHtml(item.occurrenceDate || toLocalDateStr(item.date))}')" ondragend="endCalendarReminderDrag(event)"`,
+        color: item.color || '#bb6bd9',
+        kind: calendarReminderRepeatShort(item.repeat),
+        label: item.label,
+        labelClass: 'calendar-meeting-label',
+        title: item.label,
+        note: `${calendarReminderRepeatLabel(item.repeat)} reminder`
+      });
+    }
+
+    function renderDesktopDailyLogBar(entry) {
+      const refParam = encodeURIComponent(entry.sourceLogRef || '');
+      const linkedClass = entry.hasJob ? 'has-job' : '';
+      return renderDesktopDailyBar({
+        classes: `calendar-log-bar ${linkedClass}`,
+        attrs: `data-log-ref="${escHtml(entry.sourceLogRef || '')}" draggable="true" onclick="showCalendarLogEditor(event,decodeURIComponent('${refParam}'))" ondragstart="startCalendarLogDrag(event,decodeURIComponent('${refParam}'))" ondragend="endCalendarLogDrag(event)"`,
+        color: entry.color || '#4a90c4',
+        kind: formatWeekLogHours(entry.time),
+        label: entry.label,
+        labelClass: 'calendar-meeting-label',
+        title: entry.label,
+        note: 'Logged work'
+      });
+    }
+
+    function renderDesktopDailyMeetingBar(ev) {
+      const title = ev.location
+        ? `${ev.subject || '(No title)'} - ${ev.location}`
+        : (ev.subject || '(No title)');
+      return renderDesktopDailyBar({
+        classes: 'calendar-meeting-bar',
+        kind: formatCalendarMeetingTime(ev),
+        label: ev.subject || '(No title)',
+        labelClass: 'calendar-meeting-label',
+        title,
+        note: ev.location || 'Meeting'
+      });
+    }
+
+    function renderDesktopDailyTeamTaskBar(task, owner, date) {
+      const doneClass = task.done ? 'completed' : '';
+      const assignedClass = task.assignedDeadline ? 'assigned-deadline' : '';
+      const ownerId = task.assignedDeadline ? (task.sourceOwnerId || task.ownerId || '') : (task.ownerId || owner.user_id || '');
+      const jobId = task.assignedDeadline ? (task.sourceJobId || '') : (task.jobId || '');
+      const jobIdx = task.assignedDeadline ? task.sourceJobIdx : task.jobIdx;
+      const taskIdx = task.assignedDeadline ? task.sourceTaskIdx : task.taskIdx;
+      const dayBadge = calendarTaskDayBadge(task.fullStart || task.start, task.fullDue || task.due, date);
+      const note = [
+        owner.user_name || task.ownerName || 'Team member',
+        mobileCalendarItemDateRange(task.start || task.fullStart, task.due || task.fullDue, date),
+        task.assignedDeadline ? (task.assignedSummary || 'Assigned subtask') : ''
+      ].filter(Boolean).join(' - ');
+      return renderDesktopDailyBar({
+        classes: `calendar-task-bar ${doneClass} ${assignedClass}`,
+        attrs: `onclick="showSharedCalendarTaskDetails(event,'${encodeCalendarDetailParam(ownerId)}','${encodeCalendarDetailParam(jobId)}','${encodeCalendarDetailParam(taskIdx)}','${encodeCalendarDetailParam(jobIdx)}','${task.assignedDeadline ? 'assigned' : 'task'}')"`,
+        color: task.color,
+        kind: 'Team',
+        label: task.label,
+        title: `${task.label} - ${note}`,
+        badges: [renderDailyBadge(owner.user_name || 'Team'), renderDailyBadge(dayBadge), task.assignedDeadline ? renderDailyBadge('Deadline') : ''],
+        note
+      });
+    }
+
+    function renderDesktopDailyTeamLogBar(entry, owner) {
+      return renderDesktopDailyBar({
+        classes: `calendar-log-bar ${entry.hasJob ? 'has-job' : ''}`,
+        style: 'cursor:default;',
+        color: entry.color || '#4a90c4',
+        kind: 'Team log',
+        label: entry.label,
+        labelClass: 'calendar-meeting-label',
+        title: `${entry.label} - ${owner.user_name || 'Team member'}`,
+        badges: [renderDailyBadge(formatWeekLogHours(entry.time))],
+        note: owner.user_name || 'Team member'
+      });
+    }
+
+    function renderDesktopDailyTeamReminderBar(item, owner) {
+      return renderDesktopDailyBar({
+        classes: `calendar-reminder-bar ${item.hasJob ? 'has-job' : ''}`,
+        style: 'cursor:default;',
+        color: item.color || '#bb6bd9',
+        kind: 'Team rem',
+        label: item.label,
+        labelClass: 'calendar-meeting-label',
+        title: `${item.label} - ${owner.user_name || 'Team member'}`,
+        badges: [renderDailyBadge(owner.user_name || 'Team')],
+        note: `${calendarReminderRepeatLabel(item.repeat)} reminder`
+      });
+    }
+
+    function collectDailyTeamWeekItems(weekStart, peopleRows, assignmentRows) {
+      const items = [];
+      (peopleRows || []).forEach(person => {
+        const hasState = !!(person && person.row && person.row.state);
+        const state = hasState ? (person.row.state || {}) : { jobs: [], weeks: [], calendarReminders: [] };
+        const assignedDeadlines = collectAssignedParentDeadlineTasksForUser(person.user_id, weekStart, assignmentRows, person.user_id);
+        const tasks = hasState ? collectSnapshotCalendarTasks(state, weekStart, person) : [];
+        [...tasks, ...assignedDeadlines].forEach(task => items.push({ type: 'task', owner: person, task }));
+        if (hasState) {
+          collectSnapshotRemindersForWeek(state, weekStart).forEach(item => items.push({ type: 'reminder', owner: person, item }));
+          collectSnapshotLogEntriesForWeek(state, weekStart).forEach(entry => items.push({ type: 'log', owner: person, entry }));
+        }
+      });
+      return items;
+    }
+
+    function renderDesktopDailyTeamItem(entry, date) {
+      if (entry.type === 'task') return renderDesktopDailyTeamTaskBar(entry.task, entry.owner, date);
+      if (entry.type === 'reminder') return renderDesktopDailyTeamReminderBar(entry.item, entry.owner);
+      if (entry.type === 'log') return renderDesktopDailyTeamLogBar(entry.entry, entry.owner);
+      return '';
+    }
+
+    function renderDesktopDailyDay(date, todayStr, itemsHtml, itemCount, totalHours) {
+      const dateStr = toLocalDateStr(date);
+      const classes = ['calendar-daily-day'];
+      if (dateStr < todayStr) classes.push('past');
+      if (dateStr === todayStr) classes.push('today');
+      const weekday = date.toLocaleDateString('en-NZ', { weekday: 'long' });
+      const subLabel = dateStr === todayStr ? `${shortDateLabel(date)} - Today` : shortDateLabel(date);
+      const totalLabel = totalHours ? `${totalHours}h` : '';
+      const countLabel = itemCount ? `${itemCount} item${itemCount === 1 ? '' : 's'}` : 'No items';
+      return `
+        <section class="${classes.join(' ')}" data-daily-date="${dateStr}"${dateStr === todayStr ? ' data-current-day="true"' : ''}
+          ondragover="handleDailyCalendarDragOver(event)" ondragleave="handleCalendarDragLeave(event)" ondrop="handleDailyCalendarDrop(event,'${dateStr}')">
+          <div class="calendar-daily-head">
+            <div class="calendar-daily-title">${escHtml(weekday)}<span>${escHtml(subLabel)}</span></div>
+            <div class="calendar-daily-meta">
+              ${totalLabel ? `<span class="calendar-daily-pill">${escHtml(totalLabel)}</span>` : ''}
+              <span class="calendar-daily-pill">${escHtml(countLabel)}</span>
+              <button type="button" class="mobile-calendar-day-log" onclick="showCalendarDayLogForm(event,'${dateStr}')" title="Log work to this day">Log</button>
+            </div>
+          </div>
+          <div class="calendar-daily-items">${itemsHtml || '<div class="calendar-daily-empty">No scheduled tasks or reminders this day.</div>'}</div>
+        </section>`;
+    }
+
+    function renderDesktopDailyCalendarView(body, shouldScrollPreviousWeek = false) {
+      const previousScrollTop = body ? body.scrollTop : 0;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todayStr = toLocalDateStr(today);
+      const firstMonday = getMonday(today);
+      const dates = mobileCalendarVisibleDates(firstMonday);
+      const weekStarts = calendarVisibleWeekStarts(firstMonday);
+      const tasks = collectCalendarTasks();
+      const rmItems = collectRmGanttCalendarItems();
+      const rmDated = rmItems.filter(item => item.start && item.due);
+      const assignedByYou = collectOutgoingAssignedTasks();
+      const teamPeople = supabaseConfigured()
+        ? teamCalendarPeople().filter(person => person && !person.isCurrent)
+        : [];
+      const assignmentRows = teamCalendarAssignmentRows();
+      const teamWeekCache = new Map();
+      const teamWeekItems = weekStart => {
+        const key = toLocalDateStr(weekStart);
+        if (!teamWeekCache.has(key)) {
+          teamWeekCache.set(key, collectDailyTeamWeekItems(weekStart, teamPeople, assignmentRows));
+        }
+        return teamWeekCache.get(key);
+      };
+      const teamItemCount = weekStarts.reduce((sum, weekStart) => sum + teamWeekItems(weekStart).length, 0);
+      const counts = {
+        rm: rmDated.length,
+        assigned: assignedByYou.length,
+        team: teamItemCount
+      };
+      const weekCache = new Map();
+      const weekData = date => {
+        const key = toLocalDateStr(getMonday(date));
+        if (!weekCache.has(key)) {
+          const weekStart = parseTaskDate(key);
+          weekCache.set(key, {
+            hours: collectCalendarDayHours(weekStart),
+            logs: collectCalendarLogEntriesForWeek(weekStart),
+            reminders: collectCalendarRemindersForWeek(weekStart),
+            meetings: collectCalendarMeetingsForWeek(weekStart),
+            team: teamWeekItems(weekStart)
+          });
+        }
+        return weekCache.get(key);
+      };
+
+      const daySections = dates.map(date => {
+        const dateStr = toLocalDateStr(date);
+        const data = weekData(date);
+        const dayTasks = tasks.filter(task => calendarTaskOverlapsDate(task.start, task.due, date));
+        const dayReminders = data.reminders.filter(item => toLocalDateStr(item.date) === dateStr);
+        const dayLogs = data.logs.filter(item => toLocalDateStr(item.date) === dateStr);
+        const dayMeetings = data.meetings.filter(ev => toLocalDateStr(ev.startDt) === dateStr);
+        const dayAssigned = dailyCalendarFilters.assigned
+          ? assignedByYou.filter(item => toLocalDateStr(item.due) === dateStr)
+          : [];
+        const dayRm = dailyCalendarFilters.rm
+          ? rmDated.filter(item => calendarTaskOverlapsDate(item.start, item.due, date))
+          : [];
+        const dayTeam = dailyCalendarFilters.team
+          ? data.team.filter(entry => {
+              if (entry.type === 'task') return calendarTaskOverlapsDate(entry.task.start, entry.task.due, date);
+              if (entry.type === 'reminder') return toLocalDateStr(entry.item.date) === dateStr;
+              if (entry.type === 'log') return toLocalDateStr(entry.entry.date) === dateStr;
+              return false;
+            })
+          : [];
+        const html = [
+          ...dayTasks.map(task => renderDesktopDailyTaskBar(task, date, todayStr)),
+          ...dayAssigned.map(item => renderDesktopDailyAssignmentBar(item, todayStr)),
+          ...dayRm.map(item => renderDesktopDailyRmBar(item, date, todayStr)),
+          ...dayReminders.map(renderDesktopDailyReminderBar),
+          ...dayLogs.map(renderDesktopDailyLogBar),
+          ...dayMeetings.map(renderDesktopDailyMeetingBar),
+          ...dayTeam.map(item => renderDesktopDailyTeamItem(item, date))
+        ].join('');
+        const count = dayTasks.length + dayAssigned.length + dayRm.length + dayReminders.length + dayLogs.length + dayMeetings.length + dayTeam.length;
+        const total = formatTaskHours(data.hours.get(dateStr) || 0);
+        return renderDesktopDailyDay(date, todayStr, html, count, total);
+      }).join('');
+
+      body.innerHTML = renderDailyCalendarFilters(counts) + `<div class="calendar-daily-days">${daySections}</div>`;
+      restoreMobileCalendarScroll(body, shouldScrollPreviousWeek ? 0 : previousScrollTop, shouldScrollPreviousWeek);
+    }
+
     function calendarVisibleWeekStarts(firstMonday, futureWeekCount = TASK_CALENDAR_WEEK_COUNT) {
       const starts = [];
       for (let i = -TASK_CALENDAR_PAST_WEEK_COUNT; i < futureWeekCount; i++) {
@@ -16749,6 +17331,10 @@
 
       if (calendarViewTab === 'gmail') {
         renderGmailCalendar(body, shouldScrollPreviousWeek);
+        return;
+      }
+      if (calendarViewTab === 'daily') {
+        renderDesktopDailyCalendarView(body, shouldScrollPreviousWeek);
         return;
       }
       if (calendarViewTab === 'assigned') {
@@ -17488,6 +18074,7 @@
     function endCalendarTaskDrag(event) {
       event.currentTarget.classList.remove('dragging');
       document.querySelectorAll('.calendar-bars.drag-over').forEach(el => el.classList.remove('drag-over'));
+      document.querySelectorAll('.calendar-daily-day.drag-over').forEach(el => el.classList.remove('drag-over'));
       calendarDragTask = null;
       setTimeout(() => { calendarDragSuppressClick = false; }, 80);
     }
@@ -17506,6 +18093,7 @@
     function endCalendarLogDrag(event) {
       event.currentTarget.classList.remove('dragging');
       document.querySelectorAll('.calendar-bars.drag-over').forEach(el => el.classList.remove('drag-over'));
+      document.querySelectorAll('.calendar-daily-day.drag-over').forEach(el => el.classList.remove('drag-over'));
       calendarDragLog = null;
       setTimeout(() => { calendarDragSuppressClick = false; }, 80);
     }
@@ -17524,6 +18112,7 @@
     function endCalendarReminderDrag(event) {
       event.currentTarget.classList.remove('dragging');
       document.querySelectorAll('.calendar-bars.drag-over').forEach(el => el.classList.remove('drag-over'));
+      document.querySelectorAll('.calendar-daily-day.drag-over').forEach(el => el.classList.remove('drag-over'));
       calendarDragReminder = null;
       setTimeout(() => { calendarDragSuppressClick = false; }, 80);
     }
@@ -17580,6 +18169,52 @@
       if (task.done) {
         task.completedDate = newDateStr;
       }
+      job.updatedAt = Date.now();
+      saveToStorage();
+      renderJobs();
+      renderCompletedTasks();
+      renderTaskCalendar();
+    }
+
+    function handleDailyCalendarDragOver(event) {
+      const hasTask = calendarDragTask || calendarDragLog || calendarDragReminder || Array.from(event.dataTransfer.types || []).includes('text/plain');
+      if (!hasTask) return;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+      event.currentTarget.classList.add('drag-over');
+    }
+
+    function handleDailyCalendarDrop(event, dateStr) {
+      event.preventDefault();
+      event.currentTarget.classList.remove('drag-over');
+
+      let dragged = calendarDragTask || calendarDragLog || calendarDragReminder;
+      if (!dragged) {
+        try { dragged = JSON.parse(event.dataTransfer.getData('text/plain')); } catch(e) {}
+      }
+      if (!dragged) return;
+
+      const targetDate = parseTaskDate(dateStr);
+      if (!targetDate) return;
+
+      if (dragged.type === 'reminder' || dragged.reminderId) {
+        moveCalendarReminderToDate(dragged.reminderId, targetDate);
+        return;
+      }
+
+      if (dragged.type === 'week-log' || dragged.sourceLogRef) {
+        const moved = moveWeekLogEntryToDate(dragged.sourceLogRef, targetDate);
+        if (moved) focusJobsCalendarLogEntry(moved.sourceLogRef);
+        return;
+      }
+
+      const job = jobs.find(j => j.id === dragged.jobId);
+      const task = job && job.tasks ? job.tasks[dragged.taskIdx] : null;
+      if (!task) return;
+
+      const newDateStr = toLocalDateStr(targetDate);
+      task.dueDate = newDateStr;
+      if (task.done) task.completedDate = newDateStr;
       job.updatedAt = Date.now();
       saveToStorage();
       renderJobs();

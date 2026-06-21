@@ -375,6 +375,217 @@ function Open-FolderWithExplorer {
     [void][System.Diagnostics.Process]::Start($psi)
 }
 
+function Get-TaskaPayloadString {
+    param(
+        [object]$Payload,
+        [string]$Name
+    )
+
+    if ($null -eq $Payload -or [string]::IsNullOrWhiteSpace($Name)) { return '' }
+    $prop = $Payload.PSObject.Properties | Where-Object { $_.Name -eq $Name } | Select-Object -First 1
+    if ($null -eq $prop -or $null -eq $prop.Value) { return '' }
+    return ([string]$prop.Value).Trim()
+}
+
+function ConvertTo-TaskaArchiveUrl {
+    param([string]$Url)
+
+    $raw = ([string]$Url).Trim()
+    if ([string]::IsNullOrWhiteSpace($raw)) { return $null }
+
+    [System.Uri]$uri = $null
+    if (-not [System.Uri]::TryCreate($raw, [System.UriKind]::Absolute, [ref]$uri)) { return $null }
+    if ($uri.Scheme -ne 'https') { return $null }
+
+    $host = $uri.Host.ToLowerInvariant()
+    $path = $uri.AbsolutePath.TrimEnd('/')
+
+    if ($host -eq 'github.com') {
+        if ($path -match '^/cfmaapps/Taska$') {
+            return 'https://github.com/cfmaapps/Taska/archive/refs/heads/main.zip'
+        }
+        if ($path -match '^/cfmaapps/Taska/archive/refs/(heads|tags)/[A-Za-z0-9._/-]+\.zip$') {
+            return $uri.AbsoluteUri
+        }
+    }
+
+    if ($host -eq 'codeload.github.com' -and $path -match '^/cfmaapps/Taska/zip/refs/(heads|tags)/[A-Za-z0-9._/-]+$') {
+        return $uri.AbsoluteUri
+    }
+
+    return $null
+}
+
+function Get-TaskaUpdateArchiveUrl {
+    param([object]$Payload)
+
+    $candidates = @(
+        (Get-TaskaPayloadString -Payload $Payload -Name 'desktopUpdateUrl'),
+        (Get-TaskaPayloadString -Payload $Payload -Name 'updateZipUrl'),
+        (Get-TaskaPayloadString -Payload $Payload -Name 'sourceZipUrl'),
+        (Get-TaskaPayloadString -Payload $Payload -Name 'updateUrl'),
+        (Get-TaskaPayloadString -Payload $Payload -Name 'downloadUrl'),
+        'https://github.com/cfmaapps/Taska/archive/refs/heads/main.zip'
+    )
+
+    foreach ($candidate in $candidates) {
+        $archiveUrl = ConvertTo-TaskaArchiveUrl -Url $candidate
+        if (-not [string]::IsNullOrWhiteSpace($archiveUrl)) { return $archiveUrl }
+    }
+
+    return $null
+}
+
+function Test-TaskaUpdateExcluded {
+    param(
+        [string]$Name,
+        [bool]$IsContainer
+    )
+
+    if ([string]::IsNullOrWhiteSpace($Name)) { return $true }
+
+    if ($IsContainer) {
+        foreach ($folder in @($localDataFolders + @('.git', 'node_modules', '.taska-updates'))) {
+            if ($Name.Equals($folder, [System.StringComparison]::OrdinalIgnoreCase)) { return $true }
+        }
+        return $false
+    }
+
+    foreach ($file in $localDataFiles) {
+        if ($Name.Equals($file, [System.StringComparison]::OrdinalIgnoreCase)) { return $true }
+    }
+
+    return $false
+}
+
+function Copy-TaskaUpdateTree {
+    param(
+        [string]$SourceDir,
+        [string]$TargetDir,
+        [string]$BackupDir,
+        [string]$RelativeDir,
+        [hashtable]$Stats
+    )
+
+    if (-not (Test-Path -LiteralPath $TargetDir -PathType Container)) {
+        New-Item -ItemType Directory -Path $TargetDir -Force | Out-Null
+    }
+
+    foreach ($item in Get-ChildItem -LiteralPath $SourceDir -Force) {
+        if (Test-TaskaUpdateExcluded -Name $item.Name -IsContainer ([bool]$item.PSIsContainer)) {
+            $Stats['Skipped'] = [int]$Stats['Skipped'] + 1
+            continue
+        }
+
+        $relative = if ([string]::IsNullOrWhiteSpace($RelativeDir)) {
+            $item.Name
+        } else {
+            Join-Path $RelativeDir $item.Name
+        }
+        $target = Join-Path $TargetDir $item.Name
+
+        if ($item.PSIsContainer) {
+            Copy-TaskaUpdateTree -SourceDir $item.FullName -TargetDir $target -BackupDir $BackupDir -RelativeDir $relative -Stats $Stats
+            continue
+        }
+
+        if (Test-Path -LiteralPath $target -PathType Container) {
+            throw "Cannot replace folder with file: $relative"
+        }
+
+        if (Test-Path -LiteralPath $target -PathType Leaf) {
+            $backupFile = Join-Path $BackupDir $relative
+            $backupParent = Split-Path -Parent $backupFile
+            if (-not (Test-Path -LiteralPath $backupParent -PathType Container)) {
+                New-Item -ItemType Directory -Path $backupParent -Force | Out-Null
+            }
+            Copy-Item -LiteralPath $target -Destination $backupFile -Force
+            $Stats['BackedUp'] = [int]$Stats['BackedUp'] + 1
+        }
+
+        Copy-Item -LiteralPath $item.FullName -Destination $target -Force
+        $Stats['Copied'] = [int]$Stats['Copied'] + 1
+    }
+}
+
+function Get-TaskaUpdateSourceRoot {
+    param([string]$ExtractRoot)
+
+    $entries = @(Get-ChildItem -LiteralPath $ExtractRoot -Force)
+    $sourceRoot = $ExtractRoot
+    if ($entries.Count -eq 1 -and $entries[0].PSIsContainer) {
+        $sourceRoot = $entries[0].FullName
+    }
+
+    if (-not (Test-Path -LiteralPath (Join-Path $sourceRoot 'surveyors-toolbox.html') -PathType Leaf)) {
+        throw 'The downloaded update archive did not look like a Taska app folder.'
+    }
+
+    return $sourceRoot
+}
+
+function Install-TaskaDesktopUpdate {
+    param(
+        [string]$ArchiveUrl,
+        [string]$Version
+    )
+
+    if ([string]::IsNullOrWhiteSpace($ArchiveUrl)) {
+        throw 'No trusted Taska update archive URL was provided.'
+    }
+
+    $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+    $workRoot = Join-Path ([System.IO.Path]::GetTempPath()) 'CFMA-TASKA-Updates'
+    $workFolder = Join-Path $workRoot $stamp
+    $extractRoot = Join-Path $workFolder 'expanded'
+    $zipPath = Join-Path $workFolder 'taska-latest.zip'
+    $backupRoot = Join-Path (Get-AppFilePath 'Backups') 'Taska Update Backups'
+    $backupFolder = Join-Path $backupRoot $stamp
+
+    New-Item -ItemType Directory -Path $extractRoot -Force | Out-Null
+    New-Item -ItemType Directory -Path $backupFolder -Force | Out-Null
+
+    try {
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+        Invoke-WebRequest -Uri $ArchiveUrl -OutFile $zipPath -UseBasicParsing -TimeoutSec 180
+        Expand-Archive -LiteralPath $zipPath -DestinationPath $extractRoot -Force
+
+        $sourceRoot = Get-TaskaUpdateSourceRoot -ExtractRoot $extractRoot
+        $stats = @{ Copied = 0; BackedUp = 0; Skipped = 0 }
+        Copy-TaskaUpdateTree -SourceDir $sourceRoot -TargetDir $appRoot -BackupDir $backupFolder -RelativeDir '' -Stats $stats
+
+        $shortcutRefreshed = $false
+        $shortcutError = ''
+        $installer = Join-Path $appRoot 'Install Taska App.ps1'
+        if (Test-Path -LiteralPath $installer -PathType Leaf) {
+            try {
+                & $installer | Out-Null
+                $shortcutRefreshed = $true
+            } catch {
+                $shortcutError = if ($_.Exception) { $_.Exception.Message } else { [string]$_ }
+            }
+        }
+
+        return @{
+            ok = $true
+            version = $Version
+            copied = $stats.Copied
+            backedUp = $stats.BackedUp
+            skipped = $stats.Skipped
+            backupPath = $backupFolder
+            shortcutRefreshed = $shortcutRefreshed
+            shortcutError = $shortcutError
+            message = 'Taska updated. The page will reload now; close and reopen Taska later to load any local-server changes.'
+        }
+    } finally {
+        try {
+            if ((Test-Path -LiteralPath $workFolder) -and $workFolder.StartsWith($workRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
+                Remove-Item -LiteralPath $workFolder -Recurse -Force
+            }
+        } catch {}
+    }
+}
+
 function ConvertTo-IsoDate {
     param([object]$Value)
 
@@ -1813,6 +2024,38 @@ while ($listener.IsListening) {
     }
 
     $path = $req.Url.LocalPath.TrimStart('/')
+
+    if ($path -eq 'api/update-desktop') {
+        try {
+            if ($req.HttpMethod -ne 'POST') {
+                Write-JsonResponse $res 405 @{ ok = $false; error = 'POST required.' }
+                continue
+            }
+
+            $payload = Read-JsonRequestBody -Request $req
+            if ($null -eq $payload) {
+                Write-JsonResponse $res 400 @{ ok = $false; error = 'Missing request body.' }
+                continue
+            }
+
+            $archiveUrl = Get-TaskaUpdateArchiveUrl -Payload $payload
+            if ([string]::IsNullOrWhiteSpace($archiveUrl)) {
+                Write-JsonResponse $res 400 @{ ok = $false; error = 'No trusted Taska update download was found.' }
+                continue
+            }
+
+            $version = Get-TaskaPayloadString -Payload $payload -Name 'version'
+            Write-Host "  [Update] Downloading Taska update from $archiveUrl" -ForegroundColor Cyan
+            $result = Install-TaskaDesktopUpdate -ArchiveUrl $archiveUrl -Version $version
+            Write-JsonResponse $res 200 $result
+            Write-Host "  [Update] Installed Taska update $version" -ForegroundColor Green
+        } catch {
+            $detail = if ($_.Exception) { $_.Exception.Message } else { [string]$_ }
+            Write-JsonResponse $res 500 @{ ok = $false; error = "Could not update Taska. $detail" }
+            Write-Host "  [Update] Error: $_" -ForegroundColor Red
+        }
+        continue
+    }
 
     if ($path -eq 'api/openai') {
         try {

@@ -12,7 +12,7 @@ For the current hybrid setup, each user does this:
 4. Open `CFMA TASKA` from the Desktop or Start Menu shortcut.
 5. To pin it, open Start, search `CFMA TASKA`, right-click it, then choose `Pin to taskbar`.
 
-The `CFMA TASKA` shortcut starts the local server hidden and opens:
+The `CFMA TASKA` shortcut starts the local server hidden and opens an app-style browser window at:
 
 ```text
 http://localhost:8080/
@@ -20,13 +20,13 @@ http://localhost:8080/
 
 No visible terminal needs to stay open for normal use.
 
-If the app icon changes later, run `Install Taska App.bat` again to refresh the Desktop and Start Menu shortcuts.
+If the app icon changes later, run `Install Taska App.bat` again to refresh the Desktop and Start Menu shortcuts. The desktop updater also refreshes these shortcuts after it installs a newer copy.
 
 ## Updates
 
 The app checks the hosted `version.json` file from `cfma-public-config.js`. If the hosted version is newer than the local copy, users see an update popup after the app starts.
 
-For most bug fixes, users only need to sync or replace the local `Taska` folder and reopen `CFMA TASKA`. They only need to run `Install Taska App.bat` again when shortcut/launcher/icon files change.
+On the local desktop app, the popup's `Update now` button downloads the latest GitHub source archive, replaces Taska app files, keeps local/private folders, refreshes shortcuts, and reloads the page. If the local server itself changed, close and reopen `CFMA TASKA` after the update so the hidden server uses the new script.
 
 ## Mobile App
 

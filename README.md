@@ -84,7 +84,7 @@ The included Supabase policies are intentionally permissive for a private protot
 - `assets/cfma-taska-icon.*` - app icon for shortcuts, browser tabs, and pinned taskbar use
 - `manifest.webmanifest` / `service-worker.js` - mobile installable app shell
 - `cfma-public-config.js` - public deployment defaults for Team Sync
-- `version.json` - hosted version manifest used for update notifications
+- `version.json` - hosted version manifest used for update notifications and desktop update downloads
 - `server.ps1` - local helper server
 - `Open Taska.bat` / `Open Taska.ps1` - app-style hidden-server launcher
 - `Install Taska App.bat` / `Install Taska App.ps1` - creates Desktop and Start Menu shortcuts

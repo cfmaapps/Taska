@@ -1,8 +1,9 @@
 {
-  "version": "2026.06.19.12",
-  "releasedAt": "2026-06-19",
+  "version": "2026.06.22.01",
+  "releasedAt": "2026-06-22",
   "title": "CFMA TASKA update available",
-  "summary": "Task day badges now show on mobile calendar items only.",
+  "summary": "Desktop updates now install from the popup and the launcher opens Taska as an app window instead of a normal browser tab.",
   "appUrl": "https://cfmaapps.github.io/Taska/",
-  "downloadUrl": "https://github.com/cfmaapps/Taska"
+  "downloadUrl": "https://github.com/cfmaapps/Taska",
+  "desktopUpdateUrl": "https://github.com/cfmaapps/Taska/archive/refs/heads/main.zip"
 }

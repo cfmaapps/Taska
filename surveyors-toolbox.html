@@ -6905,8 +6905,8 @@
         To update this desktop copy, replace or sync the Taska folder from the latest source. If launcher files or the icon changed, run Install Taska App.bat again.
       </div>
       <div class="modal-actions">
-        <button class="btn-save" onclick="openLatestTaskaVersion()">Open latest</button>
-        <button class="btn-cancel" onclick="dismissTaskaUpdate()">Later</button>
+        <button class="btn-save" id="taska-update-action" onclick="openLatestTaskaVersion()">Open latest</button>
+        <button class="btn-cancel" id="taska-update-later" onclick="dismissTaskaUpdate()">Later</button>
       </div>
     </div>
   </div>
@@ -6934,12 +6934,14 @@
   <script src="gmail-analysis-core.js"></script>
   <script src="cfma-public-config.js"></script>
   <script>
-    const TASKA_APP_VERSION = String(window.CFMA_TASKA_CONFIG?.appVersion || '2026.06.19.12');
+    const TASKA_APP_VERSION = String(window.CFMA_TASKA_CONFIG?.appVersion || '2026.06.22.01');
     const TASKA_UPDATE_DISMISS_KEY = 'cfma-taska-update-dismissed';
     const TASKA_MOBILE_VIEW_KEY = 'cfma-taska-mobile-view';
     const TASKA_INSTALL_DISMISS_KEY = 'cfma-taska-install-dismissed';
     let latestTaskaUpdateInfo = null;
     let deferredTaskaInstallPrompt = null;
+    let taskaUpdateInProgress = false;
+    let taskaDesktopUpdateFailed = false;
 
     // ── Dropdown ──────────────────────────────────────────
     function toggleDropdown(id) {
@@ -7341,6 +7343,8 @@
 
     function showTaskaUpdateModal(info) {
       latestTaskaUpdateInfo = info || {};
+      taskaDesktopUpdateFailed = false;
+      taskaUpdateInProgress = false;
       const latestVersion = String(latestTaskaUpdateInfo.version || latestTaskaUpdateInfo.appVersion || '').trim();
       const title = latestTaskaUpdateInfo.title || 'CFMA TASKA update available';
       const summary = latestTaskaUpdateInfo.summary || 'A newer version of Taska is available.';
@@ -7349,13 +7353,26 @@
       const versionEl = document.getElementById('taska-update-version');
       const summaryEl = document.getElementById('taska-update-summary');
       const noteEl = document.getElementById('taska-update-note');
+      const actionEl = document.getElementById('taska-update-action');
+      const laterEl = document.getElementById('taska-update-later');
+      const canUpdateDesktop = canInstallTaskaDesktopUpdate();
       if (titleEl) titleEl.textContent = title;
       if (versionEl) versionEl.textContent = `Current ${TASKA_APP_VERSION} -> Latest ${latestVersion}`;
       if (summaryEl) summaryEl.textContent = summary;
       if (noteEl) {
         noteEl.textContent = isMobileDevice()
           ? 'The mobile app updates from the hosted version. Tap Open latest, or close and reopen Taska if it does not refresh automatically.'
-          : 'To update this desktop copy, replace or sync the Taska folder from the latest source. If launcher files or the icon changed, run Install Taska App.bat again.';
+          : canUpdateDesktop
+            ? 'Taska will download the latest desktop copy, keep local data, refresh shortcuts, and reload when it finishes.'
+            : 'Open latest to download the newest Taska copy, then replace or sync this local folder.';
+      }
+      if (actionEl) {
+        actionEl.textContent = canUpdateDesktop ? 'Update now' : 'Open latest';
+        actionEl.disabled = false;
+      }
+      if (laterEl) {
+        laterEl.textContent = 'Later';
+        laterEl.disabled = false;
       }
       if (modal) modal.style.display = 'flex';
     }
@@ -7366,6 +7383,7 @@
     }
 
     function dismissTaskaUpdate() {
+      if (taskaUpdateInProgress) return;
       const version = String(latestTaskaUpdateInfo?.version || latestTaskaUpdateInfo?.appVersion || '').trim();
       if (version) {
         try {
@@ -7375,9 +7393,99 @@
       hideTaskaUpdateModal();
     }
 
-    function openLatestTaskaVersion() {
+    function canInstallTaskaDesktopUpdate() {
+      return isLocalAppHost() && !isMobileDevice() && window.location.protocol.startsWith('http');
+    }
+
+    function latestTaskaVersionUrl(preferDownload = false) {
       const cfg = window.CFMA_TASKA_CONFIG || {};
-      const target = latestTaskaUpdateInfo?.appUrl || latestTaskaUpdateInfo?.downloadUrl || cfg.downloadUrl || cfg.appUrl;
+      if (preferDownload) return latestTaskaUpdateInfo?.downloadUrl || cfg.downloadUrl || latestTaskaUpdateInfo?.appUrl || cfg.appUrl || '';
+      return latestTaskaUpdateInfo?.appUrl || latestTaskaUpdateInfo?.downloadUrl || cfg.downloadUrl || cfg.appUrl || '';
+    }
+
+    function taskaDesktopUpdateUrl() {
+      const cfg = window.CFMA_TASKA_CONFIG || {};
+      const explicit = latestTaskaUpdateInfo?.desktopUpdateUrl
+        || latestTaskaUpdateInfo?.updateZipUrl
+        || latestTaskaUpdateInfo?.sourceZipUrl
+        || cfg.desktopUpdateUrl
+        || cfg.updateZipUrl
+        || cfg.sourceZipUrl;
+      if (explicit) return explicit;
+
+      const download = latestTaskaUpdateInfo?.downloadUrl || cfg.downloadUrl || '';
+      try {
+        const url = new URL(download, window.location.href);
+        const path = url.pathname.replace(/\/+$/g, '').toLowerCase();
+        if (url.hostname.toLowerCase() === 'github.com' && path === '/cfmaapps/taska') {
+          return 'https://github.com/cfmaapps/Taska/archive/refs/heads/main.zip';
+        }
+      } catch (_) {}
+      return download;
+    }
+
+    function setTaskaUpdateMessage(message, options = {}) {
+      const noteEl = document.getElementById('taska-update-note');
+      const actionEl = document.getElementById('taska-update-action');
+      const laterEl = document.getElementById('taska-update-later');
+      if (noteEl) noteEl.textContent = message;
+      if (actionEl) {
+        if (options.actionText) actionEl.textContent = options.actionText;
+        actionEl.disabled = !!options.busy;
+      }
+      if (laterEl) laterEl.disabled = !!options.busy;
+      taskaUpdateInProgress = !!options.busy;
+    }
+
+    async function installLatestTaskaDesktopVersion() {
+      const latestVersion = String(latestTaskaUpdateInfo?.version || latestTaskaUpdateInfo?.appVersion || '').trim();
+      const updateUrl = taskaDesktopUpdateUrl();
+      if (!updateUrl) {
+        taskaDesktopUpdateFailed = true;
+        setTaskaUpdateMessage('No desktop update download was listed. Open the latest source manually.', { actionText: 'Open latest' });
+        return;
+      }
+
+      setTaskaUpdateMessage('Downloading and installing the latest Taska desktop copy...', { busy: true, actionText: 'Updating...' });
+      try {
+        const resp = await fetchWithTimeout(localApiUrl('/api/update-desktop'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            version: latestVersion,
+            updateUrl,
+            desktopUpdateUrl: latestTaskaUpdateInfo?.desktopUpdateUrl || '',
+            updateZipUrl: latestTaskaUpdateInfo?.updateZipUrl || '',
+            sourceZipUrl: latestTaskaUpdateInfo?.sourceZipUrl || '',
+            downloadUrl: latestTaskaUpdateInfo?.downloadUrl || window.CFMA_TASKA_CONFIG?.downloadUrl || '',
+            appUrl: latestTaskaUpdateInfo?.appUrl || window.CFMA_TASKA_CONFIG?.appUrl || ''
+          })
+        }, 300000);
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok || !data.ok) {
+          throw new Error((data && data.error) || 'The local server did not install the update.');
+        }
+        try { localStorage.removeItem(TASKA_UPDATE_DISMISS_KEY); } catch (_) {}
+        const shortcutNote = data.shortcutError ? ` Shortcut refresh warning: ${data.shortcutError}` : '';
+        setTaskaUpdateMessage(`${data.message || 'Taska updated. Reloading now...'}${shortcutNote}`, { busy: true, actionText: 'Reloading...' });
+        setTimeout(() => window.location.reload(), 1200);
+      } catch (e) {
+        taskaDesktopUpdateFailed = true;
+        const detail = e && e.name === 'AbortError'
+          ? 'The update took too long.'
+          : ((e && e.message) || 'Could not update Taska automatically.');
+        setTaskaUpdateMessage(`${detail} Close and reopen Taska once, then try again. You can also open the latest source manually.`, { actionText: 'Open source' });
+      }
+    }
+
+    async function openLatestTaskaVersion() {
+      if (taskaUpdateInProgress) return;
+      if (canInstallTaskaDesktopUpdate() && !taskaDesktopUpdateFailed) {
+        await installLatestTaskaDesktopVersion();
+        return;
+      }
+
+      const target = latestTaskaVersionUrl(taskaDesktopUpdateFailed);
       if (target) window.open(target, '_blank', 'noopener');
       dismissTaskaUpdate();
     }

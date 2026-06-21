@@ -64,7 +64,10 @@ if (-not (Test-TaskaServer)) {
 
 $browser = Get-TaskaBrowserPath
 if ($browser) {
-    Start-Process -FilePath $browser -ArgumentList @("--app=$appUrl", '--new-window') | Out-Null
+    Start-Process -FilePath $browser -ArgumentList @(
+        '--no-first-run',
+        "--app=$appUrl"
+    ) | Out-Null
 } else {
     Start-Process $appUrl | Out-Null
 }

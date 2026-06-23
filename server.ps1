@@ -458,6 +458,48 @@ function Test-TaskaUpdateExcluded {
     return $false
 }
 
+function Clear-TaskaReadOnlyAttribute {
+    param([string]$Path)
+
+    if ([string]::IsNullOrWhiteSpace($Path) -or -not (Test-Path -LiteralPath $Path)) { return }
+
+    try {
+        $item = Get-Item -LiteralPath $Path -Force
+        if (($item.Attributes -band [System.IO.FileAttributes]::ReadOnly) -ne 0) {
+            $item.Attributes = ($item.Attributes -band (-bnot [System.IO.FileAttributes]::ReadOnly))
+        }
+    } catch {}
+}
+
+function Clear-TaskaReadOnlyTree {
+    param([string]$Path)
+
+    if ([string]::IsNullOrWhiteSpace($Path) -or -not (Test-Path -LiteralPath $Path)) { return }
+
+    Clear-TaskaReadOnlyAttribute -Path $Path
+    try {
+        Get-ChildItem -LiteralPath $Path -Force -Recurse -ErrorAction SilentlyContinue | ForEach-Object {
+            Clear-TaskaReadOnlyAttribute -Path $_.FullName
+        }
+    } catch {}
+}
+
+function Clear-TaskaUpdateTargetAttributes {
+    param([string]$Path)
+
+    if ([string]::IsNullOrWhiteSpace($Path)) { return }
+    $full = [System.IO.Path]::GetFullPath($Path)
+    $appPrefix = $appRoot.TrimEnd('\') + '\'
+    if (-not ($full.Equals($appRoot, [System.StringComparison]::OrdinalIgnoreCase) -or
+        $full.StartsWith($appPrefix, [System.StringComparison]::OrdinalIgnoreCase))) {
+        throw "Refusing to change attributes outside the Taska app folder: $Path"
+    }
+
+    if (Test-Path -LiteralPath $full) {
+        Clear-TaskaReadOnlyAttribute -Path $full
+    }
+}
+
 function Copy-TaskaUpdateTree {
     param(
         [string]$SourceDir,
@@ -470,6 +512,7 @@ function Copy-TaskaUpdateTree {
     if (-not (Test-Path -LiteralPath $TargetDir -PathType Container)) {
         New-Item -ItemType Directory -Path $TargetDir -Force | Out-Null
     }
+    Clear-TaskaUpdateTargetAttributes -Path $TargetDir
 
     foreach ($item in Get-ChildItem -LiteralPath $SourceDir -Force) {
         if (Test-TaskaUpdateExcluded -Name $item.Name -IsContainer ([bool]$item.PSIsContainer)) {
@@ -485,6 +528,7 @@ function Copy-TaskaUpdateTree {
         $target = Join-Path $TargetDir $item.Name
 
         if ($item.PSIsContainer) {
+            Clear-TaskaUpdateTargetAttributes -Path $target
             Copy-TaskaUpdateTree -SourceDir $item.FullName -TargetDir $target -BackupDir $BackupDir -RelativeDir $relative -Stats $Stats
             continue
         }
@@ -494,16 +538,21 @@ function Copy-TaskaUpdateTree {
         }
 
         if (Test-Path -LiteralPath $target -PathType Leaf) {
+            Clear-TaskaUpdateTargetAttributes -Path $target
             $backupFile = Join-Path $BackupDir $relative
             $backupParent = Split-Path -Parent $backupFile
             if (-not (Test-Path -LiteralPath $backupParent -PathType Container)) {
                 New-Item -ItemType Directory -Path $backupParent -Force | Out-Null
             }
+            Clear-TaskaReadOnlyAttribute -Path $backupParent
             Copy-Item -LiteralPath $target -Destination $backupFile -Force
+            Clear-TaskaReadOnlyAttribute -Path $backupFile
             $Stats['BackedUp'] = [int]$Stats['BackedUp'] + 1
         }
 
+        Clear-TaskaUpdateTargetAttributes -Path $target
         Copy-Item -LiteralPath $item.FullName -Destination $target -Force
+        Clear-TaskaReadOnlyAttribute -Path $target
         $Stats['Copied'] = [int]$Stats['Copied'] + 1
     }
 }
@@ -580,6 +629,7 @@ function Install-TaskaDesktopUpdate {
     } finally {
         try {
             if ((Test-Path -LiteralPath $workFolder) -and $workFolder.StartsWith($workRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
+                Clear-TaskaReadOnlyTree -Path $workFolder
                 Remove-Item -LiteralPath $workFolder -Recurse -Force
             }
         } catch {}

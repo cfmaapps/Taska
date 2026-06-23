@@ -6251,15 +6251,7 @@ function renderEAPanel() {
         </div>
       </div>
     </div>`;
-    const dz = document.getElementById('eaDz');
-    if (dz) {
-      dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('drag'); });
-      dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
-      dz.addEventListener('drop', e => {
-        e.preventDefault(); dz.classList.remove('drag');
-        const f = e.dataTransfer.files[0]; if (f) processEAPdf(f);
-      });
-    }
+    setupEaPdfDropZone('eaDz');
   } else {
     const eaConds = ea.eaConditions || [];
     const condHtml = eaConds.length
@@ -6346,11 +6338,14 @@ async function processEAPdf(file) {
   eaPdfObjectUrl = URL.createObjectURL(file);
 
   const panel = document.getElementById('eaPanel');
+  const summaryDropZone = document.getElementById('eaSummaryDz');
   if (panel) panel.innerHTML = `<div class="ea-panel"><div class="ea-proc"><div class="spinner" style="margin:0 auto 10px"></div>Reading EA document…</div></div>`;
+  if (summaryDropZone) summaryDropZone.innerHTML = `<div class="ea-proc"><div class="spinner" style="margin:0 auto 10px"></div>Reading EA document...</div>`;
 
   try {
     const text = await extractPdf(file);
     if (panel) panel.innerHTML = `<div class="ea-panel"><div class="ea-proc"><div class="spinner" style="margin:0 auto 10px"></div>Extracting EA conditions with OpenAI…</div></div>`;
+    if (summaryDropZone) summaryDropZone.innerHTML = `<div class="ea-proc"><div class="spinner" style="margin:0 auto 10px"></div>Extracting EA conditions...</div>`;
 
     const result = await callOpenAIAnalyseEA(text);
     data.eaData = cleanEAData(repairEADataFromRawText(result, text));
@@ -6365,6 +6360,7 @@ async function processEAPdf(file) {
   } catch (err) {
     alert('Could not process EA: ' + err.message);
     renderEAPanel();
+    renderSummary(data);
   }
 }
 

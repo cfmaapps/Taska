@@ -1,8 +1,8 @@
 {
-  "version": "2026.06.23.02",
+  "version": "2026.06.23.04",
   "releasedAt": "2026-06-23",
   "title": "CFMA TASKA update available",
-  "summary": "RM analyser now repairs EA condition splitting, keeps lettered subparts, and uses smaller responsibility-scan prompts.",
+  "summary": "Desktop updater now clears read-only file attributes before replacing app files, plus RM EA upload improvements.",
   "appUrl": "https://cfmaapps.github.io/Taska/",
   "downloadUrl": "https://github.com/cfmaapps/Taska",
   "desktopUpdateUrl": "https://github.com/cfmaapps/Taska/archive/refs/heads/main.zip"

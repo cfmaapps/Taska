@@ -363,9 +363,10 @@
     .crow.flagged .cnum { background: var(--danger) !important; }
     /* Flag button */
     .crow-actions { display: flex; align-items: center; gap: 10px; margin-top: 3px; }
-    .crow-flag-btn { font-size: .73rem; color: var(--muted); cursor: pointer; background: none; border: none; padding: 2px 5px 2px 2px; display: inline-flex; align-items: center; gap: 4px; border-radius: 3px; line-height: 1; }
+    .crow-flag-btn, .crow-split-btn { font-size: .73rem; color: var(--muted); cursor: pointer; background: none; border: none; padding: 2px 5px 2px 2px; display: inline-flex; align-items: center; gap: 4px; border-radius: 3px; line-height: 1; }
     .crow-flag-btn:hover { color: var(--danger); }
     .crow-flag-btn.active { color: var(--danger); font-weight: 600; }
+    .crow-split-btn:hover { color: var(--primary); text-decoration: underline; }
     .crow-note-wrap { margin-top: 6px; }
     .crow-note-ta { width: 100%; padding: 7px 10px; border: 1.5px solid #b8d0e8; border-radius: var(--r); font-size: .82rem; font-family: inherit; resize: vertical; min-height: 56px; background: #f0f6ff; color: var(--text); line-height: 1.5; }
     .crow-note-ta:focus { outline: none; border-color: var(--primary); background: #fff; }
@@ -423,6 +424,8 @@
     .ea-sum-card.pending h4 { color: #9a6200; }
     .ea-sum-card.accepted h4 { color: #15803d; }
     .ea-sum-card p { font-size: .79rem; color: var(--muted); margin: 0 0 2px; line-height: 1.45; }
+    .ea-sum-upload { margin-top: 10px; max-width: 520px; }
+    .ea-sum-upload .ea-dz { padding: 14px 12px; }
     /* Project management mode */
     .pm-grid { display: grid; grid-template-columns: minmax(280px, 360px) 1fr; gap: 16px; align-items: start; }
     #page-conditions .content { max-width: none; width: 100%; padding: 22px 28px; }
@@ -2624,6 +2627,10 @@ function normalizeExtractedConditionText(text) {
     .replace(/\r/g, '\n')
     .replace(/\n\s*\d{1,4}\s*\n\s*V\d+_[^\n]*RM\d+[^\n]*\n/gi, '\n')
     .replace(/\n\s*V\d+_[^\n]*RM\d+[^\n]*\n/gi, '\n')
+    .replace(/\n\s*Version:\s*\d+[^\n]*\n/gi, '\n')
+    .replace(/\n\s*Document\s+Set\s+ID:\s*\d+[^\n]*\n/gi, '\n')
+    .replace(/\n\s*This\s+information\s+is\s+provided\s+by\s+Queenstown\s+Lakes\s+District\s+Council[^\n]*\n/gi, '\n')
+    .replace(/\n\s*Print\s+Date:\s*[^\n]*\n/gi, '\n')
     .replace(/[ \t]+\n/g, '\n')
     .replace(/\n[ \t]+/g, '\n')
     .replace(/\s+/g, ' ')
@@ -2696,6 +2703,8 @@ function topLevelLetterMarkers(text, parentNumber = '') {
     const atLineStart = /(^|[\r\n])\s*$/.test(beforeToken);
     const previousText = beforeToken.replace(/\s+$/, '');
     const afterListPunctuation = /[:;.]$/.test(previousText);
+    const afterConnector = /\b(?:and|or)\s*$/.test(previousText);
+    if (!atLineStart && afterConnector) continue;
     if (!atLineStart && !afterListPunctuation && letter === 'a') continue;
     candidates.push({
       letter,
@@ -2750,7 +2759,7 @@ function conditionSubpartCount(text, parentNumber = '') {
 function rawConditionBlocksByNumber(rawText) {
   const source = String(rawText || '');
   const matches = [];
-  const re = numberedConditionLinePattern(undefined, 'gi');
+  const re = numberedConditionLinePattern(arguments.length > 1 ? arguments[1] : undefined, 'gi');
   let m;
   while ((m = re.exec(source)) !== null) {
     matches.push({
@@ -2767,6 +2776,50 @@ function rawConditionBlocksByNumber(rawText) {
     if (block) map.set(match.number, block);
   });
   return map;
+}
+
+function eaConditionSectionText(rawText) {
+  const text = sliceEAAnalysisText(rawText);
+  const startPatterns = [
+    /\n\s*(?:[>\u203a\u27a2\u25ba\u2023\u25b8\u25b6\uF0D8]\s*)?CIVIL\s+WORKS\s+CONDITIONS\b/i,
+    /\n\s*(?:[>\u203a\u27a2\u25ba\u2023\u25b8\u25b6\uF0D8]\s*)?PRIOR\s+TO\s+223\s*\/\s*224\s*\(?c\)?\s+CONDITIONS\b/i,
+    /\n\s*(?:[>\u203a\u27a2\u25ba\u2023\u25b8\u25b6\uF0D8]\s*)?GENERAL\s+CONDITIONS\b/i,
+    /\n\s*The\s+proposed\s+works\s+have\s+been\s+reviewed\s+and\s+accepted\s+subject\s+to\s+the\s+following\s+conditions\b/i
+  ];
+  const starts = startPatterns.map(re => {
+    const m = re.exec(text);
+    return m ? m.index : -1;
+  }).filter(i => i >= 0);
+  const start = starts.length ? Math.min(...starts) : 0;
+  const afterStart = text.slice(start);
+  const endPatterns = [
+    /\n\s*(?:[>\u203a\u27a2\u25ba\u2023\u25b8\u25b6\uF0D8]\s*)?Advice\s+Notes?\s*:/i,
+    /\n\s*Please\s+do\s+not\s+hesitate\s+to\s+contact/i,
+    /\n\s*Prepared\s+by\s*:/i,
+    /\n\s*Attachment\s+List\b/i,
+    /\n\s*ATTACHMENT\s+A\b/i
+  ];
+  const ends = endPatterns.map(re => {
+    const m = re.exec(afterStart);
+    return m && m.index > 200 ? m.index : -1;
+  }).filter(i => i >= 0);
+  const end = ends.length ? Math.min(...ends) : afterStart.length;
+  return afterStart.slice(0, end);
+}
+
+function eaConditionBlocksByNumber(rawText) {
+  const section = eaConditionSectionText(rawText);
+  const rawBlocks = rawConditionBlocksByNumber(section, '\\d{1,3}(?:\\.\\d{1,3})*');
+  const out = new Map();
+  let previousNumber = 0;
+  rawBlocks.forEach((text, number) => {
+    const value = conditionNumberValue(number);
+    if (!Number.isFinite(value) || value < 1 || value > 120) return;
+    if (previousNumber && value < previousNumber) return;
+    previousNumber = Math.max(previousNumber, value);
+    out.set(number, text);
+  });
+  return out;
 }
 
 function serializeRawConditionBlocks(rawBlocks) {
@@ -2806,6 +2859,30 @@ function rawConditionBlocksFromStored(blocks) {
 function rememberRawConditionBlocks(d, rawBlocks) {
   if (!d || !rawBlocks?.size) return;
   d.sourceConditionBlocks = serializeRawConditionBlocks(rawBlocks);
+}
+
+function repairEADataFromRawText(ea, rawText) {
+  const out = ea && typeof ea === 'object' ? { ...ea } : {};
+  const rawBlocks = eaConditionBlocksByNumber(rawText);
+  if (!rawBlocks.size) return out;
+
+  const rawList = serializeRawConditionBlocks(rawBlocks).map(c => ({ ...c, isEA: true }));
+  const existing = cleanConditionList(out.eaConditions || []);
+  const existingByNumber = new Map(existing.map(c => [conditionNumberKey(c.number), c]));
+  const used = new Set();
+  out.eaConditions = rawList.map(raw => {
+    const key = conditionNumberKey(raw.number);
+    const current = existingByNumber.get(key);
+    used.add(key);
+    return { ...(current || {}), number: raw.number, text: raw.text, isEA: true };
+  });
+  existing.forEach(c => {
+    const key = conditionNumberKey(c.number);
+    if (key && used.has(key)) return;
+    out.eaConditions.push({ ...c, isEA: true });
+  });
+  out.sourceConditionBlocks = serializeRawConditionBlocks(rawBlocks);
+  return out;
 }
 
 function shouldUseRawConditionText(current, raw, number = '') {
@@ -2923,7 +3000,25 @@ function repairExtractedConditionsFromRawText(d, rawText) {
 
 function repairExtractedConditionsFromStoredBlocks(d) {
   if (!d?.conditions) return d;
-  return repairExtractedConditionsFromRawBlocks(d, rawConditionBlocksFromStored(d.sourceConditionBlocks || d.rawConditionBlocks));
+  repairExtractedConditionsFromRawBlocks(d, rawConditionBlocksFromStored(d.sourceConditionBlocks || d.rawConditionBlocks));
+  if (d.eaData?.sourceConditionBlocks || d.eaData?.rawConditionBlocks) {
+    d.eaData = repairEADataFromRawBlocks(d.eaData, rawConditionBlocksFromStored(d.eaData.sourceConditionBlocks || d.eaData.rawConditionBlocks));
+  }
+  return d;
+}
+
+function repairEADataFromRawBlocks(ea, rawBlocks) {
+  if (!ea || !rawBlocks?.size) return ea;
+  const out = { ...ea };
+  const rawList = serializeRawConditionBlocks(rawBlocks).map(c => ({ ...c, isEA: true }));
+  const existing = cleanConditionList(out.eaConditions || []);
+  const existingByNumber = new Map(existing.map(c => [conditionNumberKey(c.number), c]));
+  out.eaConditions = rawList.map(raw => {
+    const current = existingByNumber.get(conditionNumberKey(raw.number));
+    return { ...(current || {}), number: raw.number, text: raw.text, isEA: true };
+  });
+  out.sourceConditionBlocks = serializeRawConditionBlocks(rawBlocks);
+  return out;
 }
 
 /* ── Build a single interactive condition row ── */
@@ -5087,6 +5182,10 @@ function condRow(stageKey, idx, c, opts = {}) {
     ? `<span class="ea-cond-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Engineering Acceptance</span>`
     : '';
   const flagSvg  = (filled) => `<svg width="11" height="11" viewBox="0 0 24 24" fill="${filled ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2.5"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>`;
+  const sourceIndex = Number.isInteger(opts.sourceIndex) ? opts.sourceIndex : -1;
+  const splitButton = sourceIndex >= 0 && conditionCanRepairParts(stageKey, c)
+    ? `<button class="crow-split-btn" onclick="splitConditionParts('${jsq(stageKey)}',${sourceIndex})" title="Re-read this condition from the saved PDF text and show lettered parts">Split parts</button>`
+    : '';
   return `
   <div class="crow${c.isSub ? ' is-sub' : ''}${isEaCondition ? ' ea-cond' : ''}${st.checked ? ' done' : ''}${isFlagged ? ' flagged' : ''}" id="crow_${domKey}" data-condition-key="${xt(key)}">
     <input type="checkbox" class="crow-cb"${st.checked ? ' checked' : ''} onchange="setCond('${key}','checked',this.checked)">
@@ -5100,6 +5199,7 @@ function condRow(stageKey, idx, c, opts = {}) {
       </div>
       <div class="crow-actions">
         <button class="crow-note-btn" id="cnotebtn_${domKey}" onclick="togNote('${domKey}')">${hasNote ? '− Hide comment' : '+ Add comment for checklist'}</button>
+        ${splitButton}
         <button class="crow-flag-btn${isFlagged ? ' active' : ''}" id="cflagbtn_${domKey}" data-flag-condition-key="${xt(key)}" onclick="toggleFlag('${key}')" title="${isFlagged ? 'Remove flag' : 'Flag this condition'}">${flagSvg(isFlagged)}${isFlagged ? 'Flagged' : 'Flag'}</button>
       </div>
     </div>
@@ -5518,7 +5618,15 @@ function renderSummary(d) {
     <svg class="ea-sum-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e8a020" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
     <div>
       <h4>Engineering Acceptance Required</h4>
-      <p>This consent has conditions requiring Engineering Review &amp; Acceptance. Upload your approved EA letter on the conditions page to record acceptance.</p>
+      <p>This consent has conditions requiring Engineering Review &amp; Acceptance. Upload the approved EA letter to record acceptance and extract the EA conditions.</p>
+      <div class="ea-sum-upload">
+        <div class="ea-dz" id="eaSummaryDz" onclick="document.getElementById('eaSummaryFileIn').click()">
+          <input type="file" id="eaSummaryFileIn" accept=".pdf" onchange="processEAPdf(this.files[0])">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="color:#e8a020"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <h4>Drop Engineering Acceptance PDF here</h4>
+          <p>Or click to browse</p>
+        </div>
+      </div>
     </div>
   </div>`;
     } else {
@@ -5616,6 +5724,7 @@ function renderSummary(d) {
   }
 
   document.getElementById('sumContent').innerHTML = html;
+  setupEaPdfDropZone('eaSummaryDz');
 }
 
 /* ── Render conditions ── */
@@ -5747,16 +5856,22 @@ function expandSubConditionsRobust(conds) {
   return out;
 }
 
+function expandSubConditionsForRender(conds) {
+  return (Array.isArray(conds) ? conds : []).flatMap((cond, sourceIndex) =>
+    expandSubConditionsRobust([cond]).map(row => ({ ...row, _sourceIndex: sourceIndex }))
+  );
+}
+
 let accId = 0;
 function accSection(label, pill, cls, conds, stageKey) {
   const id       = 'ac' + (++accId);
   const sk       = stageKey || cls;
-  const expanded = expandSubConditionsRobust(conds);
+  const expanded = expandSubConditionsForRender(conds);
   const topCount = expanded.filter(c => !c.isSub).length;
   const subCount = expanded.filter(c => c.isSub).length;
   const countLabel = topCount + (subCount ? ` conditions · ${subCount} sub-items` : ` condition${topCount !== 1 ? 's' : ''}`);
 
-  const body = expanded.map((c, idx) => condRow(sk, idx, c)).join('');
+  const body = expanded.map((c, idx) => condRow(sk, idx, c, { sourceIndex: c._sourceIndex })).join('');
 
   return `
   <div class="acc">
@@ -5789,6 +5904,73 @@ function allAcc(open) {
 }
 
 /* ── Icons ── */
+function conditionListForStageKey(stageKey) {
+  const key = String(stageKey || '');
+  if (key === 'ea') return data?.eaData && Array.isArray(data.eaData.eaConditions) ? data.eaData.eaConditions : null;
+  if (key.startsWith('sub_')) {
+    const stage = key.slice(4);
+    const sc = data?.conditions?.subdivisionConditions || {};
+    return Array.isArray(sc[stage]) ? sc[stage] : null;
+  }
+  if (key.startsWith('lu_')) {
+    const stage = key.slice(3);
+    const lc = data?.conditions?.landUseConditions || {};
+    return Array.isArray(lc[stage]) ? lc[stage] : null;
+  }
+  return null;
+}
+
+function rawConditionTextForStageCondition(stageKey, condition) {
+  const number = String(condition?.number || '').trim();
+  if (!number) return '';
+  const stored = String(stageKey || '') === 'ea'
+    ? data?.eaData?.sourceConditionBlocks || data?.eaData?.rawConditionBlocks
+    : data?.sourceConditionBlocks || data?.rawConditionBlocks;
+  const blocks = rawConditionBlocksFromStored(stored);
+  return blocks.get(number) || '';
+}
+
+function conditionCanRepairParts(stageKey, condition) {
+  if (!condition || condition.isSub) return false;
+  const number = String(condition.number || '').trim();
+  const raw = rawConditionTextForStageCondition(stageKey, condition);
+  const rawParts = conditionSubpartCount(raw, number);
+  const currentParts = conditionSubpartCount(condition.text || '', number);
+  return rawParts > currentParts || currentParts > 0;
+}
+
+function splitConditionParts(stageKey, sourceIndex) {
+  const list = conditionListForStageKey(stageKey);
+  const idx = Number(sourceIndex);
+  if (!list || !Number.isInteger(idx) || idx < 0 || idx >= list.length) return;
+
+  const condition = list[idx];
+  const number = String(condition?.number || '').trim();
+  const raw = rawConditionTextForStageCondition(stageKey, condition);
+  const sourceText = raw && conditionSubpartCount(raw, number) >= conditionSubpartCount(condition.text || '', number)
+    ? raw
+    : String(condition.text || '');
+  const parts = conditionSubpartCount(sourceText, number);
+  if (!parts) {
+    alert('No lettered parts were found in the saved text for this condition.');
+    return;
+  }
+
+  list[idx] = { ...condition, text: sourceText, isEA: !!condition.isEA || stageKey === 'ea' };
+  if (stageKey === 'ea' && data?.eaData) {
+    data.eaData.eaConditions = cleanConditionList(list).map(c => ({ ...c, isEA: true }));
+  } else {
+    cleanAnalysisData(data);
+  }
+  markPmResponsibilityScanStale();
+  conditionsPanelDirty = true;
+  autoSave();
+  renderConditionsPreservingAccordions();
+  if (conditionsTab === 'project') renderProjectTeamPanel({ preserveScroll: true });
+  if (conditionsTab === 'responsibilities') renderResponsibilitiesPanel({ preserveOpen: true, preserveScroll: true });
+  if (conditionsTab === 'gantt') renderGanttChart();
+}
+
 function icon(name) {
   const icons = {
     doc:  `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`,
@@ -6031,6 +6213,19 @@ function clearEngineeringAcceptanceData() {
   if (conditionsTab === 'responsibilities') renderResponsibilitiesPanel({ preserveOpen: true, preserveScroll: true });
 }
 
+function setupEaPdfDropZone(dropZoneId) {
+  const dz = document.getElementById(dropZoneId);
+  if (!dz) return;
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault();
+    dz.classList.remove('drag');
+    const f = e.dataTransfer.files[0];
+    if (f) processEAPdf(f);
+  });
+}
+
 /* Render the EA panel below conditions */
 function renderEAPanel() {
   const panel = document.getElementById('eaPanel');
@@ -6158,7 +6353,7 @@ async function processEAPdf(file) {
     if (panel) panel.innerHTML = `<div class="ea-panel"><div class="ea-proc"><div class="spinner" style="margin:0 auto 10px"></div>Extracting EA conditions with OpenAI…</div></div>`;
 
     const result = await callOpenAIAnalyseEA(text);
-    data.eaData = cleanEAData(result);
+    data.eaData = cleanEAData(repairEADataFromRawText(result, text));
     cleanAnalysisData(data);
     markPmResponsibilityScanStale();
     conditionsPanelDirty = true;
@@ -6498,19 +6693,28 @@ function pmConfiguredPartyPayload() {
     }));
 }
 
-function pmScanConditionPayload() {
+function compactPmConditionText(text, maxLength = 2600) {
+  const clean = normalizeExtractedConditionText(text);
+  if (clean.length <= maxLength) return clean;
+  const headLength = Math.floor(maxLength * 0.72);
+  const tailLength = Math.max(260, maxLength - headLength - 80);
+  return clean.slice(0, headLength).trim() + ' ... [condition text shortened for responsibility scan] ... ' + clean.slice(-tailLength).trim();
+}
+
+function pmScanConditionPayload(options = {}) {
+  const compact = options.compact !== false;
   return flattenProjectManagementConditions().map(c => ({
     key: c.key,
     stage: c.stage,
     source: c.source || 'Resource Consent',
     number: c.number,
-    text: c.text
+    text: compact ? compactPmConditionText(c.text) : String(c.text || '')
   }));
 }
 
 function pmResponsibilityScanSignature() {
   return JSON.stringify({
-    conditions: pmScanConditionPayload(),
+    conditions: pmScanConditionPayload({ compact: false }),
     parties: pmConfiguredPartyPayload()
   });
 }
@@ -7926,7 +8130,7 @@ function pmRequirementHints() {
 
 function pmPrompt() {
   const details = data?.consentDetails || {};
-  const conditions = pmScanConditionPayload();
+  const conditions = pmScanConditionPayload({ compact: true });
   return `You are acting as a senior New Zealand subdivision/resource-consent project manager with 30 years of practical delivery experience.
 
 Your job is to turn consent conditions into a practical responsibility matrix for delivery of subdivision/resource consent works. Use project-management judgement, but do not invent requirements that are not supported by the condition text.

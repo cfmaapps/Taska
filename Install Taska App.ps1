@@ -67,5 +67,5 @@ Write-Host 'CFMA TASKA shortcuts created:' -ForegroundColor Green
 Write-Host "  Desktop:    $desktopShortcut"
 Write-Host "  Start Menu: $startShortcut"
 Write-Host ''
-Write-Host 'To pin it: open Start, search CFMA TASKA, right-click it, then choose Pin to taskbar.' -ForegroundColor Yellow
 Write-Host 'The shortcut starts the local server hidden and opens Taska as an app window.' -ForegroundColor Gray
+Write-Host 'For a proper Taska taskbar icon instead of an Edge-grouped window, run Install Taska Taskbar App.bat.' -ForegroundColor Yellow

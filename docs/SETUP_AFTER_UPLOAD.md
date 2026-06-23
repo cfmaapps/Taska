@@ -10,7 +10,6 @@ For the current hybrid setup, each user does this:
 2. If they need Outlook desktop scanning, local attachment opening, local backups, useful documents, or the RC analyser AI proxy, download/clone the GitHub repo.
 3. Double-click `Install Taska App.bat` once.
 4. Open `CFMA TASKA` from the Desktop or Start Menu shortcut.
-5. To pin it, open Start, search `CFMA TASKA`, right-click it, then choose `Pin to taskbar`.
 
 The `CFMA TASKA` shortcut starts the local server hidden and opens an app-style browser window at:
 
@@ -19,6 +18,16 @@ http://localhost:8080/
 ```
 
 No visible terminal needs to stay open for normal use.
+
+For a proper Taska taskbar icon instead of an Edge-grouped window:
+
+1. Double-click `Install Taska Taskbar App.bat`.
+2. In the Edge tab that opens, click the app/install icon, or use `... > Apps > Install this site as an app`.
+3. Name it `CFMA TASKA`.
+4. Pin the Taska app window to the taskbar.
+5. Unpin the old Edge-looking Taska shortcut.
+
+That taskbar setup also creates a user Startup shortcut for the hidden local server so the pinned Taska app can open after Windows sign-in. The normal `CFMA TASKA` launcher detects the installed Taska web app and uses it automatically.
 
 If the app icon changes later, run `Install Taska App.bat` again to refresh the Desktop and Start Menu shortcuts. The desktop updater also refreshes these shortcuts after it installs a newer copy.
 

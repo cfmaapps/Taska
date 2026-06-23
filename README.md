@@ -18,9 +18,17 @@ For normal desktop-style use:
 
 1. Double-click `Install Taska App.bat` once.
 2. Open `CFMA TASKA` from the Desktop or Start Menu shortcut.
-3. Pin `CFMA TASKA` to the taskbar from the Start Menu if desired.
 
 The shortcut starts the local server hidden, then opens `http://localhost:8080/` in an app-style browser window.
+
+For a proper Windows taskbar icon that shows as Taska instead of grouping under Edge:
+
+1. Double-click `Install Taska Taskbar App.bat`.
+2. In the Edge tab that opens, choose the app/install icon, or use `... > Apps > Install this site as an app`.
+3. Name it `CFMA TASKA`.
+4. Pin the Taska app window to the taskbar, then unpin the old Edge-looking shortcut.
+
+That taskbar setup also creates a user Startup shortcut for the hidden local server. The normal `CFMA TASKA` launcher will use the installed Taska web app automatically when it exists.
 
 For troubleshooting, open `Start Server.bat` instead. That keeps the server window visible so errors can be read.
 
@@ -88,6 +96,7 @@ The included Supabase policies are intentionally permissive for a private protot
 - `server.ps1` - local helper server
 - `Open Taska.bat` / `Open Taska.ps1` - app-style hidden-server launcher
 - `Install Taska App.bat` / `Install Taska App.ps1` - creates Desktop and Start Menu shortcuts
+- `Install Taska Taskbar App.bat` / `Install Taska Taskbar App.ps1` - sets up a Taska taskbar web app and startup server shortcut
 - `Stop Taska Server.bat` / `Stop Taska Server.ps1` - stops the hidden local server for restart/troubleshooting
 - `gmail-analysis-core.js` - deterministic Gmail analysis
 - `gmail-analysis-tests.js` - fixtures/tests

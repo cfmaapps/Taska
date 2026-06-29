@@ -1489,6 +1489,8 @@ function updateTaskaLinkBanner(statusText = '') {
 
 function buildProgressObject() {
   if (!data) return null;
+  normalizeMojibakeDeep(data);
+  normalizeMojibakeDeep(pmState);
   condState = normalizeCondStateMap(condState);
   ensurePmState();
   const ref = data.consentDetails?.rmReference || 'unknown';
@@ -2684,10 +2686,88 @@ async function startExpressAnalysis(btn, loader) {
   }
 }
 
+const CP1252_SPECIAL_BYTES = {
+  0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84,
+  0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88,
+  0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C,
+  0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93,
+  0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97,
+  0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B,
+  0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F
+};
+const MOJIBAKE_RUN_RE = /[\u0080-\u00FF\u20AC\u201A-\u201E\u2020-\u2022\u02C6\u2030\u0160\u2039\u0152\u017D\u2018-\u201D\u2026\u2122\u0161\u203A\u0153\u017E\u0178]{2,}/g;
+
+function normalizePrivateUseGlyphs(text) {
+  return String(text || '')
+    .replace(/[\uF0B7\uF0D8\uF0A7\uF0A8\uF0B0\uF0FC\uF075\uF076]/g, '\u2022')
+    .replace(/\u00A0/g, ' ')
+    .replace(/\uF020/g, ' ')
+    .replace(/\uF02D/g, '-');
+}
+
+function cp1252ByteForChar(ch) {
+  const cp = ch.codePointAt(0);
+  if (cp <= 0xFF) return cp;
+  return Object.prototype.hasOwnProperty.call(CP1252_SPECIAL_BYTES, cp) ? CP1252_SPECIAL_BYTES[cp] : -1;
+}
+
+function mojibakeScore(text) {
+  const s = String(text || '');
+  const markers = s.match(/[\u0080-\u009F\u00C2-\u00C5\u00E2\u00EF\u00F0\uFFFD\uF000-\uF8FF]/g);
+  const common = s.match(/(?:\u00C2|\u00C3|\u00C4|\u00E2|\u00EF)[\u0080-\u00FF\u20AC\u201A-\u201E\u2018-\u201D\u2022\u2122]/g);
+  return (markers ? markers.length : 0) + ((common ? common.length : 0) * 3);
+}
+
+function decodeMojibakeRun(run) {
+  if (typeof TextDecoder === 'undefined' || !run || run.length < 2) return run;
+  const bytes = [];
+  for (const ch of run) {
+    const b = cp1252ByteForChar(ch);
+    if (b < 0) return run;
+    bytes.push(b);
+  }
+  try {
+    const decoded = normalizePrivateUseGlyphs(new TextDecoder('utf-8', { fatal: true }).decode(new Uint8Array(bytes)));
+    if (!decoded || decoded.includes('\uFFFD')) return run;
+    return mojibakeScore(decoded) <= mojibakeScore(run) ? decoded : run;
+  } catch (_) {
+    return run;
+  }
+}
+
+function normalizeMojibakeText(value) {
+  if (value == null) return '';
+  let out = normalizePrivateUseGlyphs(String(value));
+  if (!out) return '';
+  out = out.replace(MOJIBAKE_RUN_RE, decodeMojibakeRun);
+  out = normalizePrivateUseGlyphs(out)
+    .replace(/\u00C2\u00A0/g, ' ')
+    .replace(/\u00EF\u00BB\u00BF|\uFEFF/g, '')
+    .replace(/\u00C2(?=[\s,.;:!?)\]\}])/g, '')
+    .replace(/\u00C2/g, '')
+    .replace(/\uFFFD/g, '');
+  return out;
+}
+
+function normalizeMojibakeDeep(value, seen = new WeakSet()) {
+  if (typeof value === 'string') return normalizeMojibakeText(value);
+  if (!value || typeof value !== 'object') return value;
+  if (seen.has(value)) return value;
+  seen.add(value);
+  if (Array.isArray(value)) {
+    for (let i = 0; i < value.length; i++) value[i] = normalizeMojibakeDeep(value[i], seen);
+    return value;
+  }
+  Object.keys(value).forEach(key => {
+    value[key] = normalizeMojibakeDeep(value[key], seen);
+  });
+  return value;
+}
+
 /* -- Textarea-safe escape (no <br> conversion) -- */
 function xt(str) {
   if (str == null) return '';
-  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return normalizeMojibakeText(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 /* -- Engineering Acceptance condition detector -- */
@@ -2704,7 +2784,7 @@ function isEACond(c) {
 }
 
 function stripConditionTextNoise(text) {
-  let out = String(text || '').trim();
+  let out = normalizeMojibakeText(text).trim();
   out = out.replace(/^\s*(?:[-\u2013\u2014\u2022]\s*)?(?:General|Subdivision|Land\s+Use|Engineering|Civil\s+Works|Ongoing|During\s+Construction)(?:\s+(?:Consent\s+)?Conditions?)?\s*[:\u2013\u2014-]\s*/i, '');
   out = out.replace(/^\s*(?:General|Subdivision|Land\s+Use|Engineering|Civil\s+Works)\s+Condition\s*(?:No\.?\s*)?[\w().-]*\s*[:\u2013\u2014-]\s*/i, '');
   return out.trim();
@@ -2724,7 +2804,7 @@ function cleanConditionList(list) {
       const src = c || {};
       return {
         ...src,
-        number: src.number == null ? '' : String(src.number).trim(),
+        number: src.number == null ? '' : normalizeMojibakeText(src.number).trim(),
         text: stripConditionTextNoise(src.text || '')
       };
     })
@@ -2750,6 +2830,7 @@ function invalidateConditionCaches() {
 
 function cleanAnalysisData(d) {
   if (!d) return d;
+  normalizeMojibakeDeep(d);
   invalidateConditionCaches();
   const sc = d.conditions?.subdivisionConditions || {};
   const lc = d.conditions?.landUseConditions || {};
@@ -2780,7 +2861,7 @@ function assertExtractedConsentConditions(d, rawText = '') {
 }
 
 function normalizeExtractedConditionText(text) {
-  return String(text || '')
+  return normalizeMojibakeText(text)
     .replace(/\r/g, '\n')
     .replace(/\n\s*\d{1,4}\s*\n\s*V\d+_[^\n]*RM\d+[^\n]*\n/gi, '\n')
     .replace(/\n\s*V\d+_[^\n]*RM\d+[^\n]*\n/gi, '\n')
@@ -3661,6 +3742,7 @@ function ensureCondStateEntry(conditionKey) {
   }
   if (typeof condState[conditionKey].checked !== 'boolean') condState[conditionKey].checked = !!condState[conditionKey].checked;
   if (typeof condState[conditionKey].comment !== 'string') condState[conditionKey].comment = '';
+  condState[conditionKey].comment = normalizeMojibakeText(condState[conditionKey].comment);
   if (typeof condState[conditionKey].flagged !== 'boolean') condState[conditionKey].flagged = !!condState[conditionKey].flagged;
   return condState[conditionKey];
 }
@@ -3678,7 +3760,7 @@ function normalizeCondStateMap(raw) {
     if (!value || typeof value !== 'object' || Array.isArray(value)) return;
     out[id] = {
       checked: !!value.checked,
-      comment: value.comment == null ? '' : String(value.comment),
+      comment: value.comment == null ? '' : normalizeMojibakeText(value.comment),
       flagged: !!value.flagged
     };
   });
@@ -5491,7 +5573,7 @@ function togNote(key) {
 function setCond(key, field, value) {
   const state = ensureCondStateEntry(key);
   if (field === 'checked') setConditionCompletionState(key, !!value);
-  else state[field] = value;
+  else state[field] = typeof value === 'string' ? normalizeMojibakeText(value) : value;
   if (conditionsTab !== 'conditions') conditionsPanelDirty = true;
   if (field === 'flagged') {
     document.querySelectorAll(`[data-condition-key="${key}"]`).forEach(row => {
@@ -6150,7 +6232,7 @@ function icon(name) {
 /* -- Safe HTML escape (preserves <br> for newlines) -- */
 function x(str) {
   if (str == null) return '';
-  return String(str)
+  return normalizeMojibakeText(str)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -6754,6 +6836,7 @@ function ensurePmState() {
       .filter(Boolean);
   });
   pmState.testingPlan = normalizeTestingPlanState(pmState.testingPlan);
+  normalizeMojibakeDeep(pmState);
   return pmState;
 }
 

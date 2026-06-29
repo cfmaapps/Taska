@@ -41,7 +41,7 @@
     .page { display: none; min-height: 100vh; flex-direction: column; }
     .page.active { display: flex; }
 
-    /* ─── Upload page ─── */
+    /* --- Upload page --- */
     #page-upload { align-items: center; justify-content: center; padding: 40px 20px; }
     .upload-wrap { width: 100%; max-width: 560px; }
     .upload-logo { text-align: center; margin-bottom: 28px; }
@@ -102,7 +102,7 @@
     .err { display: none; background: var(--danger-l); border: 1px solid #f5b7b1; border-radius: var(--r); padding: 11px 15px; margin-top: 14px; font-size: .86rem; color: var(--danger); }
     .err.active { display: block; }
 
-    /* ─── Page header (summary / conditions) ─── */
+    /* --- Page header (summary / conditions) --- */
     .pheader { background: var(--primary); color: #fff; padding: 13px 22px; display: flex; align-items: center; justify-content: space-between; gap: 14px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
     .pheader-l { display: flex; align-items: center; gap: 12px; }
     .pheader h2 { font-size: 1rem; font-weight: 600; }
@@ -110,7 +110,7 @@
     .pheader-r { display: flex; gap: 8px; align-items: center; }
     .content { flex: 1; padding: 22px; max-width: 900px; margin: 0 auto; width: 100%; }
 
-    /* ─── Cards ─── */
+    /* --- Cards --- */
     .card { background: var(--card); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 18px; }
     .ch { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; padding-bottom: 13px; border-bottom: 1.5px solid var(--border); }
     .ci { width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -123,7 +123,7 @@
     .ct { font-size: 1.02rem; font-weight: 700; }
     .cs { font-size: .8rem; color: var(--muted); margin-top: 2px; }
 
-    /* ─── Consent details header card ─── */
+    /* --- Consent details header card --- */
     .detail-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 12px; overflow: hidden; }
     .detail-hdr { background: linear-gradient(135deg, #1b4f8a 0%, #2471a3 100%); color: #fff; padding: 18px 22px 16px; }
     .detail-ref { font-size: 1.35rem; font-weight: 800; letter-spacing: -.02em; margin-bottom: 5px; }
@@ -146,7 +146,7 @@
     /* Conditions link */
     .cond-link-bar { margin-bottom: 18px; }
 
-    /* ─── Summary section accordions ─── */
+    /* --- Summary section accordions --- */
     .sacc { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 14px; overflow: hidden; box-shadow: var(--shadow); }
     .sacc-hd { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; cursor: pointer; background: none; border: none; text-align: left; transition: background .15s; }
     .sacc-hd:hover { background: #fafafa; }
@@ -201,7 +201,7 @@
     .anal h4 { font-size: .88rem; font-weight: 600; margin-bottom: 4px; }
     .anal p { font-size: .84rem; color: var(--muted); line-height: 1.55; }
 
-    /* ─── Conditions page ─── */
+    /* --- Conditions page --- */
     .cond-controls { display: flex; justify-content: flex-end; gap: 9px; margin-bottom: 15px; }
 
     /* Accordion */
@@ -562,6 +562,95 @@
     .pm-rescan-banner strong { display: block; color: #744600; font-size: .84rem; margin-bottom: 2px; }
     .pm-rescan-banner span { display: block; color: #7a5a20; font-size: .76rem; line-height: 1.4; }
     .pm-empty { border: 1px dashed var(--border); border-radius: var(--r); padding: 18px; color: var(--muted); font-size: .84rem; text-align: center; background: #fafbfc; }
+    .testing-panel { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 0; overflow: hidden; }
+    .testing-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; padding: 16px 18px; border-bottom: 1px solid var(--border); background: #fbfdff; }
+    .testing-head h3 { font-size: 1rem; color: var(--primary); margin: 0 0 4px; font-weight: 800; }
+    .testing-head p { font-size: .78rem; color: var(--muted); margin: 0; line-height: 1.45; }
+    .testing-actions, .testing-row-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: flex-end; }
+    .testing-body { padding: 16px 18px 18px; display: grid; gap: 16px; }
+    .testing-status { font-size: .78rem; color: var(--muted); line-height: 1.45; min-height: 1.1em; }
+    .testing-status.error { color: var(--danger); }
+    .testing-stats { display: flex; gap: 7px; flex-wrap: wrap; justify-content: flex-end; }
+    .testing-pill { display: inline-flex; align-items: center; padding: 4px 9px; border-radius: 100px; background: #fff; border: 1px solid var(--border); color: var(--muted); font-size: .72rem; font-weight: 800; white-space: nowrap; }
+    .testing-pill.strong { color: var(--primary); background: var(--primary-xl); border-color: #a8c4e0; }
+    .testing-section-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 4px 0 0; }
+    .testing-section-title h4 { margin: 0; font-size: .9rem; color: var(--primary); font-weight: 800; }
+    .testing-section-title p { margin: 3px 0 0; font-size: .76rem; color: var(--muted); line-height: 1.45; }
+    .testing-review-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; }
+    .testing-component { border: 1px solid var(--border); border-left: 5px solid var(--primary); border-radius: var(--r); background: #fff; padding: 11px 12px; display: grid; gap: 9px; }
+    .testing-component.excluded { opacity: .68; border-left-color: #9aa5b1; background: #f8fafc; }
+    .testing-component-head { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+    .testing-component-title { display: flex; gap: 8px; align-items: flex-start; min-width: 0; }
+    .testing-component-title input[type=checkbox] { margin-top: 3px; accent-color: var(--primary); }
+    .testing-component-title strong { display: block; font-size: .86rem; color: var(--text); line-height: 1.25; }
+    .testing-component-title span { display: block; font-size: .72rem; color: var(--muted); line-height: 1.35; }
+    .testing-component-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .testing-component-fields .wide { grid-column: 1 / -1; }
+    .testing-field label { display: block; font-size: .68rem; font-weight: 900; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 3px; }
+    .testing-input, .testing-select, .testing-textarea { width: 100%; border: 1px solid var(--border); border-radius: var(--r); background: #fff; color: var(--text); padding: 7px 8px; font-size: .78rem; font-family: inherit; line-height: 1.35; }
+    .testing-textarea { min-height: 66px; resize: none; overflow: hidden; }
+    .testing-input:focus, .testing-select:focus, .testing-textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(27,79,138,.08); }
+    .testing-link-preview { display: inline-block; margin-top: 4px; font-size: .7rem; color: var(--primary); font-weight: 800; }
+    .testing-register-wrap { border: 1px solid var(--border); border-radius: var(--r); background: #fff; overflow-x: hidden; }
+    .testing-table { width: 100%; min-width: 0; border-collapse: collapse; table-layout: fixed; font-size: .72rem; }
+    .testing-table th, .testing-table td { border: 1px solid #d7dee8; padding: 5px; vertical-align: top; overflow-wrap: anywhere; }
+    .testing-table th { background: #eaf1f8; color: #183c5f; font-size: .62rem; text-transform: uppercase; letter-spacing: .02em; text-align: left; }
+    .testing-table th:nth-child(1), .testing-table td:nth-child(1) { width: 9.5%; }
+    .testing-table th:nth-child(2), .testing-table td:nth-child(2) { width: 8%; }
+    .testing-table th:nth-child(3), .testing-table td:nth-child(3) { width: 10.5%; }
+    .testing-table th:nth-child(4), .testing-table td:nth-child(4) { width: 13%; }
+    .testing-table th:nth-child(5), .testing-table td:nth-child(5) { width: 11.5%; }
+    .testing-table th:nth-child(6), .testing-table td:nth-child(6) { width: 9.5%; }
+    .testing-table th:nth-child(7), .testing-table td:nth-child(7) { width: 5.5%; }
+    .testing-table th:nth-child(8), .testing-table td:nth-child(8) { width: 5.5%; }
+    .testing-table th:nth-child(9), .testing-table td:nth-child(9) { width: 5.5%; }
+    .testing-table th:nth-child(10), .testing-table td:nth-child(10) { width: 8%; }
+    .testing-table th:nth-child(11), .testing-table td:nth-child(11) { width: 9%; }
+    .testing-table th:nth-child(12), .testing-table td:nth-child(12) { width: 4.5%; }
+    .testing-table.hide-hold th:nth-child(1), .testing-table.hide-hold td:nth-child(1) { width: 10%; }
+    .testing-table.hide-hold th:nth-child(2), .testing-table.hide-hold td:nth-child(2) { width: 8.5%; }
+    .testing-table.hide-hold th:nth-child(3), .testing-table.hide-hold td:nth-child(3) { width: 11.5%; }
+    .testing-table.hide-hold th:nth-child(4), .testing-table.hide-hold td:nth-child(4) { width: 14%; }
+    .testing-table.hide-hold th:nth-child(5), .testing-table.hide-hold td:nth-child(5) { width: 12.5%; }
+    .testing-table.hide-hold th:nth-child(6), .testing-table.hide-hold td:nth-child(6) { width: 10%; }
+    .testing-table.hide-hold th:nth-child(7), .testing-table.hide-hold td:nth-child(7) { width: 6%; }
+    .testing-table.hide-hold th:nth-child(8), .testing-table.hide-hold td:nth-child(8) { width: 6%; }
+    .testing-table.hide-hold th:nth-child(9), .testing-table.hide-hold td:nth-child(9) { width: 9%; }
+    .testing-table.hide-hold th:nth-child(10), .testing-table.hide-hold td:nth-child(10) { width: 8.5%; }
+    .testing-table.hide-hold th:nth-child(11), .testing-table.hide-hold td:nth-child(11) { width: 4%; }
+    .testing-table .testing-bucket-row td { background: #183c5f; color: #fff; font-size: .82rem; font-weight: 900; text-transform: uppercase; letter-spacing: .04em; }
+    .testing-table .testing-section-row td { background: var(--primary); color: #fff; font-size: .78rem; font-weight: 900; text-transform: uppercase; letter-spacing: .03em; }
+    .testing-table .testing-kind-row td { background: #f0f4f8; color: var(--text); font-size: .72rem; font-weight: 900; text-transform: uppercase; letter-spacing: .04em; }
+    .testing-register-row { cursor: grab; }
+    .testing-register-row:active { cursor: grabbing; }
+    .testing-register-row.repeat { background: #fbfdff; }
+    .testing-register-row.print-included td { background: #f7fcf9; }
+    .testing-register-row.print-included.repeat td { background: #f1faf5; }
+    .testing-register-row.print-excluded td { background: #f8f1ef; }
+    .testing-register-row.print-excluded .testing-cell-input { background: rgba(255,255,255,.62); color: #5f6771; }
+    .testing-cell-input { width: 100%; box-sizing: border-box; min-height: 34px; border: 1px solid transparent; border-radius: 4px; background: #fff; color: var(--text); padding: 5px 6px; font-size: .72rem; font-family: inherit; line-height: 1.35; resize: none; overflow: hidden; }
+    .testing-cell-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(27,79,138,.08); }
+    textarea.testing-cell-input { min-height: 42px; }
+    .testing-table select.testing-cell-input { min-height: 32px; resize: none; }
+    .testing-row-tools { display: grid; gap: 5px; margin-top: 6px; }
+    .testing-row-tool-line { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+    .testing-row-chip { display: inline-flex; align-items: center; border: 1px solid var(--border); border-radius: 100px; background: #fafbfc; color: var(--muted); padding: 2px 7px; font-size: .66rem; font-weight: 900; text-transform: uppercase; letter-spacing: .03em; }
+    .testing-row-chip.cop { background: var(--primary-xl); color: var(--primary); border-color: #a8c4e0; }
+    .testing-row-chip.additional { background: #fff8ed; color: #744600; border-color: #e8c888; }
+    .testing-repeat-badge { display: inline-flex; align-items: center; margin-top: 5px; border: 1px solid #abd6b8; border-radius: 100px; background: #eef8f0; color: #1f6a38; padding: 2px 7px; font-size: .66rem; font-weight: 900; }
+    .testing-drag-chip { display: inline-flex; align-items: center; border: 1px dashed #a8c4e0; border-radius: 100px; background: #fbfdff; color: var(--primary); padding: 2px 7px; font-size: .66rem; font-weight: 900; text-transform: uppercase; letter-spacing: .03em; cursor: grab; }
+    .testing-print-check { display: inline-flex; align-items: center; gap: 5px; margin-top: 5px; border: 1px solid var(--border); border-radius: 100px; background: #fff; color: var(--muted); padding: 2px 7px; font-size: .66rem; font-weight: 900; text-transform: uppercase; letter-spacing: .03em; cursor: pointer; }
+    .testing-print-check input { margin: 0; accent-color: var(--primary); }
+    .testing-register-row.print-included .testing-print-check { background: #eef8f0; border-color: #abd6b8; color: #1f6a38; }
+    .testing-register-row.print-excluded .testing-print-check { background: #fff5f3; border-color: #e6b1a8; color: #9f3e32; }
+    .testing-mini-btn { border: 1px solid var(--border); border-radius: var(--r); background: #fff; color: var(--primary); padding: 3px 6px; font-size: .66rem; font-weight: 900; cursor: pointer; }
+    .testing-mini-btn:hover { background: var(--primary-xl); border-color: #a8c4e0; }
+    .testing-delete { width: 100%; border: 1px solid #f5b7b1; border-radius: var(--r); background: #fff; color: var(--danger); padding: 5px 4px; font-size: .66rem; font-weight: 800; cursor: pointer; }
+    .testing-delete:hover { background: var(--danger-l); }
+    .testing-source-list { display: flex; flex-wrap: wrap; gap: 5px; }
+    .testing-option { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border); border-radius: var(--r); background: #fff; color: var(--text); padding: 6px 9px; font-size: .72rem; font-weight: 800; cursor: pointer; white-space: nowrap; }
+    .testing-option input { accent-color: var(--primary); }
+    .testing-print-register { display: none; }
     .gantt-panel { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px; }
     .gantt-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 12px; }
     .gantt-head h3 { font-size: .96rem; font-weight: 700; color: var(--primary); margin: 0 0 4px; }
@@ -705,12 +794,15 @@
       .pm-step-list { border-right: none; border-bottom: 1px solid var(--border); }
       .pm-contractor-row { grid-template-columns: 1fr; }
       .pm-remove { width: 100%; }
+      .testing-head { flex-direction: column; }
+      .testing-actions, .testing-stats { justify-content: flex-start; }
+      .testing-component-fields { grid-template-columns: 1fr; }
       .gantt-axis, .gantt-row { grid-template-columns: minmax(210px, 280px) minmax(520px, 1fr); }
     }
     /* Save/progress status */
     .save-status { font-size: .73rem; color: rgba(255,255,255,.65); white-space: nowrap; }
 
-    /* ─── Resume / pick-up-where-you-left-off (upload page) ─── */
+    /* --- Resume / pick-up-where-you-left-off (upload page) --- */
     .resume-banner { background: var(--primary-xl); border: 1.5px solid #a8c4e0; border-radius: var(--r); padding: 12px 15px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
     .taska-link-banner { background: #eef8f0; border-color: #abd6b8; }
     .taska-link-banner .resume-info svg { color: var(--success); }
@@ -732,7 +824,7 @@
     .json-dz h4 { font-size: .88rem; font-weight: 600; color: var(--text); margin: 8px 0 4px; }
     .json-dz p  { font-size: .78rem; color: var(--muted); }
 
-    /* ─── Analysis mode toggle ─── */
+    /* --- Analysis mode toggle --- */
     .mode-toggle { display: flex; border: 1.5px solid var(--border); border-radius: var(--r); overflow: hidden; }
     .mode-btn { flex: 1; padding: 9px 14px; font-size: .84rem; font-weight: 600; cursor: pointer; background: var(--bg); border: none; color: var(--muted); display: flex; align-items: center; justify-content: center; gap: 6px; transition: all .15s; }
     .mode-btn:hover { color: var(--text); background: #e8eef5; }
@@ -757,12 +849,31 @@
       .card, .acc, .sacc, .detail-card { box-shadow: none; border: 1px solid #ddd; }
       .page { display: flex !important; }
       #page-upload { display: none !important; }
+      body.print-testing .pheader,
+      body.print-testing .cond-tabs,
+      body.print-testing .footer,
+      body.print-testing .testing-screen-only,
+      body.print-testing .testing-review-grid,
+      body.print-testing .testing-edit-register { display: none !important; }
+      body.print-testing .page { display: none !important; }
+      body.print-testing #page-conditions { display: block !important; }
+      body.print-testing #page-conditions .content { padding: 0 !important; }
+      body.print-testing .cond-tab-panel { display: none !important; }
+      body.print-testing #condTabTesting { display: block !important; }
+      body.print-testing .testing-panel { box-shadow: none; border: none; border-radius: 0; padding: 0; }
+      body.print-testing .testing-body { padding: 0; display: block; }
+      body.print-testing .testing-print-register { display: block !important; }
+      body.print-testing .testing-table { min-width: 0; font-size: 8.5pt; page-break-inside: auto; }
+      body.print-testing .testing-table th,
+      body.print-testing .testing-table td { padding: 4px; border-color: #999; }
+      body.print-testing .testing-table tr { page-break-inside: avoid; }
+      body.print-testing a { color: #0645ad; text-decoration: underline; }
     }
   </style>
 </head>
 <body>
 
-<!-- ═══════════════════════ UPLOAD PAGE ═══════════════════════ -->
+<!-- ======================= UPLOAD PAGE ======================= -->
 <div id="page-upload" class="page active">
   <div class="upload-wrap">
     <div class="upload-logo">
@@ -781,7 +892,7 @@
 
     <div class="upload-card">
 
-      <!-- Resume banner — shown when a consent is already loaded in memory -->
+      <!-- Resume banner - shown when a consent is already loaded in memory -->
       <div class="resume-banner taska-link-banner" id="taskaLinkBanner" style="display:none">
         <div class="resume-info">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11.5 4.43"/><path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07l1.33-1.33"/></svg>
@@ -797,7 +908,7 @@
         <div class="resume-info">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
           <div>
-            <strong id="resumeRef">—</strong>
+            <strong id="resumeRef">-</strong>
             <span id="resumeName"></span>
           </div>
         </div>
@@ -856,7 +967,7 @@
             Express
           </button>
         </div>
-        <p class="mode-desc" id="modeDesc">Quick: conditions &amp; key details only — ideal for the 224(c) checklist workflow</p>
+        <p class="mode-desc" id="modeDesc">Quick: conditions &amp; key details only - ideal for the 224(c) checklist workflow</p>
       </div>
 
       <div class="btn-wrap">
@@ -868,7 +979,7 @@
 
       <div class="loading" id="loadingState">
         <div class="spinner"></div>
-        <strong id="loadTtl">Extracting PDF text…</strong>
+        <strong id="loadTtl">Extracting PDF text...</strong>
         <p id="loadDtl">Please wait, this may take a moment for large documents</p>
       </div>
 
@@ -880,7 +991,7 @@
         <input type="file" id="jsonInput" accept=".json" />
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="color:var(--primary)"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         <h4>Drop a saved progress file here</h4>
-        <p>Select or drop a <strong>.json</strong> file exported from a previous session — loads your analysis, notes, ticks and flags</p>
+        <p>Select or drop a <strong>.json</strong> file exported from a previous session - loads your analysis, notes, ticks and flags</p>
       </div>
 
     </div>
@@ -891,7 +1002,7 @@
   </div>
 </div>
 
-<!-- ═══════════════════════ CONDITIONS PAGE ═══════════════════════ -->
+<!-- ======================= CONDITIONS PAGE ======================= -->
 <div id="page-conditions" class="page">
   <div class="pheader">
     <div class="pheader-l">
@@ -937,6 +1048,7 @@
         <button class="cond-tab-btn" id="condTabBtnProject" onclick="setConditionsTab('project')" type="button">Project Team</button>
         <button class="cond-tab-btn" id="condTabBtnResponsibilities" onclick="setConditionsTab('responsibilities')" type="button">Responsibilities</button>
         <button class="cond-tab-btn" id="condTabBtnGantt" onclick="setConditionsTab('gantt')" type="button">Gantt Chart</button>
+        <button class="cond-tab-btn" id="condTabBtnTesting" onclick="setConditionsTab('testing')" type="button">Inspection &amp; Testing</button>
       </div>
       <div class="cond-tab-actions" id="pmTabActions">
         <span class="save-status" id="pmSaveStatus"></span>
@@ -987,11 +1099,17 @@
       </div>
       <div id="ganttContent"></div>
     </div>
+    <div class="cond-tab-panel" id="condTabTesting">
+      <div style="margin-bottom:12px">
+        <p id="testingSub" style="font-size:.8rem;color:var(--muted)"></p>
+      </div>
+      <div id="testingContent"></div>
+    </div>
   </div>
-  <div class="footer">Resource Consent Analyser — For informational purposes only.</div>
+  <div class="footer">Resource Consent Analyser - For informational purposes only.</div>
 </div>
 
-<!-- ═══════════════════════ CONTINUE OVERLAY (large-document pagination) ═══════════════════════ -->
+<!-- ======================= CONTINUE OVERLAY (large-document pagination) ======================= -->
 <!-- PROJECT MANAGEMENT PAGE -->
 <div id="page-project-legacy" style="display:none">
   <div class="pheader">
@@ -1143,7 +1261,7 @@
       </div>
       <div>
         <h3 style="font-size:.97rem;font-weight:700;color:var(--text);margin-bottom:3px">Large Document</h3>
-        <p style="font-size:.78rem;color:var(--muted);margin:0">Response cut off — continuation needed</p>
+        <p style="font-size:.78rem;color:var(--muted);margin:0">Response cut off - continuation needed</p>
       </div>
     </div>
     <p id="continueMsg" style="font-size:.86rem;line-height:1.65;color:var(--text);margin-bottom:18px"></p>
@@ -1155,28 +1273,28 @@
   </div>
 </div>
 
-<!-- ═══════════════════════ SAVE/LOAD INFO MODAL ═══════════════════════ -->
+<!-- ======================= SAVE/LOAD INFO MODAL ======================= -->
 <div class="info-overlay" id="saveInfoModal" onclick="if(event.target===this)this.classList.remove('active')">
   <div class="info-modal">
-    <h3>💾 Saving &amp; Resuming Progress</h3>
+    <h3>Saving &amp; Resuming Progress</h3>
     <ul>
-      <li>Ticks, flags, notes, and project-management details are <strong>auto-saved in your browser</strong> whenever you make a change.</li>
+      <li>Ticks, flags, notes, project-management details, and inspection/testing plans are <strong>auto-saved in your browser</strong> whenever you make a change.</li>
       <li>Progress is stored per consent (by RM reference), so different consents don't overwrite each other.</li>
-      <li>Click <strong>Save</strong> to download a <code>.json</code> backup — use this if you switch computers or browsers.</li>
+      <li>Click <strong>Save</strong> to download a <code>.json</code> backup - use this if you switch computers or browsers.</li>
       <li>Drop a saved <strong>.json</strong> progress file on the upload screen to fully restore a previous session.</li>
-      <li>Re-open the same HTML file and load the same PDF - your ticks, flags, notes, and project-management setup are restored automatically.</li>
+      <li>Re-open the same HTML file and load the same PDF - your ticks, flags, notes, project-management setup, and inspection/testing plan are restored automatically.</li>
     </ul>
-    <p class="info-warn">⚠ Browser storage may be cleared if you clear browsing data. Always export a JSON backup for long-term storage.</p>
+    <p class="info-warn">Warning: Browser storage may be cleared if you clear browsing data. Always export a JSON backup for long-term storage.</p>
     <button class="btn btn-primary btn-sm" style="margin-top:16px" onclick="document.getElementById('saveInfoModal').classList.remove('active')">Got it</button>
   </div>
 </div>
 
 <script>
-/* ── PDF.js ── */
+/* -- PDF.js -- */
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-/* ── State ── */
+/* -- State -- */
 let data = null;
 let selFile = null;
 let condState = {};     // { key: { checked: bool, comment: string } }
@@ -1194,12 +1312,13 @@ const PM_SCOPE_OPTIONS = [
   { key: 'traffic', label: 'Traffic management' },
   { key: 'otherCivil', label: 'Other civil works' }
 ];
+const TESTING_PLAN_VERSION = 1;
 let pmState = defaultPmState();
 let pdfObjectUrl = null;
 let eaPdfObjectUrl = null;  // blob URL for the uploaded EA PDF (session only, not persisted)
 let continueResolver = null; // resolves the pause-for-user-confirmation promise in openaiFetch
 let expressMode = true;      // default: Express (faster, conditions + key details only)
-const CONDITION_TAB_KEYS = ['summary', 'conditions', 'flagged', 'overdue', 'project', 'responsibilities', 'gantt'];
+const CONDITION_TAB_KEYS = ['summary', 'conditions', 'flagged', 'overdue', 'project', 'responsibilities', 'gantt', 'testing'];
 let conditionsTab = 'gantt';
 let timingState = null;
 let ganttEditState = null;
@@ -1212,9 +1331,34 @@ let flatConditionCache = null;
 let flatConditionMetaCache = null;
 let conditionsPanelDirty = false;
 let pmScanState = { inFlight: false, promise: null, startedTab: '', showResponsibilities: false, error: '' };
+let testingScanState = { inFlight: false, promise: null, startedTab: '', error: '' };
+let testingDragRowId = '';
 const AI_ENDPOINT = window.RC_ANALYSER_API_ENDPOINT || '/api/openai';
 const AI_STATUS_ENDPOINT = window.RC_ANALYSER_AI_STATUS_ENDPOINT || '/api/ai-status';
 const AI_KEY_OWNER_MESSAGE = 'Come see Lachlan for API key to use this tool, you will only need to see him once.';
+const TESTING_SECTION_OPTIONS = ['EARTHWORKS', 'ROADING', 'STORMWATER', 'WASTEWATER / FOUL SEWER', 'WATER RETICULATION / SERVICES', 'LANDSCAPE / RESERVES', 'NETWORK UTILITIES', 'TRAFFIC SIGNALS', 'OTHER'];
+const TESTING_COMPONENT_TYPES = ['earthworks', 'roading', 'stormwater', 'wastewater', 'water', 'landscape', 'utilities', 'trafficSignals', 'retaining', 'other'];
+const TESTING_SURFACE_OPTIONS = ['n/a', 'unknown', 'gravel / unsealed', 'chipseal', 'asphalt', 'concrete', 'mixed'];
+const TESTING_STATUS_OPTIONS = ['', 'Planned', 'Requested', 'Complete', 'Approved', 'Not approved', 'PASS', 'FAIL', 'N/A'];
+const TESTING_BUCKETS = [
+  { key: 'cop', label: 'COP REQUIRED' },
+  { key: 'additional', label: 'ADDITIONAL INSPECTIONS / TESTS' }
+];
+const TESTING_QLDC_RULE_SUMMARY = [
+  'Use these QLDC Code of Practice testing and inspection requirements as the rule base for the inspection and testing plan.',
+  'Global: required infrastructure must be tested before QLDC/network inspections. Test certificates and reports are required for completion. Hold points include concrete before pour, earthworks/subsoil drainage before filling, completed earthworks/subgrade, water/wastewater/stormwater before backfill, water/wastewater pressure tests, finished sub-base/basecourse before sealing, and water-main disinfection.',
+  'Earthworks/geotech: the geo-professional sets the construction control test method, location and frequency. Use NZS 4431 where applicable or the geo-professional standard. Testing must be by a recognised lab/competent person. Completion evidence includes compaction test records, compliant/retest/failed areas, geotech completion report, Schedule 2A sign-off, as-built contours/cut-fill/subsoil drains.',
+  'Roading subgrade: CBR by soaked CBR lab test NZS 4402.6; Scala may be used for local roads with Council approval at 150/300/450 mm. Document proof rolling. BB/FWD is mandatory above Primary Collector and discretionary below.',
+  'Roading subbase: mean 95% MDD, minimum 92%. Required evidence includes NDM, stringline/total station grid, material properties, acceptance sets per aggregate source at start and then one per 1000 m3 over 2000 m3, with NZS 4407 aggregate tests and retesting after failures.',
+  'Roading basecourse: mean 98% MDD, minimum 95%. Required evidence includes NDM, Benkelman Beam, NAASRA if road length is over 150 m, material properties, acceptance sets per aggregate source and retesting after failures.',
+  'Roading pre-seal/surfacing: QLDC inspection of finished basecourse before sealing. Deflection testing by BB/FWD before surfacing except cast-in-situ concrete; wheel paths both lanes max 10 m spacing. Roughness testing is not required for readings <=150 m; otherwise NAASRA limits apply. Asphalt/chipseal need relevant surfacing compliance evidence; concrete requires pre-pour inspection and specified strength (30 MPa road/crossing slabs, 20 MPa kerb/channel/footpaths).',
+  'Stormwater: soakage testing before detailed design and reconfirmation after construction disturbance/compaction where soakage devices are used. Report L/hr/m2 and test by borehole/test pit methods suited to soil type. Pipes <=1200 mm need CCTV before acceptance to the NZ Gravity Pipe Inspection Manual, Grade 1 only; Council may require water testing. Building over stormwater pipe requires pre-construction CCTV.',
+  'Wastewater/foul sewer: gravity sewers require CCTV before acceptance, Grade 1 only, and field leakage testing before connection. Pressurised sewers require field pressure testing. Pressure wastewater mains with non-metallic pipe need tracer wire continuity. Pump/pumping main systems may require surge analysis. Building over wastewater pipe requires pre-construction CCTV.',
+  'Water supply: mains require successful pressure/rebound testing before connection, disinfection/chlorination after pressure testing and backfill, possible water sampling at network ends/boundaries, hydrant flow testing to the Firefighting Water Supplies code, and tracer wire continuity for non-metallic mains. Pothole checks every 10 m are required for building over water mains.',
+  'Landscape/reserves: soil testing for composition/fertiliser may be required. Parks final inspection/sign-off after maintenance is required before bond/practical completion. Playgrounds/public toilets/pump/septic systems require relevant code compliance/sign-off.',
+  'Utilities/electrical: trench backfill and compaction must satisfy the corridor manager. Before 224(c), utility provider confirmations are required. Electrical works require CoC, ESC and RoI as applicable.',
+  'Traffic signals: design/safety peer review, post-construction installation/safety audit, independent software testing, SFT/WinTraff test report, P43 SAT commissioning, hardware/operations audit, 24 h site running without lanterns before switch-on, SCATS checks, CCTV visibility checks and original electrical CoC.'
+].join('\n');
 const taskaParams = new URLSearchParams(window.location.search);
 const taskaJobId = (taskaParams.get('jobId') || '').trim();
 const taskaJobNum = (taskaParams.get('jobNum') || '').trim();
@@ -1228,9 +1372,9 @@ let taskaRmLastSavedJson = '';
 let taskaRmLoadedFromServer = false;
 let taskaDuplicateRequestId = '';
 
-/* ── API keys are never saved in browser storage ── */
+/* -- API keys are never saved in browser storage -- */
 
-/* ── PDF drop zone ── */
+/* -- PDF drop zone -- */
 const dz = document.getElementById('dropzone');
 const fi = document.getElementById('fileInput');
 
@@ -1244,7 +1388,7 @@ dz.addEventListener('drop', e => {
 });
 fi.addEventListener('change', e => { if (e.target.files[0]) setFile(e.target.files[0]); });
 
-/* ── JSON "pick up where you left off" drop zone ── */
+/* -- JSON "pick up where you left off" drop zone -- */
 const jdz = document.getElementById('jsonDrop');
 const jfi = document.getElementById('jsonInput');
 jdz.addEventListener('dragover', e => { e.preventDefault(); jdz.classList.add('drag-over'); });
@@ -1348,12 +1492,14 @@ function buildProgressObject() {
   condState = normalizeCondStateMap(condState);
   ensurePmState();
   const ref = data.consentDetails?.rmReference || 'unknown';
+  const testingPlan = JSON.parse(JSON.stringify(pmState.testingPlan || defaultTestingPlanState()));
   return {
-    version: 4,
+    version: 5,
     rmReference: ref,
     exported: new Date().toISOString(),
     condState: JSON.parse(JSON.stringify(condState)),
     pmState: JSON.parse(JSON.stringify(pmState)),
+    testingPlan,
     data
   };
 }
@@ -1428,10 +1574,15 @@ async function saveLinkedRmSession() {
 function applySessionObject(obj, options = {}) {
   if (!obj) return false;
   const session = obj.session || obj;
-  const incomingCondState = session.condState || (session.data || session.pmState ? {} : session);
+  const incomingCondState = session.condState || (session.data || session.pmState || session.testingPlan ? {} : session);
   condState = normalizeCondStateMap(incomingCondState);
   const hasPmState = session.pmState && typeof session.pmState === 'object';
+  const hasTestingPlan = session.testingPlan && typeof session.testingPlan === 'object' && !Array.isArray(session.testingPlan);
   pmState = hasPmState ? session.pmState : (data && !session.data ? pmState : defaultPmState());
+  if (hasTestingPlan) {
+    pmState = pmState && typeof pmState === 'object' ? pmState : defaultPmState();
+    pmState.testingPlan = session.testingPlan;
+  }
   ensurePmState();
   if (session.data) {
     data = session.data;
@@ -1535,7 +1686,7 @@ async function loadLinkedRmSession() {
 updateTaskaLinkBanner();
 setTimeout(loadLinkedRmSession, 0);
 
-/* ── Navigation ── */
+/* -- Navigation -- */
 function showPage(name) {
   if (name === 'summary') {
     showPage('conditions');
@@ -1562,6 +1713,7 @@ function setConditionsTab(tab) {
   const project = conditionsTab === 'project';
   const responsibilities = conditionsTab === 'responsibilities';
   const gantt = conditionsTab === 'gantt';
+  const testing = conditionsTab === 'testing';
   const page = document.getElementById('page-conditions');
   if (page) page.classList.toggle('pm-tab-open', project || responsibilities);
   if (page) page.classList.toggle('gantt-tab-open', gantt);
@@ -1572,6 +1724,7 @@ function setConditionsTab(tab) {
   const pmPanel = document.getElementById('condTabProject');
   const respPanel = document.getElementById('condTabResponsibilities');
   const ganttPanel = document.getElementById('condTabGantt');
+  const testingPanel = document.getElementById('condTabTesting');
   const summaryBtn = document.getElementById('condTabBtnSummary');
   const condBtn = document.getElementById('condTabBtnConditions');
   const flaggedBtn = document.getElementById('condTabBtnFlagged');
@@ -1579,6 +1732,7 @@ function setConditionsTab(tab) {
   const pmBtn = document.getElementById('condTabBtnProject');
   const respBtn = document.getElementById('condTabBtnResponsibilities');
   const ganttBtn = document.getElementById('condTabBtnGantt');
+  const testingBtn = document.getElementById('condTabBtnTesting');
   const pmActions = document.getElementById('pmTabActions');
   if (summaryPanel) summaryPanel.classList.toggle('active', summary);
   if (condPanel) condPanel.classList.toggle('active', conditionsTab === 'conditions');
@@ -1587,6 +1741,7 @@ function setConditionsTab(tab) {
   if (pmPanel) pmPanel.classList.toggle('active', project);
   if (respPanel) respPanel.classList.toggle('active', responsibilities);
   if (ganttPanel) ganttPanel.classList.toggle('active', gantt);
+  if (testingPanel) testingPanel.classList.toggle('active', testing);
   if (summaryBtn) summaryBtn.classList.toggle('active', summary);
   if (condBtn) condBtn.classList.toggle('active', conditionsTab === 'conditions');
   if (flaggedBtn) flaggedBtn.classList.toggle('active', flagged);
@@ -1594,6 +1749,7 @@ function setConditionsTab(tab) {
   if (pmBtn) pmBtn.classList.toggle('active', project);
   if (respBtn) respBtn.classList.toggle('active', responsibilities);
   if (ganttBtn) ganttBtn.classList.toggle('active', gantt);
+  if (testingBtn) testingBtn.classList.toggle('active', testing);
   if (pmActions) pmActions.classList.toggle('active', project || responsibilities);
   if (conditionsTab === 'conditions' && data) {
     const condContent = document.getElementById('condContent');
@@ -1606,10 +1762,11 @@ function setConditionsTab(tab) {
   if (project) renderProjectTeamPanel();
   if (responsibilities) renderResponsibilitiesPanel();
   if (gantt) renderGanttChart();
+  if (testing) renderTestingPanel();
   updateOverdueTabBadge();
 }
 
-/* ── PDF text extraction ── */
+/* -- PDF text extraction -- */
 async function extractPdf(file) {
   const buf = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
@@ -1805,15 +1962,15 @@ function removeStruckChars(item, strikeRects) {
   return kept.replace(/\s{2,}/g, ' ');
 }
 
-/* ── JSON parser with repair + truncation recovery ── */
+/* -- JSON parser with repair + truncation recovery -- */
 function parseJSON(raw) {
   // 1. Straight parse first
   try { return JSON.parse(raw); } catch (_) {}
 
-  // 2. Repair pass — fixes:
+  // 2. Repair pass - fixes:
   //    a) Literal control chars inside strings (newline, tab, etc.)
   //    b) Invalid backslash escapes (e.g. \S \k)
-  //    c) Truncated JSON — tracks open structures and closes them
+  //    c) Truncated JSON - tracks open structures and closes them
   const validEsc = new Set(['"', '\\', '/', 'b', 'f', 'n', 'r', 't', 'u']);
   let out = '';
   let inStr = false;
@@ -1830,13 +1987,13 @@ function parseJSON(raw) {
       if (validEsc.has(ch)) {
         out += '\\' + ch;
         if (ch === 'u') {
-          // Consume \uXXXX — pad with zeros if truncated (e.g. \u12 → \u1200)
+          // Consume \uXXXX - pad with zeros if truncated (e.g. \u12 -> \u1200)
           const hex = raw.slice(i + 1, i + 5);
           out += (hex + '0000').slice(0, 4);
           i += 4;
         }
       } else {
-        out += '\\\\' + ch; // invalid escape → escape the backslash
+        out += '\\\\' + ch; // invalid escape -> escape the backslash
       }
       continue;
     }
@@ -1865,7 +2022,7 @@ function parseJSON(raw) {
   }
 
   // 3. Close anything left open (handles truncated output)
-  if (pendingSlash) out += '"';   // incomplete \X — close the string
+  if (pendingSlash) out += '"';   // incomplete \X - close the string
   else if (inStr)   out += '"';   // string never closed
 
   // Close open arrays/objects, stripping trailing commas before each closer
@@ -1878,14 +2035,14 @@ function parseJSON(raw) {
     return JSON.parse(out);
   } catch (e) {
     throw new Error(
-      'The API response could not be parsed — the document may be too complex or the response was malformed. ' +
+      'The API response could not be parsed - the document may be too complex or the response was malformed. ' +
       'Try again; if the problem persists, the PDF may need to be processed in smaller sections. ' +
       '(Technical detail: ' + e.message + ')'
     );
   }
 }
 
-/* ── Continuation overlay helpers ── */
+/* -- Continuation overlay helpers -- */
 function showContinuePrompt(msg) {
   document.getElementById('continueMsg').textContent = msg;
   document.getElementById('continueOverlay').classList.add('active');
@@ -1896,7 +2053,7 @@ function onContinueClick() {
   if (continueResolver) { continueResolver(); continueResolver = null; }
 }
 
-/* ── Low-level: one OpenAI proxy call, returns { text, stopReason } ── */
+/* -- Low-level: one OpenAI proxy call, returns { text, stopReason } -- */
 async function openaiOnce(messages, maxTokens) {
   const apiKey = manualApiKey();
   if (apiKey) {
@@ -1936,11 +2093,11 @@ async function openaiOnce(messages, maxTokens) {
   return res.json();
 }
 
-/* ── OpenAI API call — multi-turn continuation when max_tokens is hit ──
+/* -- OpenAI API call - multi-turn continuation when max_tokens is hit --
    When the model fills its output budget mid-JSON the overlay appears and
    the user clicks Continue. A follow-up turn is appended to the conversation
    asking the model to carry on from the exact character it stopped at.
-   This repeats until stop_reason is "end_turn" (fully done). ── */
+   This repeats until stop_reason is "end_turn" (fully done). -- */
 async function openaiFetch(prompt, maxTokens = 8000) {
   const messages = [{ role: 'user', content: prompt }];
   let accRaw = '';
@@ -1953,15 +2110,15 @@ async function openaiFetch(prompt, maxTokens = 8000) {
 
     // Pause and ask the user to confirm before sending the follow-up request
     const msg = pass === 1
-      ? 'This PDF is very large and the response was cut off partway through.\n\nEverything extracted so far is saved. Click Continue to fetch the remaining content — this may happen more than once for very long documents.'
-      : `Still going — ${pass} parts fetched so far. Click Continue to fetch more.`;
+      ? 'This PDF is very large and the response was cut off partway through.\n\nEverything extracted so far is saved. Click Continue to fetch the remaining content - this may happen more than once for very long documents.'
+      : `Still going - ${pass} parts fetched so far. Click Continue to fetch more.`;
     await showContinuePrompt(msg);
 
     // Update the loading indicator and build the continuation turn
-    setLoad('Continuing…', `Fetching part ${pass + 1} of this step…`);
+    setLoad('Continuing...', `Fetching part ${pass + 1} of this step...`);
     messages.push(
       { role: 'assistant', content: text },
-      { role: 'user', content: 'Continue exactly from where you left off. Output ONLY the remaining JSON — no preamble, no code fence, no explanation. Begin at the exact character where you stopped.' }
+      { role: 'user', content: 'Continue exactly from where you left off. Output ONLY the remaining JSON - no preamble, no code fence, no explanation. Begin at the exact character where you stopped.' }
     );
   }
 
@@ -1971,10 +2128,10 @@ async function openaiFetch(prompt, maxTokens = 8000) {
   return parseJSON(raw);
 }
 
-/* ── Call 1: Summary & analysis ── */
+/* -- Call 1: Summary & analysis -- */
 async function callOpenAISummary(docText) {
   const truncated = docText.length > 130000
-    ? docText.slice(0, 130000) + '\n\n[Document truncated — full text exceeded limit]'
+    ? docText.slice(0, 130000) + '\n\n[Document truncated - full text exceeded limit]'
     : docText;
 
   const prompt = `You are an expert New Zealand planning consultant analysing a resource consent decision under the Resource Management Act 1991.
@@ -2031,12 +2188,12 @@ JSON structure:
 
 Guidance:
 - isVariation: true if this document is a s127 variation/change to an existing consent (look for "variation", "change", ".1", ".2" suffixes in the RM reference, or explicit variation language); false otherwise
-- originalConsent: the RM number of the original consent being varied (e.g. "RM250534") — only if isVariation is true
-- previousVariations: list any other variation RM references mentioned in the document (e.g. ["RM250534.1"]) — empty array if none
+- originalConsent: the RM number of the original consent being varied (e.g. "RM250534") - only if isVariation is true
+- previousVariations: list any other variation RM references mentioned in the document (e.g. ["RM250534.1"]) - empty array if none
 - For variation documents, base the analysis on the current amended consent wording. Ignore deleted/struck-through wording and prefer added/underlined/bold replacement wording.
-- majorRestrictions: things a buyer might not realise — building platform limits, perpetual maintenance, no-objection clauses, material/colour/height controls, amalgamation conditions, systems required at time of building (water, wastewater, firefighting storage). High = significant impact on rights, medium = noteworthy, low = minor.
+- majorRestrictions: things a buyer might not realise - building platform limits, perpetual maintenance, no-objection clauses, material/colour/height controls, amalgamation conditions, systems required at time of building (water, wastewater, firefighting storage). High = significant impact on rights, medium = noteworthy, low = minor.
 - councilConcerns: technical reports required, standards breached (earthworks near waterbodies, setbacks), natural hazards (flooding, alluvial fans, liquefaction, geotechnical), landscape, infrastructure, ecology.
-- consentNotices: ALL s221 consent notice conditions — building platform covenants, development controls, water, firefighting, wastewater, maintenance. Include conditional ones (e.g. "at time of building erection").
+- consentNotices: ALL s221 consent notice conditions - building platform covenants, development controls, water, firefighting, wastewater, maintenance. Include conditional ones (e.g. "at time of building erection").
 - importantAnalysis: staging, hold points, lapse periods (s125 RMA), other RM consent references, ORC requirements, advice notes, monitoring.
 
 DOCUMENT TEXT:
@@ -2045,7 +2202,7 @@ ${truncated}`;
   return openaiFetch(prompt, 8000);
 }
 
-/* ── Find where the conditions appendix starts in the extracted text ──
+/* -- Find where the conditions appendix starts in the extracted text --
    Some PDFs (especially combined subdivision + land use consents) have long
    assessment reports BEFORE the conditions, which can push them past the
    truncation limit. By slicing to start at the conditions we guarantee they
@@ -2074,7 +2231,7 @@ function looksLikeConditionsHeading(line) {
 }
 
 function findConditionsSectionStart(text) {
-  /* Strategy 0 — variation decisions often append "Updated conditions of RM..."
+  /* Strategy 0 - variation decisions often append "Updated conditions of RM..."
      and may not begin at condition 1 because deleted/added numbering is shown. */
   const updatedAppendixRe = /APPENDIX\s+1\s*[-\u2013\u2014\s]?\s*UPDATED\s+CONDITIONS(?:\s+OF\s+(?:RESOURCE\s+CONSENT\s+)?RM\d+)?/gi;
   let m;
@@ -2093,7 +2250,7 @@ function findConditionsSectionStart(text) {
     if (/(Subdivision Conditions|Land Use|General Conditions|Decision\s+[A-Z]|Engineering)/i.test(after)) return m.index;
   }
 
-  /* Strategy 1 — APPENDIX 1 heading (various dash chars, optional spaces),
+  /* Strategy 1 - APPENDIX 1 heading (various dash chars, optional spaces),
      verified by a "1. " condition following within 600 chars */
   const appendixRe = /APPENDIX\s+1\s*[-\u2013\u2014\s]?\s*(?:COMBINED\s+)?(?:SUBDIVISION(?:\s+AND\s+LAND\s+USE)?\s+)?(?:CONSENT\s+)?CONDITIONS/gi;
   while ((m = appendixRe.exec(text)) !== null) {
@@ -2101,33 +2258,33 @@ function findConditionsSectionStart(text) {
     if (hasNumberedConditionAfter(after)) return m.index;
   }
 
-  /* Strategy 2 — "General Conditions" heading immediately before condition 1 */
+  /* Strategy 2 - "General Conditions" heading immediately before condition 1 */
   const gcRe = /(?:General Conditions|GENERAL CONDITIONS)\s*\n\s*(?:Condition\s+)?1(?:\s*[.)]\s+|\s{2,}|\s+(?=\S))/gi;
   const gcMatch = gcRe.exec(text);
   if (gcMatch) return Math.max(0, gcMatch.index - 200);
 
-  /* Strategy 3 — "SCHEDULE OF CONDITIONS" or similar standalone heading */
+  /* Strategy 3 - "SCHEDULE OF CONDITIONS" or similar standalone heading */
   const schedRe = /SCHEDULES?\s+(?:\d+\s*)?(?:[-:\u2013\u2014]\s*)?OF\s+(?:(?:RESOURCE\s+)?CONSENT\s+)?CONDITIONS/gi;
   while ((m = schedRe.exec(text)) !== null) {
     const after = text.slice(m.index, m.index + 6000);
     if (hasNumberedConditionAfter(after)) return m.index;
   }
 
-  /* Strategy 4 — first numbered condition with typical QLDC opening language */
+  /* Strategy 4 - first numbered condition with typical QLDC opening language */
   const firstCondRe = /\n\s*(?:Condition\s+)?1(?:\.\d{1,3})*(?:\s*[.)]\s+|\s{2,}|\s+)(?:That\s+the\s+development|The\s+consent\s+holder|All\s+engineering\s+works|The\s+development\s+must|The\s+activity|The\s+proposal|The\s+consent|This\s+consent|To\s+ensure|Pursuant\s+to|Subject\s+to)/i.exec(text);
   if (firstCondRe) return Math.max(0, firstCondRe.index - 400);
 
-  /* Strategy 5 — generic "CONDITIONS OF CONSENT" heading with numbered list following */
+  /* Strategy 5 - generic "CONDITIONS OF CONSENT" heading with numbered list following */
   const cocRe = /(?:CONDITIONS\s+OF\s+(?:THE\s+)?(?:RESOURCE\s+)?CONSENT|RESOURCE\s+CONSENT\s+CONDITIONS|CONSENT\s+CONDITIONS|CONDITIONS\s+IMPOSED\s+UNDER\s+S(?:ECTION)?\s*108)/gi;
   while ((m = cocRe.exec(text)) !== null) {
     const after = text.slice(m.index, m.index + 1800);
     if (hasNumberedConditionAfter(after)) return m.index;
   }
 
-  return 0; // final fallback — send full text from start
+  return 0; // final fallback - send full text from start
 }
 
-/* ── Slice the raw extracted text down to just the conditions section ──
+/* -- Slice the raw extracted text down to just the conditions section --
    Prevents the long s95 assessment reports that precede conditions from
    consuming the context window. Returns up to 150k chars from the conditions
    section start, or the first 150k chars of the doc as a fallback. */
@@ -2136,7 +2293,7 @@ function sliceToConditions(docText) {
   const from  = start > 0 ? start : 0;
   const slice = docText.slice(from, from + 150000);
   return slice.length === 150000
-    ? slice + '\n\n[Document truncated — full text exceeded limit]'
+    ? slice + '\n\n[Document truncated - full text exceeded limit]'
     : slice;
 }
 
@@ -2150,11 +2307,11 @@ function conditionExtractionGuardrails() {
 - If a condition has lettered subparts such as a), b), c), d) or nested roman items, the condition continues until the next top-level numbered condition. Page breaks, page numbers, headers, or footers do not end the condition.`;
 }
 
-/* ── Prompt: COMBINED subdivision + land use conditions (single numbered list) ── */
+/* -- Prompt: COMBINED subdivision + land use conditions (single numbered list) -- */
 function conditionsPromptCombined(condText) {
   return `You are an expert New Zealand planning consultant extracting consent conditions from a New Zealand resource consent decision.
 
-This document has COMBINED Subdivision and Land Use Consent Conditions in a single numbered list — do NOT try to separate them.
+This document has COMBINED Subdivision and Land Use Consent Conditions in a single numbered list - do NOT try to separate them.
 
 Return a single valid JSON object. Do NOT include markdown code fences or any text outside the JSON.
 
@@ -2174,19 +2331,19 @@ ${conditionExtractionGuardrails()}
 - Extract EVERY numbered condition. Do not skip any.
 - Treat headings such as "Conditions", "Conditions of Consent", "Resource Consent Conditions", "Consent Conditions", and "Schedule of Conditions" as the consent-condition section, including Southland District Council decisions.
 - Accept condition numbering printed as "1.", "1)", "Condition 1", or "1 The consent holder...".
-- Reproduce condition text IN FULL — include every sub-item (a), (b), (c)… verbatim as part of that condition's text. Do not paraphrase or summarise.
+- Reproduce condition text IN FULL - include every sub-item (a), (b), (c)... verbatim as part of that condition's text. Do not paraphrase or summarise.
 - Classify each condition by stage using the trigger language inside the condition text:
-  - No specific trigger, or under "General Conditions" heading → general
-  - "Prior to commencement of works" / "Prior to bulk earthworks" / "HOLD POINT" / engineering review conditions → priorToWorks
-  - "Prior to the Council signing the Survey Plan" / "prior to section 223" / "s.223" → priorTo223
-  - "Prior to any application for certification pursuant to section 224(c)" / "prior to 224(c)" / "s.224(c)" → priorTo224c
-  - "shall be complied with in perpetuity" / "registered on the relevant Titles" / "Consent Notice" / "s.221" / ongoing land use obligations → ongoing
+  - No specific trigger, or under "General Conditions" heading -> general
+  - "Prior to commencement of works" / "Prior to bulk earthworks" / "HOLD POINT" / engineering review conditions -> priorToWorks
+  - "Prior to the Council signing the Survey Plan" / "prior to section 223" / "s.223" -> priorTo223
+  - "Prior to any application for certification pursuant to section 224(c)" / "prior to 224(c)" / "s.224(c)" -> priorTo224c
+  - "shall be complied with in perpetuity" / "registered on the relevant Titles" / "Consent Notice" / "s.221" / ongoing land use obligations -> ongoing
 
 DOCUMENT TEXT:
 ${condText}`;
 }
 
-/* ── Prompt: Subdivision-only conditions ── */
+/* -- Prompt: Subdivision-only conditions -- */
 function conditionsPromptSubdivision(condText) {
   return `You are an expert New Zealand planning consultant extracting subdivision consent conditions from a New Zealand resource consent decision.
 
@@ -2205,23 +2362,23 @@ JSON structure:
 
 Rules:
 ${conditionExtractionGuardrails()}
-- Extract EVERY subdivision consent condition. Reproduce text in full — do not paraphrase or shorten.
-- Include all sub-items (a), (b), (c)… within a condition as part of that condition's text.
+- Extract EVERY subdivision consent condition. Reproduce text in full - do not paraphrase or shorten.
+- Include all sub-items (a), (b), (c)... within a condition as part of that condition's text.
 - Treat headings such as "Conditions", "Conditions of Consent", "Resource Consent Conditions", "Consent Conditions", and "Schedule of Conditions" as condition-section headings, including Southland District Council decisions.
 - Accept condition numbering printed as "1.", "1)", "Condition 1", or "1 The consent holder...".
 - If the document has no subdivision conditions, return empty arrays.
 - Stage classification (use section headings if present, otherwise infer from trigger language):
-  - "General Conditions" or no trigger → general
-  - "Prior to commencement of works" / engineering acceptance / hold points → priorToWorks
-  - "Prior to section 223" / "s.223" / signing Survey Plan → priorTo223
-  - "Prior to 224(c)" / "s.224(c)" / certification → priorTo224c
-  - Consent notices / "in perpetuity" / s.221 → ongoing
+  - "General Conditions" or no trigger -> general
+  - "Prior to commencement of works" / engineering acceptance / hold points -> priorToWorks
+  - "Prior to section 223" / "s.223" / signing Survey Plan -> priorTo223
+  - "Prior to 224(c)" / "s.224(c)" / certification -> priorTo224c
+  - Consent notices / "in perpetuity" / s.221 -> ongoing
 
 DOCUMENT TEXT:
 ${condText}`;
 }
 
-/* ── Prompt: Land use-only conditions ── */
+/* -- Prompt: Land use-only conditions -- */
 function conditionsPromptLandUse(condText) {
   return `You are an expert New Zealand planning consultant extracting land use consent conditions from a New Zealand resource consent decision.
 
@@ -2242,13 +2399,13 @@ ${conditionExtractionGuardrails()}
 - Treat headings such as "Conditions", "Conditions of Consent", "Resource Consent Conditions", "Consent Conditions", and "Schedule of Conditions" as condition-section headings, including Southland District Council decisions.
 - Accept condition numbering printed as "1.", "1)", "Condition 1", or "1 The consent holder...".
 - If the document has no separate land use conditions (e.g. subdivision-only consent), return empty arrays.
-- Stage: "General Conditions" → general, construction / earthworks → duringConstruction, ongoing / consent notices → ongoing.
+- Stage: "General Conditions" -> general, construction / earthworks -> duringConstruction, ongoing / consent notices -> ongoing.
 
 DOCUMENT TEXT:
 ${condText}`;
 }
 
-/* ── Main flow ── */
+/* -- Main flow -- */
 async function startAnalysis() {
   const errBox = document.getElementById('errBox');
   const loader = document.getElementById('loadingState');
@@ -2270,11 +2427,11 @@ async function startAnalysis() {
   try {
     const text = await extractPdf(selFile);
 
-    setLoad('Analysing (1 of 3)…', 'Identifying restrictions, council concerns and consent notices');
+    setLoad('Analysing (1 of 3)...', 'Identifying restrictions, council concerns and consent notices');
     const summary = await callOpenAISummary(text);
 
-    /* ── Locate conditions section and detect combined consent ──────────────────
-       Search the raw text directly for the "combined" heading — do NOT rely on
+    /* -- Locate conditions section and detect combined consent ------------------
+       Search the raw text directly for the "combined" heading - do NOT rely on
        sliceToConditions first, because if the finder returns 0 the isCombined
        check would look at the wrong part of the document.
        We search up to 300k chars (well past any pre-conditions assessment report). */
@@ -2290,7 +2447,7 @@ async function startAnalysis() {
       : findConditionsSectionStart(text);
     const condSlice = condStart > 0
       ? text.slice(condStart, condStart + 160000)
-      : text.slice(0, 250000);   /* fallback: send first 250k — catches conditions
+      : text.slice(0, 250000);   /* fallback: send first 250k - catches conditions
                                     even when pre-conditions report is very long */
     const condText = condSlice.length >= 160000
       ? condSlice + '\n\n[Document truncated]'
@@ -2299,16 +2456,16 @@ async function startAnalysis() {
     let subdivConds, landUseConds;
 
     if (isCombined) {
-      setLoad('Analysing (2 of 2)…', 'Extracting combined consent conditions');
+      setLoad('Analysing (2 of 2)...', 'Extracting combined consent conditions');
       const result = await openaiFetch(conditionsPromptCombined(condText), 16000);
       subdivConds   = result.subdivisionConditions || {};
       landUseConds  = {};
     } else {
-      setLoad('Analysing (2 of 3)…', 'Extracting subdivision consent conditions');
+      setLoad('Analysing (2 of 3)...', 'Extracting subdivision consent conditions');
       const resultA = await openaiFetch(conditionsPromptSubdivision(condText), 16000);
       subdivConds   = resultA.subdivisionConditions || {};
 
-      setLoad('Analysing (3 of 3)…', 'Extracting land use consent conditions');
+      setLoad('Analysing (3 of 3)...', 'Extracting land use consent conditions');
       const resultB = await openaiFetch(conditionsPromptLandUse(condText), 16000);
       landUseConds  = resultB.landUseConditions || {};
     }
@@ -2364,13 +2521,13 @@ function showErr(msg) {
   b.classList.add('active');
 }
 
-/* ── Mode toggle ── */
+/* -- Mode toggle -- */
 function setMode(mode) {
   expressMode = (mode === 'express');
   document.getElementById('modeBtn-express').classList.toggle('active', expressMode);
   document.getElementById('modeBtn-full').classList.toggle('active', !expressMode);
   document.getElementById('modeDesc').textContent = expressMode
-    ? 'Quick: conditions & key details only — ideal for the 224(c) checklist workflow'
+    ? 'Quick: conditions & key details only - ideal for the 224(c) checklist workflow'
     : 'Full: narrative summary, restrictions, council concerns, consent notices + conditions';
   document.getElementById('analyseBtnLabel').textContent = expressMode ? 'Express Analysis' : 'Full Analysis';
   const btnIcon = document.querySelector('#analyseBtn svg');
@@ -2379,11 +2536,11 @@ function setMode(mode) {
     : '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>';
 }
 
-/* ── Express mode: combined single-pass prompt ── */
+/* -- Express mode: combined single-pass prompt -- */
 function expressPrompt(headerText, condText) {
   return `You are a New Zealand planning consultant extracting structured data from a resource consent decision.
 
-Return ONE valid JSON object — no markdown fences, no text outside the JSON.
+Return ONE valid JSON object - no markdown fences, no text outside the JSON.
 
 {
   "consentDetails": {
@@ -2413,38 +2570,38 @@ Return ONE valid JSON object — no markdown fences, no text outside the JSON.
   }
 }
 
-HEADER EXTRACTION — from the HEADER SECTION below, extract:
+HEADER EXTRACTION - from the HEADER SECTION below, extract:
 rmReference, applicant, location, legalDescription, consentType, activityStatus, decisionDate, consentHolder, isVariation, originalConsent, previousVariations.
 - isVariation: true if this document is a s127 variation/change to an existing consent; false otherwise.
 - originalConsent: the RM number being varied (for example "RM170622") if stated.
 
-CONDITIONS EXTRACTION — from the CONDITIONS SECTION below:
+CONDITIONS EXTRACTION - from the CONDITIONS SECTION below:
 ${conditionExtractionGuardrails()}
 - Extract EVERY numbered condition verbatim. Do not paraphrase or shorten any condition text.
 - Treat headings such as "Conditions", "Conditions of Consent", "Resource Consent Conditions", "Consent Conditions", and "Schedule of Conditions" as consent-condition headings, including Southland District Council decisions.
 - Accept condition numbering printed as "1.", "1)", "Condition 1", or "1 The consent holder...".
-- Include all sub-items (a), (b), (c)… as part of the parent condition's text field.
+- Include all sub-items (a), (b), (c)... as part of the parent condition's text field.
 - COMBINED consent (single numbered list for both subdivision and land use): put ALL conditions into subdivisionConditions; return empty arrays for landUseConditions.
 - SEPARATE consents: split conditions into subdivisionConditions and landUseConditions as appropriate.
 - Stage classification (use section headings if present, otherwise infer from trigger language):
-  - No specific trigger / under "General Conditions" heading → general
-  - "Prior to commencement of works" / engineering review / hold points → priorToWorks
-  - "Prior to section 223" / signing Survey Plan → priorTo223
-  - "Prior to section 224(c)" / certification → priorTo224c
-  - Consent notices / "in perpetuity" / s.221 / ongoing obligations → ongoing
-  - Construction / earthworks (land use only) → duringConstruction
+  - No specific trigger / under "General Conditions" heading -> general
+  - "Prior to commencement of works" / engineering review / hold points -> priorToWorks
+  - "Prior to section 223" / signing Survey Plan -> priorTo223
+  - "Prior to section 224(c)" / certification -> priorTo224c
+  - Consent notices / "in perpetuity" / s.221 / ongoing obligations -> ongoing
+  - Construction / earthworks (land use only) -> duringConstruction
 
-═══ HEADER SECTION (first pages of document) ═══
+=== HEADER SECTION (first pages of document) ===
 ${headerText}
 
-═══ CONDITIONS SECTION ═══
+=== CONDITIONS SECTION ===
 ${condText}`;
 }
 
-/* ── Express analysis flow (single API call) ── */
+/* -- Express analysis flow (single API call) -- */
 async function startExpressAnalysis(btn, loader) {
   try {
-    setLoad('Extracting PDF text…', 'Please wait, this may take a moment for large documents');
+    setLoad('Extracting PDF text...', 'Please wait, this may take a moment for large documents');
     const text = await extractPdf(selFile);
 
     // Header slice: first 3 000 chars covers the opening pages where appellation info lives
@@ -2461,7 +2618,7 @@ async function startExpressAnalysis(btn, loader) {
       ? condSlice + '\n\n[Document truncated]'
       : condSlice;
 
-    setLoad('Express analysis…', 'Extracting consent details and all conditions in one pass');
+    setLoad('Express analysis...', 'Extracting consent details and all conditions in one pass');
     const result = await openaiFetch(expressPrompt(headerText, condText), 16000);
 
     const cd = result.consentDetails || {};
@@ -2527,13 +2684,13 @@ async function startExpressAnalysis(btn, loader) {
   }
 }
 
-/* ── Textarea-safe escape (no <br> conversion) ── */
+/* -- Textarea-safe escape (no <br> conversion) -- */
 function xt(str) {
   if (str == null) return '';
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-/* ── Engineering Acceptance condition detector ── */
+/* -- Engineering Acceptance condition detector -- */
 function jsq(str) {
   return String(str == null ? '' : str)
     .replace(/\\/g, '\\\\')
@@ -2548,8 +2705,8 @@ function isEACond(c) {
 
 function stripConditionTextNoise(text) {
   let out = String(text || '').trim();
-  out = out.replace(/^\s*(?:[-–—•]\s*)?(?:General|Subdivision|Land\s+Use|Engineering|Civil\s+Works|Ongoing|During\s+Construction)(?:\s+(?:Consent\s+)?Conditions?)?\s*[:–—-]\s*/i, '');
-  out = out.replace(/^\s*(?:General|Subdivision|Land\s+Use|Engineering|Civil\s+Works)\s+Condition\s*(?:No\.?\s*)?[\w().-]*\s*[:–—-]\s*/i, '');
+  out = out.replace(/^\s*(?:[-\u2013\u2014\u2022]\s*)?(?:General|Subdivision|Land\s+Use|Engineering|Civil\s+Works|Ongoing|During\s+Construction)(?:\s+(?:Consent\s+)?Conditions?)?\s*[:\u2013\u2014-]\s*/i, '');
+  out = out.replace(/^\s*(?:General|Subdivision|Land\s+Use|Engineering|Civil\s+Works)\s+Condition\s*(?:No\.?\s*)?[\w().-]*\s*[:\u2013\u2014-]\s*/i, '');
   return out.trim();
 }
 
@@ -2557,7 +2714,7 @@ function isAdviceNoteCondition(c) {
   const number = String(c?.number || '').trim();
   const text = String(c?.text || '').trim();
   const combined = (number + ' ' + text).trim();
-  const adviceRe = /^(?:[-–—•➢]\s*)?(?:top\s+and\s+note|advice\s+notes?|advisory\s+notes?|notes?|note)\b/i;
+  const adviceRe = /^(?:[-\u2013\u2014\u2022\u27a2]\s*)?(?:top\s+and\s+note|advice\s+notes?|advisory\s+notes?|notes?|note)\b/i;
   return adviceRe.test(combined) || adviceRe.test(text);
 }
 
@@ -3021,7 +3178,7 @@ function repairEADataFromRawBlocks(ea, rawBlocks) {
   return out;
 }
 
-/* ── Build a single interactive condition row ── */
+/* -- Build a single interactive condition row -- */
 function effectiveResponsibilityMatrix(opts = {}) {
   ensurePmState();
   const includeHidden = !!opts.includeHidden;
@@ -4165,7 +4322,7 @@ function renderProgressAssigneeChips(conditionKey, item, opts = {}) {
     const removeAction = opts.removeHandler
       ? `${opts.removeHandler}('${jsq(key)}')`
       : `removeProgressAssignee('${jsq(conditionKey)}','${jsq(item.id)}','${jsq(key)}',true)`;
-    const remove = opts.locked ? '' : `<button type="button" onclick="event.stopPropagation();${removeAction}" title="Remove ${x(label)}">&times;</button>`;
+    const remove = opts.locked ? '' : `<button type="button" onclick="event.stopPropagation();${removeAction}" title="Remove ${x(label)}">x</button>`;
     return `<span class="prog-party-chip ${x(colorClass)}"><span>${x(label)}</span>${remove}</span>`;
   }).join('');
 }
@@ -5189,16 +5346,16 @@ function condRow(stageKey, idx, c, opts = {}) {
   return `
   <div class="crow${c.isSub ? ' is-sub' : ''}${isEaCondition ? ' ea-cond' : ''}${st.checked ? ' done' : ''}${isFlagged ? ' flagged' : ''}" id="crow_${domKey}" data-condition-key="${xt(key)}">
     <input type="checkbox" class="crow-cb"${st.checked ? ' checked' : ''} onchange="setCond('${key}','checked',this.checked)">
-    <div class="cnum">${x(c.number || '—')}</div>
+    <div class="cnum">${x(c.number || '-')}</div>
     <div class="crow-r">
       <div class="ctext">${eaTag}${x(c.text)}</div>
       ${renderPmConditionResponsibilityEditor(key, c)}
       ${renderProgressItems(key)}
       <div class="crow-note-wrap" id="cnote_${domKey}"${hasNote ? '' : ' style="display:none"'}>
-        <textarea class="crow-note-ta" placeholder="Developer note…" oninput="setCond('${key}','comment',this.value)">${xt(st.comment || '')}</textarea>
+        <textarea class="crow-note-ta" placeholder="Developer note..." oninput="setCond('${key}','comment',this.value)">${xt(st.comment || '')}</textarea>
       </div>
       <div class="crow-actions">
-        <button class="crow-note-btn" id="cnotebtn_${domKey}" onclick="togNote('${domKey}')">${hasNote ? '− Hide comment' : '+ Add comment for checklist'}</button>
+        <button class="crow-note-btn" id="cnotebtn_${domKey}" onclick="togNote('${domKey}')">${hasNote ? '- Hide comment' : '+ Add comment for checklist'}</button>
         ${splitButton}
         <button class="crow-flag-btn${isFlagged ? ' active' : ''}" id="cflagbtn_${domKey}" data-flag-condition-key="${xt(key)}" onclick="toggleFlag('${key}')" title="${isFlagged ? 'Remove flag' : 'Flag this condition'}">${flagSvg(isFlagged)}${isFlagged ? 'Flagged' : 'Flag'}</button>
       </div>
@@ -5319,18 +5476,18 @@ function renderFlaggedConditions() {
     </div>`;
 }
 
-/* ── Toggle note visibility ── */
+/* -- Toggle note visibility -- */
 function togNote(key) {
   const wrap = document.getElementById('cnote_' + key);
   const btn  = document.getElementById('cnotebtn_' + key);
   if (!wrap) return;
   const show = wrap.style.display === 'none';
   wrap.style.display = show ? '' : 'none';
-  btn.textContent = show ? '− Hide comment' : '+ Add comment for checklist';
+  btn.textContent = show ? '- Hide comment' : '+ Add comment for checklist';
   if (show) wrap.querySelector('textarea').focus();
 }
 
-/* ── Update a condition's checked / comment / flagged state ── */
+/* -- Update a condition's checked / comment / flagged state -- */
 function setCond(key, field, value) {
   const state = ensureCondStateEntry(key);
   if (field === 'checked') setConditionCompletionState(key, !!value);
@@ -5357,13 +5514,13 @@ function setCond(key, field, value) {
   }
 }
 
-/* ── Toggle flag on a condition ── */
+/* -- Toggle flag on a condition -- */
 function toggleFlag(key) {
   const current = !!(condState[key]?.flagged);
   setCond(key, 'flagged', !current);
 }
 
-/* ── Auto-save to localStorage ── */
+/* -- Auto-save to localStorage -- */
 function flushAutoSave() {
   if (autoSaveTimer) {
     clearTimeout(autoSaveTimer);
@@ -5380,11 +5537,11 @@ function flushAutoSave() {
   const el = document.getElementById('saveStatus');
   if (el) {
     const t = new Date().toLocaleTimeString('en-NZ', { hour: '2-digit', minute: '2-digit' });
-    el.textContent = '✓ Saved ' + t;
+    el.textContent = 'Saved ' + t;
   }
 }
 
-/* ── Load saved state from localStorage ── */
+/* -- Load saved state from localStorage -- */
 function scheduleAutoSave(delay = 90) {
   if (!data) return;
   if (autoSaveTimer) clearTimeout(autoSaveTimer);
@@ -5429,7 +5586,7 @@ function loadSavedState() {
   }
 }
 
-/* ── Update PDF links in both page headers ── */
+/* -- Update PDF links in both page headers -- */
 function updatePdfLinks() {
   ['pdfLinkCond'].forEach(id => {
     const el = document.getElementById(id);
@@ -5437,7 +5594,7 @@ function updatePdfLinks() {
   });
 }
 
-/* ── Export progress as JSON file (includes full data for session restore) ── */
+/* -- Export progress as JSON file (includes full data for session restore) -- */
 function exportProgressFilename(ref, date = new Date()) {
   const rm = String(ref || 'unknown').trim().replace(/[^a-zA-Z0-9_-]+/g, '_').replace(/^_+|_+$/g, '') || 'unknown';
   const yy = String(date.getFullYear()).slice(-2);
@@ -5461,13 +5618,13 @@ function exportProgress() {
   scheduleLinkedRmSave(80);
 }
 
-/* ── Save progress then navigate back to conditions page ── */
+/* -- Save progress then navigate back to conditions page -- */
 function saveAndReturn() {
   exportProgress();
   showPage('conditions');
 }
 
-/* ── Core session loader — used by both the upload page drop zone and conditions Load button ── */
+/* -- Core session loader - used by both the upload page drop zone and conditions Load button -- */
 function loadSessionFromFile(file) {
   if (!file) return;
   const reader = new FileReader();
@@ -5475,13 +5632,18 @@ function loadSessionFromFile(file) {
     try {
       const obj = JSON.parse(ev.target.result);
       if (applySessionObject(obj)) return;
-      const incomingCondState = obj.condState || (obj.data || obj.pmState ? {} : obj);
+      const incomingCondState = obj.condState || (obj.data || obj.pmState || obj.testingPlan ? {} : obj);
       condState = normalizeCondStateMap(incomingCondState);
       const hasPmState = obj.pmState && typeof obj.pmState === 'object';
+      const hasTestingPlan = obj.testingPlan && typeof obj.testingPlan === 'object' && !Array.isArray(obj.testingPlan);
       pmState = hasPmState ? obj.pmState : (data && !obj.data ? pmState : defaultPmState());
+      if (hasTestingPlan) {
+        pmState = pmState && typeof pmState === 'object' ? pmState : defaultPmState();
+        pmState.testingPlan = obj.testingPlan;
+      }
       ensurePmState();
       if (obj.data) {
-        // Full session (version 2+) — restore analysis data and navigate
+        // Full session (version 2+) - restore analysis data and navigate
         data = obj.data;
         repairExtractedConditionsFromStoredBlocks(data);
         cleanAnalysisData(data);
@@ -5492,21 +5654,21 @@ function loadSessionFromFile(file) {
         updatePdfLinks();
         showPage('conditions');
       } else if (data) {
-        // Legacy: condState only — re-render if a consent is already loaded
+        // Legacy: condState only - re-render if a consent is already loaded
         renderConditions(data);
         autoSave();
         showPage('conditions');
       } else {
-        alert('This file only contains progress notes — no analysis data was found.\n\nPlease analyse the PDF first (or use a newer .json export that includes the full session), then use Load in the conditions header.');
+        alert('This file only contains progress notes - no analysis data was found.\n\nPlease analyse the PDF first (or use a newer .json export that includes the full session), then use Load in the conditions header.');
       }
     } catch (_) {
-      alert('Could not read the progress file — make sure it is a valid .json file exported from this app.');
+      alert('Could not read the progress file - make sure it is a valid .json file exported from this app.');
     }
   };
   reader.readAsText(file);
 }
 
-/* ── Import progress — conditions page Load button ── */
+/* -- Import progress - conditions page Load button -- */
 function importProgress() {
   const inp    = document.createElement('input');
   inp.type     = 'file';
@@ -5517,7 +5679,7 @@ function importProgress() {
   setTimeout(() => inp.remove(), 2000);
 }
 
-/* ── Show / hide the resume banner on the upload page ── */
+/* -- Show / hide the resume banner on the upload page -- */
 function updateResumeBanner() {
   const banner = document.getElementById('resumeBanner');
   if (!banner) return;
@@ -5531,7 +5693,7 @@ function updateResumeBanner() {
   }
 }
 
-/* ── Summary section accordion ── */
+/* -- Summary section accordion -- */
 let saId = 0;
 function sumAcc(iconName, color, title, subtitle, content, open = true) {
   const id = 'sa' + (++saId);
@@ -5554,30 +5716,30 @@ function togSumAcc(btn, id) {
   document.getElementById(id).classList.toggle('open');
 }
 
-/* ── Render summary ── */
+/* -- Render summary -- */
 function renderSummary(d) {
   const cd = d.consentDetails || {};
   const workspaceTitle = document.getElementById('workspaceTitle');
   const condSubEl = document.getElementById('condSub');
-  condSubEl.textContent = (cd.rmReference || '') + (cd.applicant ? ' — ' + cd.applicant : '');
+  condSubEl.textContent = (cd.rmReference || '') + (cd.applicant ? ' - ' + cd.applicant : '');
   if (d._expressMode) {
     condSubEl.innerHTML += ' <span style="background:#dbeafe;color:#1b4f8a;font-size:.67rem;font-weight:700;padding:1px 8px;border-radius:100px;letter-spacing:.03em;vertical-align:middle">EXPRESS</span>';
   }
 
   const granted = (cd.decision || '').toLowerCase().includes('grant');
   const decCls  = granted ? 'db-granted' : 'db-other';
-  const notiTxt = cd.notified || '—';
+  const notiTxt = cd.notified || '-';
 
   if (workspaceTitle) {
-    workspaceTitle.textContent = (cd.isVariation ? 'Variation — ' : '') + (cd.rmReference || 'Resource Consent Analysis');
+    workspaceTitle.textContent = (cd.isVariation ? 'Variation - ' : '') + (cd.rmReference || 'Resource Consent Analysis');
   }
 
-  // ── Consent details card (always visible, not collapsible) ──
+  // -- Consent details card (always visible, not collapsible) --
   const varInfo = cd.isVariation ? `
       <div class="detail-variation">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 1 4-4h12"/></svg>
         Variation to <strong>${x(cd.originalConsent || 'original consent')}</strong>
-        ${cd.previousVariations?.length ? ` &nbsp;·&nbsp; Previous: ${cd.previousVariations.map(v => `<span>${x(v)}</span>`).join(', ')}` : ''}
+        ${cd.previousVariations?.length ? ` - Previous: ${cd.previousVariations.map(v => `<span>${x(v)}</span>`).join(', ')}` : ''}
       </div>` : '';
 
   let html = `
@@ -5590,10 +5752,10 @@ function renderSummary(d) {
         ${x(cd.location)}
       </div>
       <div class="detail-badges">
-        ${cd.isVariation ? `<span class="dbadge db-variation">▲ Variation</span>` : ''}
+        ${cd.isVariation ? `<span class="dbadge db-variation">Variation</span>` : ''}
         ${d._expressMode
           ? `<span class="dbadge" style="background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.3)">Express</span>`
-          : `<span class="dbadge ${decCls}">✓ ${x(cd.decision || 'See document')}</span>
+          : `<span class="dbadge ${decCls}">${x(cd.decision || 'See document')}</span>
         <span class="dbadge db-notify">${x(notiTxt)}</span>`}
       </div>
       ${varInfo}
@@ -5609,7 +5771,7 @@ function renderSummary(d) {
     </div>
   </div>`;
 
-  // ── Engineering Acceptance card ──
+  // -- Engineering Acceptance card --
   if (hasEAConditions()) {
     const ea = data.eaData;
     if (!ea) {
@@ -5634,8 +5796,8 @@ function renderSummary(d) {
         ea.date || '',
         ea.engineer ? 'Issued by ' + ea.engineer : '',
         ea.validityPeriod ? 'Valid ' + ea.validityPeriod : ''
-      ].filter(Boolean).join(' · ');
-      const eaTitle = (ea.eaReference || 'Engineering Acceptance') + (ea.outcome ? ' — ' + ea.outcome : '');
+      ].filter(Boolean).join(' - ');
+      const eaTitle = (ea.eaReference || 'Engineering Acceptance') + (ea.outcome ? ' - ' + ea.outcome : '');
       const condCount = Array.isArray(ea.eaConditions) ? ea.eaConditions.length : 0;
       html += `
   <div class="ea-sum-card accepted" style="position:relative">
@@ -5647,12 +5809,12 @@ function renderSummary(d) {
       ${ea.summary ? `<p style="margin-top:4px">${x(ea.summary)}</p>` : ''}
       ${eaPdfObjectUrl ? `<a href="${eaPdfObjectUrl}" target="_blank" class="ea-pdf-link"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>View PDF</a>` : ''}
     </div>
-    <button class="btn btn-ghost btn-sm" style="font-size:.72rem;flex-shrink:0;align-self:flex-start" onclick="clearEngineeringAcceptanceData()" title="Remove EA">✕ Remove</button>
+    <button class="btn btn-ghost btn-sm" style="font-size:.72rem;flex-shrink:0;align-self:flex-start" onclick="clearEngineeringAcceptanceData()" title="Remove EA">Remove</button>
   </div>`;
     }
   }
 
-  // ── Express info card OR full narrative ──
+  // -- Express info card OR full narrative --
   if (d._expressMode) {
     html += `
   <div class="ea-sum-card pending" style="background:#f0f6ff;border-color:#a8c4e0">
@@ -5671,7 +5833,7 @@ function renderSummary(d) {
       `<p class="sum-text">${x(d.summary)}</p>`, false);
   }
 
-  // ── Major Restrictions ──
+  // -- Major Restrictions --
   if (d.majorRestrictions?.length) {
     const inner = d.majorRestrictions.map(r => `
     <div class="rest ${x(r.severity||'medium')}">
@@ -5682,7 +5844,7 @@ function renderSummary(d) {
       'Key limitations not immediately obvious from the decision', inner, false);
   }
 
-  // ── Council Concerns ──
+  // -- Council Concerns --
   if (d.councilConcerns?.length) {
     const inner = d.councilConcerns.map(c => `
     <div class="conc">
@@ -5697,7 +5859,7 @@ function renderSummary(d) {
       'Issues council needed to be satisfied about before approving', inner, false);
   }
 
-  // ── Consent Notices ──
+  // -- Consent Notices --
   if (d.consentNotices?.length) {
     const inner = d.consentNotices.map(n => `
     <div class="notice">
@@ -5712,7 +5874,7 @@ function renderSummary(d) {
       'Covenants and notices to be registered on title (s.221 RMA)', inner, false);
   }
 
-  // ── Important Analysis ──
+  // -- Important Analysis --
   if (d.importantAnalysis?.length) {
     const inner = d.importantAnalysis.map(a => `
     <div class="anal">
@@ -5727,7 +5889,7 @@ function renderSummary(d) {
   setupEaPdfDropZone('eaSummaryDz');
 }
 
-/* ── Render conditions ── */
+/* -- Render conditions -- */
 function renderConditions(d) {
   const c  = d.conditions || {};
   const sc = c.subdivisionConditions || {};
@@ -5766,7 +5928,7 @@ function renderConditions(d) {
     html += `<div class="consent-type-header"><span class="consent-type-badge landuse">Land Use Conditions</span></div>` + landHtml;
   }
 
-  if (!html) html = '<div class="card"><p style="color:var(--muted);text-align:center;padding:20px">No conditions extracted — check the PDF was readable.</p></div>';
+  if (!html) html = '<div class="card"><p style="color:var(--muted);text-align:center;padding:20px">No conditions extracted - check the PDF was readable.</p></div>';
   document.getElementById('condContent').innerHTML = html;
   renderEAPanel();
   conditionsPanelDirty = false;
@@ -5796,7 +5958,7 @@ function renderConditionsPreservingAccordions() {
   restoreConditionAccordionState(state);
 }
 
-/* ── Split conditions like "10. Main text: a) Sub a b) Sub b" into separate rows ── */
+/* -- Split conditions like "10. Main text: a) Sub a b) Sub b" into separate rows -- */
 function expandSubConditions(conds) {
   const out = [];
   for (const c of conds) {
@@ -5808,7 +5970,7 @@ function expandSubConditions(conds) {
     const numSubs = Math.floor((parts.length - 1) / 2);
 
     if (numSubs < 1) {
-      // No sub-conditions found — check inline pattern "a) ... b) ..."
+      // No sub-conditions found - check inline pattern "a) ... b) ..."
       // Only split inline if there are at least two sub-items (reduces false positives)
       const inline = text.split(/\s+([a-z])\)\s+(?=[a-z(])/);
       if (Math.floor((inline.length - 1) / 2) >= 2) {
@@ -5869,7 +6031,7 @@ function accSection(label, pill, cls, conds, stageKey) {
   const expanded = expandSubConditionsForRender(conds);
   const topCount = expanded.filter(c => !c.isSub).length;
   const subCount = expanded.filter(c => c.isSub).length;
-  const countLabel = topCount + (subCount ? ` conditions · ${subCount} sub-items` : ` condition${topCount !== 1 ? 's' : ''}`);
+  const countLabel = topCount + (subCount ? ` conditions - ${subCount} sub-items` : ` condition${topCount !== 1 ? 's' : ''}`);
 
   const body = expanded.map((c, idx) => condRow(sk, idx, c, { sourceIndex: c._sourceIndex })).join('');
 
@@ -5903,7 +6065,7 @@ function allAcc(open) {
   });
 }
 
-/* ── Icons ── */
+/* -- Icons -- */
 function conditionListForStageKey(stageKey) {
   const key = String(stageKey || '');
   if (key === 'ea') return data?.eaData && Array.isArray(data.eaData.eaConditions) ? data.eaData.eaConditions : null;
@@ -5985,7 +6147,7 @@ function icon(name) {
 }
 
 
-/* ── Safe HTML escape (preserves <br> for newlines) ── */
+/* -- Safe HTML escape (preserves <br> for newlines) -- */
 function x(str) {
   if (str == null) return '';
   return String(str)
@@ -5996,7 +6158,7 @@ function x(str) {
     .replace(/\n/g, '<br>');
 }
 
-/* ── Export self-contained HTML report ── */
+/* -- Export self-contained HTML report -- */
 function exportHTML() {
   if (!data) return;
   const cd = data.consentDetails || {};
@@ -6021,8 +6183,8 @@ function exportHTML() {
           ${x(cd.location)}
         </div>
         <div class="detail-badges">
-          <span class="dbadge ${decCls}">&#10003; ${x(cd.decision || 'See document')}</span>
-          <span class="dbadge db-notify">${x(cd.notified || '&mdash;')}</span>
+          <span class="dbadge ${decCls}">${x(cd.decision || 'See document')}</span>
+          <span class="dbadge db-notify">${x(cd.notified || '-')}</span>
         </div>
       </div>
       <div class="detail-body">
@@ -6034,7 +6196,7 @@ function exportHTML() {
       </div>
     </div>`;
 
-  /* Static section builder — .open class makes body visible without JS */
+  /* Static section builder - .open class makes body visible without JS */
   function expSect(iconName, colorCls, title, subtitle, content) {
     return `
     <div class="sacc">
@@ -6121,7 +6283,7 @@ function exportHTML() {
     const expanded = expandSubConditionsRobust(condList);
     const topCount = expanded.filter(cc => !cc.isSub).length;
     const subCount = expanded.filter(cc => cc.isSub).length;
-    const countLabel = topCount + (subCount ? ` conditions &middot; ${subCount} sub-items` : ` condition${topCount !== 1 ? 's' : ''}`);
+    const countLabel = topCount + (subCount ? ` conditions - ${subCount} sub-items` : ` condition${topCount !== 1 ? 's' : ''}`);
     return `
     <div class="acc">
       <div class="acc-hd open" style="cursor:default">
@@ -6134,7 +6296,7 @@ function exportHTML() {
       <div class="acc-body open">
         ${expanded.map(cc => `
         <div class="crow${cc.isSub ? ' is-sub' : ''}">
-          <div class="cnum">${x(cc.number || '&mdash;')}</div>
+          <div class="cnum">${x(cc.number || '-')}</div>
           <div class="ctext">${x(cc.text)}</div>
         </div>`).join('')}
       </div>
@@ -6162,7 +6324,7 @@ function exportHTML() {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${x(ref)} &mdash; Resource Consent Analysis</title>
+  <title>${x(ref)} - Resource Consent Analysis</title>
   <style>
 ${css}
   </style>
@@ -6170,7 +6332,7 @@ ${css}
 <body style="background:var(--bg)">
   <div style="background:var(--primary);color:#fff;padding:10px 22px;display:flex;align-items:center;gap:10px;font-size:.82rem">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-    Resource Consent Analyser &mdash; Exported ${genDate}
+    Resource Consent Analyser - Exported ${genDate}
   </div>
   <div class="content" style="padding-top:20px">${body}</div>
   <div class="footer">Generated by Resource Consent Analyser on ${genDate}. For informational purposes only. Always consult a qualified planning professional.</div>
@@ -6188,7 +6350,7 @@ ${css}
   setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
 }
 
-/* ══════════════════════ ENGINEERING ACCEPTANCE ══════════════════════ */
+/* ====================== ENGINEERING ACCEPTANCE ====================== */
 
 /* Does this consent have any Engineering Acceptance conditions? */
 function hasEAConditions() {
@@ -6247,7 +6409,7 @@ function renderEAPanel() {
           <input type="file" id="eaFileIn" accept=".pdf" onchange="processEAPdf(this.files[0])">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="color:#e8a020"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           <h4>Drop Engineering Acceptance PDF here</h4>
-          <p>Or click to browse — accepts approved EA letters from QLDC</p>
+          <p>Or click to browse - accepts approved EA letters from QLDC</p>
         </div>
       </div>
     </div>`;
@@ -6263,12 +6425,12 @@ function renderEAPanel() {
       <div class="ea-acc-hdr">
         <svg class="ea-acc-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         <div style="flex:1">
-          <h4>${x(ea.eaReference || 'Engineering Acceptance')} — ${x(ea.outcome || 'Accepted')}</h4>
-          <p>${[ea.date, ea.engineer ? 'Issued by ' + ea.engineer : '', ea.validityPeriod ? 'Valid ' + ea.validityPeriod : ''].filter(Boolean).join(' · ')}</p>
+          <h4>${x(ea.eaReference || 'Engineering Acceptance')} - ${x(ea.outcome || 'Accepted')}</h4>
+          <p>${[ea.date, ea.engineer ? 'Issued by ' + ea.engineer : '', ea.validityPeriod ? 'Valid ' + ea.validityPeriod : ''].filter(Boolean).join(' - ')}</p>
           ${ea.consentConditionsAddressed?.length ? `<p style="margin-top:3px">Addresses consent condition${ea.consentConditionsAddressed.length !== 1 ? 's' : ''}: <strong>${ea.consentConditionsAddressed.map(v => x(v)).join(', ')}</strong></p>` : ''}
           ${eaPdfObjectUrl ? `<a href="${eaPdfObjectUrl}" target="_blank" class="ea-pdf-link" style="margin-top:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>View original EA PDF</a>` : ''}
         </div>
-        <button class="btn btn-ghost btn-sm" style="font-size:.72rem;flex-shrink:0" onclick="clearEngineeringAcceptanceData()" title="Remove EA">✕ Remove</button>
+        <button class="btn btn-ghost btn-sm" style="font-size:.72rem;flex-shrink:0" onclick="clearEngineeringAcceptanceData()" title="Remove EA">Remove</button>
       </div>
       ${condHtml}
     </div>`;
@@ -6278,7 +6440,7 @@ function renderEAPanel() {
 function sliceEAAnalysisText(docText) {
   const text = String(docText || '');
   const markers = [
-    /\n\s*(?:➢\s*)?Advice Notes?\s*:/i,
+    /\n\s*(?:\u27a2\s*)?Advice Notes?\s*:/i,
     /\n\s*Please do not hesitate to contact/i,
     /\n\s*Attachment List\b/i,
     /\n\s*ATTACHMENT\s+A\b/i
@@ -6329,7 +6491,7 @@ ${truncated}`;
   return openaiFetch(prompt, 4000);
 }
 
-/* Process an uploaded EA PDF — extract text, call OpenAI, store result, re-render */
+/* Process an uploaded EA PDF - extract text, call OpenAI, store result, re-render */
 async function processEAPdf(file) {
   if (!file) return;
 
@@ -6339,12 +6501,12 @@ async function processEAPdf(file) {
 
   const panel = document.getElementById('eaPanel');
   const summaryDropZone = document.getElementById('eaSummaryDz');
-  if (panel) panel.innerHTML = `<div class="ea-panel"><div class="ea-proc"><div class="spinner" style="margin:0 auto 10px"></div>Reading EA document…</div></div>`;
+  if (panel) panel.innerHTML = `<div class="ea-panel"><div class="ea-proc"><div class="spinner" style="margin:0 auto 10px"></div>Reading EA document...</div></div>`;
   if (summaryDropZone) summaryDropZone.innerHTML = `<div class="ea-proc"><div class="spinner" style="margin:0 auto 10px"></div>Reading EA document...</div>`;
 
   try {
     const text = await extractPdf(file);
-    if (panel) panel.innerHTML = `<div class="ea-panel"><div class="ea-proc"><div class="spinner" style="margin:0 auto 10px"></div>Extracting EA conditions with OpenAI…</div></div>`;
+    if (panel) panel.innerHTML = `<div class="ea-panel"><div class="ea-proc"><div class="spinner" style="margin:0 auto 10px"></div>Extracting EA conditions with OpenAI...</div></div>`;
     if (summaryDropZone) summaryDropZone.innerHTML = `<div class="ea-proc"><div class="spinner" style="margin:0 auto 10px"></div>Extracting EA conditions...</div>`;
 
     const result = await callOpenAIAnalyseEA(text);
@@ -6364,7 +6526,7 @@ async function processEAPdf(file) {
   }
 }
 
-/* ── s224(c) Checklist Export ── */
+/* -- s224(c) Checklist Export -- */
 
 /* Flatten all consent conditions into a keyed list (matches condRow key format) */
 function flattenConditions() {
@@ -6399,7 +6561,7 @@ function flattenConditions() {
   return out;
 }
 
-/* ── Flatten subdivision conditions only, with condState notes ── */
+/* -- Flatten subdivision conditions only, with condState notes -- */
 function flattenProjectManagementConditions() {
   if (flatConditionCacheData === data && flatConditionCache) return flatConditionCache;
   const out = flattenConditions().map(c => ({ ...c, source: 'Resource Consent' }));
@@ -6507,7 +6669,8 @@ function defaultPmState() {
     showGanttOnTaska: false,
     taskaGanttMode: 'off',
     hideCompletedGanttItems: false,
-    progressItems: {}
+    progressItems: {},
+    testingPlan: defaultTestingPlanState()
   };
 }
 
@@ -6590,7 +6753,1289 @@ function ensurePmState() {
       .map(normalizeProgressItem)
       .filter(Boolean);
   });
+  pmState.testingPlan = normalizeTestingPlanState(pmState.testingPlan);
   return pmState;
+}
+
+function defaultTestingPlanState() {
+  return {
+    version: TESTING_PLAN_VERSION,
+    lastScan: '',
+    lastScanSignature: '',
+    scanSummary: '',
+    notes: [],
+    components: [],
+    suggestedRows: [],
+    rows: [],
+    activeComponentId: '',
+    showHoldPointColumn: true
+  };
+}
+
+function testingNewId(prefix = 'tp') {
+  return prefix + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+}
+
+function testingCleanId(value, prefix = 'tp') {
+  const id = String(value || '').trim().replace(/[^a-zA-Z0-9_-]/g, '');
+  return id || testingNewId(prefix);
+}
+
+function testingStringArray(value) {
+  if (Array.isArray(value)) return value.map(v => String(v || '').trim()).filter(Boolean);
+  if (typeof value === 'string') return value.split(/\r?\n|;/).map(v => v.trim()).filter(Boolean);
+  return [];
+}
+
+function testingLocationsText(locations) {
+  return testingStringArray(locations).join('\n');
+}
+
+function testingSectionForType(type) {
+  const t = String(type || '').trim();
+  if (t === 'earthworks' || t === 'retaining') return 'EARTHWORKS';
+  if (t === 'roading') return 'ROADING';
+  if (t === 'stormwater') return 'STORMWATER';
+  if (t === 'wastewater') return 'WASTEWATER / FOUL SEWER';
+  if (t === 'water') return 'WATER RETICULATION / SERVICES';
+  if (t === 'landscape') return 'LANDSCAPE / RESERVES';
+  if (t === 'utilities') return 'NETWORK UTILITIES';
+  if (t === 'trafficSignals') return 'TRAFFIC SIGNALS';
+  return 'OTHER';
+}
+
+function testingNormalizeSection(section, type = '') {
+  const value = String(section || '').trim().toUpperCase();
+  const match = TESTING_SECTION_OPTIONS.find(s => s.toUpperCase() === value);
+  return match || testingSectionForType(type);
+}
+
+function testingNormalizeSurface(value) {
+  const text = String(value || '').trim().toLowerCase();
+  if (!text || text === 'n/a' || text === 'na') return 'n/a';
+  if (/unknown|unsure|unclear|tbc/.test(text)) return 'unknown';
+  if (/gravel|unsealed|metal/.test(text)) return 'gravel / unsealed';
+  if (/chip/.test(text)) return 'chipseal';
+  if (/asphalt|\\bac\\b/.test(text)) return 'asphalt';
+  if (/concrete/.test(text)) return 'concrete';
+  if (/mixed|multiple|various/.test(text)) return 'mixed';
+  return TESTING_SURFACE_OPTIONS.includes(value) ? value : 'unknown';
+}
+
+function testingNormalizeBucket(value, raw = {}) {
+  const text = String(value || '').trim().toLowerCase();
+  if (text === 'additional' || text === 'manual') return 'additional';
+  if (text === 'cop' || text === 'required' || text === 'cop required') return 'cop';
+  if (raw.manual || raw.templateOnly === false) return 'additional';
+  return 'cop';
+}
+
+function normalizeTestingComponent(raw = {}, idx = 0) {
+  const typeRaw = String(raw.type || raw.componentType || '').trim();
+  const type = TESTING_COMPONENT_TYPES.includes(typeRaw) ? typeRaw : 'other';
+  const label = String(raw.label || raw.name || raw.componentLabel || '').trim() || testingSectionForType(type).replace(/\s*\/.*$/, '');
+  const surfaceType = testingNormalizeSurface(raw.surfaceType || raw.surface || 'n/a');
+  return {
+    id: testingCleanId(raw.id, 'tc_' + idx),
+    included: raw.included === false ? false : true,
+    type,
+    section: testingNormalizeSection(raw.section, type),
+    label,
+    surfaceType,
+    locations: testingStringArray(raw.locations || raw.parts || raw.locationNames),
+    reviewQuestion: String(raw.reviewQuestion || raw.prompt || '').trim(),
+    reasoning: String(raw.reasoning || raw.reason || '').trim(),
+    sourceRefs: testingStringArray(raw.sourceRefs || raw.conditionNumbers || raw.sources)
+  };
+}
+
+function normalizeTestingRow(raw = {}, idx = 0) {
+  const kind = String(raw.kind || raw.rowType || '').toLowerCase() === 'inspection' ? 'inspection' : 'test';
+  const componentType = String(raw.componentType || raw.type || '').trim();
+  const section = testingNormalizeSection(raw.section, componentType);
+  const hold = String(raw.holdPoint || raw.qldcHoldPoint || raw.hold || '').trim().toLowerCase();
+  const status = String(raw.status || raw.passFail || raw.result || '').trim();
+  const order = Number(raw.order);
+  return {
+    id: testingCleanId(raw.id, 'tr_' + idx),
+    kind,
+    section,
+    componentId: String(raw.componentId || '').trim(),
+    componentType,
+    componentLabel: String(raw.componentLabel || raw.asset || raw.component || '').trim(),
+    location: String(raw.location || '').trim(),
+    description: String(raw.description || raw.testDescription || raw.inspectionDescription || '').trim(),
+    requirements: String(raw.requirements || raw.testingRequirements || raw.inspectionRequirements || '').trim(),
+    acceptanceCriteria: String(raw.acceptanceCriteria || raw.criteria || '').trim(),
+    responsibility: String(raw.responsibility || raw.responsible || '').trim(),
+    holdPoint: hold === 'yes' || hold === 'y' || hold === 'true' ? 'YES' : hold === 'possible' || hold === 'maybe' ? 'POSSIBLE' : hold === 'no' || hold === 'n' || hold === 'false' ? 'NO' : String(raw.holdPoint || '').trim(),
+    date: String(raw.date || raw.inspectionDate || '').trim(),
+    status: TESTING_STATUS_OPTIONS.includes(status) ? status : status,
+    evidenceLink: String(raw.evidenceLink || raw.link || raw.dropboxLink || '').trim(),
+    notes: String(raw.notes || raw.note || '').trim(),
+    sourceRefs: testingStringArray(raw.sourceRefs || raw.conditionNumbers || raw.sources),
+    bucket: testingNormalizeBucket(raw.bucket || raw.group || raw.registerSection, raw),
+    order: Number.isFinite(order) ? order : idx,
+    printIncluded: raw.printIncluded === false || raw.includeInPrint === false || raw.showInPrint === false ? false : true,
+    manual: !!raw.manual,
+    templateOnly: raw.templateOnly === false ? false : true
+  };
+}
+
+function normalizeTestingPlanState(raw) {
+  const base = defaultTestingPlanState();
+  const plan = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+  const out = { ...base, ...plan };
+  out.version = TESTING_PLAN_VERSION;
+  out.lastScan = String(out.lastScan || '');
+  out.lastScanSignature = String(out.lastScanSignature || '');
+  out.scanSummary = String(out.scanSummary || '');
+  out.notes = testingStringArray(out.notes);
+  out.components = (Array.isArray(out.components) ? out.components : []).map(normalizeTestingComponent);
+  out.suggestedRows = (Array.isArray(out.suggestedRows) ? out.suggestedRows : []).map(normalizeTestingRow);
+  out.rows = (Array.isArray(out.rows) ? out.rows : []).map(normalizeTestingRow);
+  out.activeComponentId = String(out.activeComponentId || '');
+  out.showHoldPointColumn = out.showHoldPointColumn !== false;
+  return out;
+}
+
+function testingPlanState() {
+  ensurePmState();
+  return pmState.testingPlan;
+}
+
+function testingComponentById(id) {
+  return testingPlanState().components.find(c => c.id === id) || null;
+}
+
+function testingRowById(id) {
+  return testingPlanState().rows.find(r => r.id === id) || null;
+}
+
+function testingDefaultResponsibility(type) {
+  if (type === 'earthworks' || type === 'retaining') return 'Geotechnical professional / Engineer';
+  if (type === 'water' || type === 'wastewater' || type === 'stormwater' || type === 'roading') return 'Engineer / Contractor';
+  if (type === 'landscape') return 'Landscape contractor / Parks';
+  if (type === 'utilities') return 'Utility provider / Contractor';
+  if (type === 'trafficSignals') return 'Traffic signal engineer / Contractor';
+  return 'Engineer / Contractor';
+}
+
+function testingCorePartyLabel(field, roleLabel) {
+  ensurePmState();
+  const p = pmState.parties || {};
+  let name = '';
+  let role = roleLabel || '';
+  if (field === 'engineer') {
+    name = p.surveyorIsEngineer ? p.surveyor : p.engineer;
+    role = p.surveyorIsEngineer ? 'Surveyor / Engineer' : 'Engineer';
+  } else if (field === 'projectManager') {
+    name = p.surveyorIsProjectManager ? p.surveyor : p.projectManager;
+    role = p.surveyorIsProjectManager ? 'Surveyor / Project Manager' : 'Project Manager';
+  } else if (field === 'mainContractor') {
+    name = p.surveyorIsMainContractor ? p.surveyor : p.mainContractor;
+    role = p.surveyorIsMainContractor ? 'Surveyor / Main Contractor' : 'Main Contractor';
+  } else {
+    name = p[field];
+  }
+  name = String(name || '').trim();
+  role = String(role || '').trim();
+  if (!name) return '';
+  return role && name.toLowerCase() !== role.toLowerCase() ? `${name} (${role})` : name;
+}
+
+function testingScopedContractorLabel(scopeKeys) {
+  ensurePmState();
+  const p = pmState.parties || {};
+  const keys = new Set((Array.isArray(scopeKeys) ? scopeKeys : [scopeKeys]).filter(Boolean));
+  if (p.useAdditionalContractors && Array.isArray(p.extraContractors)) {
+    for (const contractor of p.extraContractors) {
+      const scopes = normalizeScopeMap(contractor.scopes || scopeMapFromRole(contractor.role || ''));
+      const hasScope = [...keys].some(key => scopes[key]);
+      const name = String(contractor.name || '').trim();
+      const role = String(contractor.role || '').trim();
+      if (hasScope && name) return role && name.toLowerCase() !== role.toLowerCase() ? `${name} (${role})` : name;
+    }
+  }
+  const mainScopes = normalizeScopeMap(p.mainContractorScopes);
+  const mainMatches = [...keys].some(key => mainScopes[key]);
+  const main = testingCorePartyLabel('mainContractor', 'Main Contractor');
+  if (main && (mainMatches || keys.has('otherCivil') || !p.useAdditionalContractors)) return main;
+  return '';
+}
+
+function testingScopeKeysForComponent(component = {}, row = {}) {
+  const type = String(component?.type || row?.componentType || '').trim();
+  const text = `${component?.label || ''} ${component?.reasoning || ''} ${row?.description || ''} ${row?.requirements || ''}`.toLowerCase();
+  if (type === 'earthworks') return ['earthworks'];
+  if (type === 'retaining') return ['retaining', 'earthworks'];
+  if (type === 'roading') return ['roading'];
+  if (type === 'stormwater') return ['stormwater', 'drainage'];
+  if (type === 'wastewater' || type === 'water') return ['drainage'];
+  if (type === 'landscape') return ['landscaping'];
+  if (type === 'trafficSignals') return ['traffic'];
+  if (type === 'utilities') {
+    if (/\b(power|electric|electrical|aurora|coc|esc|roi)\b/.test(text)) return ['power'];
+    if (/\b(telecom|telecommunications|fibre|fiber|chorus)\b/.test(text)) return ['telecom'];
+    if (/\b(gas|lpg)\b/.test(text)) return ['gas'];
+    return ['power', 'telecom', 'gas'];
+  }
+  return ['otherCivil'];
+}
+
+function testingUtilityPartyLabel(component = {}, row = {}) {
+  const text = `${component?.label || ''} ${row?.description || ''} ${row?.requirements || ''}`.toLowerCase();
+  if (/\b(power|electric|electrical|aurora|coc|esc|roi)\b/.test(text)) return testingCorePartyLabel('powerContractor', 'Power Contractor');
+  if (/\b(telecom|telecommunications|fibre|fiber|chorus)\b/.test(text)) return testingCorePartyLabel('telecomContractor', 'Telecom / Fibre Contractor');
+  if (/\b(gas|lpg)\b/.test(text)) return testingCorePartyLabel('gasContractor', 'Gas Contractor');
+  return testingCorePartyLabel('powerContractor', 'Power Contractor')
+    || testingCorePartyLabel('telecomContractor', 'Telecom / Fibre Contractor')
+    || testingCorePartyLabel('gasContractor', 'Gas Contractor');
+}
+
+function testingResponsiblePartyFor(component = {}, row = {}) {
+  const type = String(component?.type || row?.componentType || '').trim();
+  const text = `${row?.kind || ''} ${row?.description || ''} ${row?.requirements || ''} ${row?.acceptanceCriteria || ''}`.toLowerCase();
+  const engineer = testingCorePartyLabel('engineer', 'Engineer');
+  const projectManager = testingCorePartyLabel('projectManager', 'Project Manager');
+  const scoped = testingScopedContractorLabel(testingScopeKeysForComponent(component, row));
+  const utility = type === 'utilities' ? testingUtilityPartyLabel(component, row) : '';
+
+  if (type === 'utilities') return utility || scoped || projectManager || testingDefaultResponsibility(type);
+  if (type === 'earthworks' || type === 'retaining') return engineer || scoped || testingDefaultResponsibility(type);
+  if (type === 'trafficSignals') return scoped || engineer || testingDefaultResponsibility(type);
+  if (type === 'landscape') return scoped || projectManager || engineer || testingDefaultResponsibility(type);
+  if (/\b(cctv|pressure|rebound|chlorination|disinfection|sampling|tracer|hydrant|compaction|scala|cbr|deflection|roughness|aggregate|asphalt|chipseal|concrete strength)\b/.test(text)) {
+    return scoped || engineer || testingDefaultResponsibility(type);
+  }
+  if (row?.kind === 'inspection' || String(row?.holdPoint || '').toUpperCase() === 'YES') {
+    return engineer || scoped || testingDefaultResponsibility(type);
+  }
+  return scoped || engineer || testingDefaultResponsibility(type);
+}
+
+function testingResponsibilityLooksGeneric(value) {
+  const text = String(value || '').trim().toLowerCase();
+  if (!text) return true;
+  return /^(engineer|contractor|engineer \/ contractor|geotechnical professional \/ engineer|landscape contractor \/ parks|utility provider \/ contractor|traffic signal engineer \/ contractor|project manager|main contractor|council|qldc)$/i.test(text);
+}
+
+function testingResolveResponsibility(existing, component = {}, row = {}) {
+  if (!testingResponsibilityLooksGeneric(existing)) return String(existing || '').trim();
+  return testingResponsiblePartyFor(component, row);
+}
+
+function testingTemplateRow(component, kind, description, requirements, acceptanceCriteria, holdPoint = '', notes = '') {
+  return normalizeTestingRow({
+    id: testingNewId('tr'),
+    kind,
+    section: component.section || testingSectionForType(component.type),
+    componentId: component.id,
+    componentType: component.type,
+    componentLabel: component.label,
+    location: '',
+    description,
+    requirements,
+    acceptanceCriteria,
+    responsibility: testingResponsiblePartyFor(component, { kind, description, requirements, acceptanceCriteria, holdPoint }),
+    holdPoint,
+    status: 'Planned',
+    notes,
+    templateOnly: true
+  });
+}
+
+function testingRoadSurface(component) {
+  return String(component?.surfaceType || '').toLowerCase();
+}
+
+function testingRowsForComponent(component) {
+  const rows = [];
+  const add = (...args) => rows.push(testingTemplateRow(component, ...args));
+  const type = component.type;
+  if (type === 'earthworks' || type === 'retaining') {
+    add('inspection', 'Stripped ground surface', 'Inspect stripped surface before fill placement', 'All organics and vegetation removed; foundation suitable for filling', 'NO');
+    add('inspection', 'Unsuitable material removal', 'Inspect undercuts and replacement fill areas as required', 'Unsuitable material removed to acceptable foundation', 'POSSIBLE');
+    add('inspection', 'Completed earthworks / subgrade', 'Geotechnical inspection before fill or pavement construction proceeds', 'Completed earthworks/subgrade accepted by geo-professional', 'YES');
+    add('test', 'Material testing', 'Determine material type, optimum water content and compaction control requirements', 'Geo-professional/NZS 4431 requirements met', 'NO');
+    add('test', 'Fill compaction', 'Compaction testing at the locations and frequency set by the geo-professional', 'Compliant compaction results, retests closed out, failed areas identified', 'NO');
+    add('test', 'Geotechnical completion evidence', 'Geotech completion report, Schedule 2A sign-off, compaction records and as-builts', 'All earthworks testing and certification accepted for completion', 'NO');
+  } else if (type === 'roading') {
+    const surface = testingRoadSurface(component);
+    const sealed = /chip|asphalt|seal|mixed|unknown/.test(surface) || !surface || surface === 'n/a';
+    const concrete = /concrete/.test(surface);
+    const gravel = /gravel|unsealed/.test(surface);
+    add('inspection', 'Subgrade inspection', 'Inspect shape, unsuitable material, drainage and readiness for pavement construction', 'Subgrade suitable; required testing reviewed', 'YES');
+    add('test', 'Subgrade strength testing', 'Soaked CBR by NZS 4402.6 or Scala testing where Council accepts it; Scala at 150/300/450 mm', 'Design CBR achieved and weak areas remediated', 'YES');
+    add('test', 'Proof rolling', 'Documented proof rolling where required by the pavement design/Engineer', 'No unacceptable deflection or pumping', 'POSSIBLE');
+    add('inspection', 'Subbase inspection', 'Inspect shape, depth, moisture condition and readiness before next layer', 'Correct shape, depth and compaction', 'POSSIBLE');
+    add('test', 'Subbase compaction', 'Nuclear density testing and level/grid checks', 'Mean 95% MDD, minimum 92% MDD', 'YES');
+    add('test', 'Subbase aggregate properties', 'NZS 4407 material property/acceptance testing per aggregate source and volume', 'Specified aggregate properties achieved; failed tests retested', 'NO');
+    add('test', 'Basecourse compaction', 'Nuclear density testing and level/grid checks before surfacing', 'Mean 98% MDD, minimum 95% MDD', sealed ? 'YES' : 'POSSIBLE');
+    add('test', 'Basecourse aggregate properties', 'NZS 4407 material property/acceptance testing per aggregate source and volume', 'Specified aggregate properties achieved; failed tests retested', 'NO');
+    if (sealed && !concrete && !gravel) {
+      add('inspection', 'Pre-seal inspection', 'QLDC/Engineer inspection of finished basecourse before sealing', 'Surface shape, texture, moisture and test evidence accepted', 'YES');
+      add('test', 'Deflection testing prior to surfacing', 'Benkelman Beam or FWD before surfacing, wheel paths both lanes at max 10 m spacing', 'Maximum deflections comply with QLDC COP table 3.4', 'YES');
+      add('test', 'Roughness testing', 'NAASRA roughness testing where road length is over 150 m', 'Average dynamic roughness under QLDC limits', 'NO', 'Not required for readings 150 m or less.');
+      if (/asphalt/.test(surface)) add('test', 'Asphalt surfacing QA', 'Compaction, air voids/density or cores where required by lot size/thickness', 'Surfacing QA results compliant', 'NO');
+      if (/chip|seal/.test(surface)) add('test', 'Chipseal surfacing QA', 'Seal construction evidence and surface acceptance checks', 'Surfacing accepted and defects closed out', 'NO');
+    }
+    if (concrete) {
+      add('inspection', 'Concrete pre-pour inspection', 'Inspect shape, depth, boxing, reinforcement and subbase readiness before pour', 'Ready to pour; QLDC/Engineer hold point closed if required', 'POSSIBLE');
+      add('test', 'Concrete strength evidence', 'Concrete supply/strength evidence for road slabs, crossings, kerb/channel or footpaths', 'Specified strength achieved: 30 MPa roads/crossings, 20 MPa kerb/channel/footpaths unless specified otherwise', 'NO');
+    }
+  } else if (type === 'stormwater') {
+    const label = (component.label + ' ' + component.reasoning).toLowerCase();
+    add('inspection', 'Stormwater trench/manhole inspection', 'Inspect bedding, line, grade, manholes, corbels, cover and separation before backfill', 'QLDC COP compliant installation', 'YES');
+    add('test', 'Stormwater CCTV', 'CCTV before acceptance to NZ Gravity Pipe Inspection Manual', 'Grade 1 only; defects repaired and recaptured', 'YES');
+    add('test', 'Stormwater water/leakage test', 'Water/flood test if required by Council or Appendix C', 'Leakage within QLDC COP tolerance', 'POSSIBLE');
+    if (/soak|infiltrat|disposal|attenuat/.test(label)) {
+      add('test', 'Soakage testing / reconfirmation', 'Soakage testing before detailed design and reconfirmation after construction disturbance or compaction', 'Reported L/hr/m2 accepted by Engineer/Council', 'POSSIBLE');
+    }
+  } else if (type === 'wastewater') {
+    const label = (component.label + ' ' + component.reasoning).toLowerCase();
+    add('inspection', 'Wastewater trench/manhole inspection', 'Inspect bedding, line, grade, manholes, cover and separation before backfill', 'QLDC COP compliant installation', 'YES');
+    add('test', 'Wastewater CCTV', 'CCTV before acceptance to NZ Pipe Inspection Manual', 'Grade 1 only; defects repaired and recaptured', 'YES');
+    add('test', 'Gravity sewer leakage / air test', 'Field leakage/air/water test before connection', 'Appendix C QLDC COP requirements met', 'YES');
+    if (/pressure|rising|pump|pressuris/.test(label)) {
+      add('test', 'Pressurised sewer pressure test', 'Field pressure test of pressurised wastewater main', 'Appendix C QLDC COP requirements met', 'YES');
+      add('test', 'Tracer wire continuity', 'Continuity test for non-metallic pressure wastewater mains', 'Generated tone/detector probe confirms continuity', 'NO');
+    }
+  } else if (type === 'water') {
+    const label = (component.label + ' ' + component.reasoning).toLowerCase();
+    add('inspection', 'Water trench/services inspection', 'Inspect bedding, depth, separation, thrusting, fittings and service layout before backfill', 'QLDC COP compliant installation', 'YES');
+    add('test', 'Pressure / rebound testing', 'Pressure test before connection, not exceeding 1.25 times the lowest rated component MROP', 'Appendix C QLDC COP requirements met', 'YES');
+    add('test', 'Disinfection / chlorination', 'Disinfection after pressure testing and backfill; manage discharge requirements', 'Appendix D QLDC COP requirements met', 'YES');
+    add('test', 'Water sampling', 'Sampling at network ends/boundaries where required', 'Lab results accepted before commissioning', 'POSSIBLE');
+    add('test', 'Tracer wire continuity', 'Continuity test for non-metallic water mains', 'Generated tone/detector probe confirms continuity', 'NO');
+    if (/hydrant|fire/.test(label)) add('test', 'Hydrant flow testing', 'Hydrant flow test to Firefighting Water Supplies code', 'Flow test accepted by Council', 'POSSIBLE');
+  } else if (type === 'landscape') {
+    add('test', 'Soil testing', 'Soil composition/fertiliser testing where required by landscape/reserve specification', 'Soil results meet specification or amendments completed', 'POSSIBLE');
+    add('inspection', 'Parks / landscape final inspection', 'Final inspection after maintenance period before bond/practical completion', 'Grass, planting, trees and reserves assets accepted', 'YES');
+  } else if (type === 'utilities') {
+    add('inspection', 'Utility trench/backfill inspection', 'Inspect trench backfill and reinstatement as required by corridor manager/provider', 'Corridor manager/provider requirements satisfied', 'POSSIBLE');
+    add('test', 'Utility provider confirmation', 'Written confirmation from utility providers before 224(c)', 'Provider confirmations received', 'NO');
+    add('test', 'Electrical certification', 'CoC, ESC and RoI where applicable', 'Electrical certificates accepted', 'NO');
+  } else if (type === 'trafficSignals') {
+    add('inspection', 'Traffic signal design/safety review', 'Design/safety peer review and hold point checks', 'Peer review and QLDC/WTOC comments closed', 'YES');
+    add('test', 'Traffic signal software testing', 'Independent software, CIS/SFT and WinTraff testing', 'SFT test report accepted', 'YES');
+    add('test', 'P43 SAT commissioning', 'Site acceptance testing, hardware/operations audit, SCATS checks and switch-on requirements', 'Signed SAT and commissioning evidence accepted', 'YES');
+    add('test', 'Traffic signal electrical certification', 'Original electrical CoC and communications/CCTV visibility checks', 'CoC and operational checks accepted', 'YES');
+  } else {
+    add('inspection', 'Inspection / hold point', 'Inspect the constructed work before cover-up or completion as required by consent/EA', 'Engineer/Council accepts the work', 'POSSIBLE');
+    add('test', 'Testing evidence', 'Upload relevant test report, certificate or commissioning evidence', 'Evidence accepted for close-out', 'POSSIBLE');
+  }
+  return rows;
+}
+
+function testingRowKey(row) {
+  return [
+    row.kind,
+    row.section,
+    row.componentId || row.componentLabel,
+    row.location,
+    row.description,
+    row.requirements
+  ].map(v => String(v || '').trim().toLowerCase().replace(/\s+/g, ' ')).join('|');
+}
+
+function testingExpandedRowsFromPlan() {
+  const plan = testingPlanState();
+  const components = plan.components.filter(c => c.included);
+  const componentMap = new Map(components.map(c => [c.id, c]));
+  const labelMap = new Map(components.map(c => [String(c.label || '').toLowerCase(), c]));
+  const sourceRows = [];
+  components.forEach(component => sourceRows.push(...testingRowsForComponent(component)));
+  plan.suggestedRows.forEach(row => sourceRows.push(normalizeTestingRow(row)));
+
+  const out = [];
+  const seen = new Set();
+  sourceRows.forEach(sourceRow => {
+    const component = componentMap.get(sourceRow.componentId)
+      || labelMap.get(String(sourceRow.componentLabel || '').toLowerCase())
+      || components.find(c => c.section === sourceRow.section)
+      || null;
+    if (component && !component.included) return;
+    const base = normalizeTestingRow({
+      ...sourceRow,
+      componentId: component?.id || sourceRow.componentId,
+      componentType: component?.type || sourceRow.componentType,
+      componentLabel: component?.label || sourceRow.componentLabel,
+      section: component?.section || sourceRow.section,
+      bucket: sourceRow.bucket || 'cop',
+      responsibility: testingResolveResponsibility(sourceRow.responsibility, component || {}, sourceRow)
+    });
+    const locs = testingStringArray(component?.locations);
+    const genericLoc = !base.location || /^(all|tbc|various|site|location)$/i.test(base.location);
+    const rows = locs.length && genericLoc
+      ? locs.map(location => normalizeTestingRow({ ...base, id: testingNewId('tr'), location }))
+      : [normalizeTestingRow({ ...base, id: testingNewId('tr'), location: base.location || component?.label || '' })];
+    rows.forEach(row => {
+      const key = testingRowKey(row);
+      if (seen.has(key)) return;
+      seen.add(key);
+      out.push(row);
+    });
+  });
+  return out.map((row, idx) => ({ ...row, bucket: row.bucket || 'cop', order: idx }));
+}
+
+function testingPlanSignature() {
+  return JSON.stringify({
+    conditions: pmScanConditionPayload({ compact: false }),
+    parties: pmConfiguredPartyPayload()
+  });
+}
+
+function testingPlanNeedsRefresh() {
+  const plan = testingPlanState();
+  return !!plan.lastScan && plan.lastScanSignature !== testingPlanSignature();
+}
+
+function testingKeywordHints() {
+  const flat = flattenProjectManagementConditions();
+  const patterns = [
+    { type: 'earthworks', label: 'Earthworks', re: /\b(earthworks?|bulk earthworks|fill|cut|geotech|compaction|subsoil|retaining|soil nail)\b/i },
+    { type: 'roading', label: 'Roading / access', re: /\b(road|access|vehicle crossing|pavement|chipseal|asphalt|basecourse|subbase|kerb|footpath)\b/i },
+    { type: 'stormwater', label: 'Stormwater', re: /\b(stormwater|soakage|soakpit|infiltration|attenuation|culvert|swale)\b/i },
+    { type: 'wastewater', label: 'Wastewater / foul sewer', re: /\b(wastewater|foul sewer|sewer|sewage|rising main|pump station)\b/i },
+    { type: 'water', label: 'Water reticulation', re: /\b(water main|water supply|hydrant|chlorination|disinfection|firefighting)\b/i },
+    { type: 'landscape', label: 'Landscape / reserves', re: /\b(landscape|planting|reserve|grass|tree|playground|parks)\b/i },
+    { type: 'utilities', label: 'Network utilities', re: /\b(power|electric|telecom|fibre|fiber|utility|utilities|chorus|aurora)\b/i },
+    { type: 'trafficSignals', label: 'Traffic signals', re: /\b(traffic signal|signals|SCATS|WinTraff|P43|lantern)\b/i }
+  ];
+  return patterns.map(pattern => {
+    const hits = flat.filter(c => pattern.re.test((c.text || '') + ' ' + (c.stage || ''))).slice(0, 6);
+    if (!hits.length) return null;
+    return {
+      ...pattern,
+      conditionNumbers: hits.map(c => c.number || c.key).filter(Boolean),
+      sourceRefs: hits.map(c => c.number || c.key).filter(Boolean)
+    };
+  }).filter(Boolean);
+}
+
+function testingScanControlButtons() {
+  return ['testingScanBtn', 'testingRescanBtn']
+    .flatMap(id => Array.from(document.querySelectorAll(`[id="${id}"]`)));
+}
+
+function testingScanStatusText(defaultText = '') {
+  if (testingScanState.inFlight) return 'Scanning the consent and EA for construction components and QLDC testing requirements.';
+  if (testingScanState.error) return 'Scan failed: ' + testingScanState.error;
+  return defaultText;
+}
+
+function syncTestingScanUi() {
+  testingScanControlButtons().forEach(btn => {
+    if (!btn.dataset.testingIdleLabel && btn.innerHTML !== 'Scanning...') btn.dataset.testingIdleLabel = btn.innerHTML;
+    btn.disabled = !!testingScanState.inFlight;
+    btn.innerHTML = testingScanState.inFlight ? 'Scanning...' : (btn.dataset.testingIdleLabel || btn.innerHTML);
+  });
+  const status = document.getElementById('testingStatus');
+  if (status) {
+    if (!status.dataset.testingIdleText && !testingScanState.inFlight && !testingScanState.error) status.dataset.testingIdleText = status.textContent || '';
+    status.className = 'testing-status' + (testingScanState.error && !testingScanState.inFlight ? ' error' : '');
+    status.textContent = testingScanStatusText(status.dataset.testingIdleText || status.textContent || '');
+  }
+}
+
+function testingPlanPrompt() {
+  const details = data?.consentDetails || {};
+  const conditions = pmScanConditionPayload({ compact: true });
+  return `You are acting as a senior New Zealand civil construction engineer preparing an Inspection and Testing Plan for QLDC subdivision/resource-consent works.
+
+Use the QLDC Code of Practice rule base below, then scan the consent and Engineering Acceptance conditions to decide which constructed components are likely required and which inspections/tests are needed during construction.
+
+Do not include every possible QLDC test. Include tests that are triggered by the likely works, and include conditional tests when the consent/EA suggests the asset may exist but the detail is uncertain. If road surfacing is unclear, mark surfaceType as "unknown" and include the user review question.
+
+QLDC rule base:
+${TESTING_QLDC_RULE_SUMMARY}
+
+Consent:
+${JSON.stringify({
+  rmReference: details.rmReference || '',
+  applicant: details.applicant || '',
+  location: details.location || '',
+  consentType: details.consentType || details.activityStatus || ''
+}, null, 2)}
+
+Known project parties:
+${JSON.stringify(pmPartyPayload(), null, 2)}
+
+When setting each row's responsibility, use the known project party name when there is a clear match. If the right party is uncertain, use the role rather than inventing a company name. The app will also auto-fill generic responsibility labels from the project-team setup.
+
+Conditions and Engineering Acceptance requirements:
+${JSON.stringify(conditions, null, 2)}
+
+Return ONLY valid JSON with this structure:
+{
+  "summary": "brief practical summary of the testing plan basis",
+  "notes": ["uncertainties or assumptions"],
+  "components": [
+    {
+      "id": "short-stable-id",
+      "type": "earthworks | roading | stormwater | wastewater | water | landscape | utilities | trafficSignals | retaining | other",
+      "section": "EARTHWORKS | ROADING | STORMWATER | WASTEWATER / FOUL SEWER | WATER RETICULATION / SERVICES | LANDSCAPE / RESERVES | NETWORK UTILITIES | TRAFFIC SIGNALS | OTHER",
+      "label": "asset or work package name",
+      "surfaceType": "n/a | unknown | gravel / unsealed | chipseal | asphalt | concrete | mixed",
+      "included": true,
+      "locations": ["location names already stated in the consent/EA, if any"],
+      "reviewQuestion": "question to ask the user about missing locations/parts, if needed",
+      "reasoning": "why this component was identified",
+      "sourceRefs": ["condition numbers or EA refs"]
+    }
+  ],
+  "rows": [
+    {
+      "kind": "inspection | test",
+      "section": "section name",
+      "componentId": "matching component id where possible",
+      "componentType": "component type",
+      "componentLabel": "component label",
+      "location": "",
+      "description": "Inspection Description or Test Description",
+      "requirements": "Inspection or testing requirements",
+      "acceptanceCriteria": "Acceptance criteria",
+      "responsibility": "who should arrange/witness/review",
+      "holdPoint": "YES | NO | POSSIBLE",
+      "status": "Planned",
+      "evidenceLink": "",
+      "notes": "any conditional detail",
+      "sourceRefs": ["condition numbers or EA refs"]
+    }
+  ]
+}`;
+}
+
+function normalizeTestingScanResult(raw) {
+  const result = raw && typeof raw === 'object' ? raw : {};
+  const components = (Array.isArray(result.components) ? result.components : []).map(normalizeTestingComponent);
+  const rows = (Array.isArray(result.rows) ? result.rows : Array.isArray(result.registerRows) ? result.registerRows : []).map(normalizeTestingRow);
+  if (!components.length) {
+    testingKeywordHints().forEach((hint, idx) => {
+      components.push(normalizeTestingComponent({
+        id: 'hint_' + hint.type + '_' + idx,
+        type: hint.type,
+        label: hint.label,
+        included: true,
+        sourceRefs: hint.sourceRefs,
+        reviewQuestion: 'Confirm the locations or parts for this work package.'
+      }));
+    });
+  }
+  const byId = new Map(components.map(c => [c.id, c]));
+  const byLabel = new Map(components.map(c => [String(c.label || '').toLowerCase(), c]));
+  rows.forEach(row => {
+    if (row.componentId && byId.has(row.componentId)) return;
+    const match = byLabel.get(String(row.componentLabel || '').toLowerCase())
+      || components.find(c => c.type === row.componentType || c.section === row.section);
+    if (match) {
+      row.componentId = match.id;
+      row.componentType = row.componentType || match.type;
+      row.componentLabel = row.componentLabel || match.label;
+    }
+  });
+  return {
+    summary: String(result.summary || ''),
+    notes: testingStringArray(result.notes),
+    components,
+    rows
+  };
+}
+
+async function scanTestingPlan() {
+  if (!data) return;
+  ensurePmState();
+  if (testingScanState.inFlight) {
+    syncTestingScanUi();
+    return testingScanState.promise;
+  }
+
+  testingScanState.inFlight = true;
+  testingScanState.startedTab = conditionsTab;
+  testingScanState.error = '';
+  syncTestingScanUi();
+
+  const scanPromise = (async () => {
+    try {
+      const result = await openaiFetch(testingPlanPrompt(), 12000);
+      const scan = normalizeTestingScanResult(result);
+      const plan = testingPlanState();
+      plan.components = scan.components;
+      plan.suggestedRows = scan.rows;
+      plan.scanSummary = scan.summary;
+      plan.notes = scan.notes;
+      plan.lastScan = new Date().toLocaleString('en-NZ', { dateStyle: 'medium', timeStyle: 'short' });
+      plan.lastScanSignature = testingPlanSignature();
+      if (!plan.activeComponentId && plan.components.length) plan.activeComponentId = plan.components[0].id;
+      autoSave();
+      if (conditionsTab === 'testing') renderTestingPanel({ preserveScroll: true });
+    } catch (err) {
+      testingScanState.error = err.message || String(err);
+      syncTestingScanUi();
+    } finally {
+      testingScanState.inFlight = false;
+      testingScanState.promise = null;
+      syncTestingScanUi();
+    }
+  })();
+
+  testingScanState.promise = scanPromise;
+  return scanPromise;
+}
+
+function testingSourceTags(refs) {
+  const items = testingStringArray(refs).slice(0, 8);
+  return items.length ? `<div class="testing-source-list">${items.map(ref => `<span class="pm-tag">${x(ref)}</span>`).join('')}</div>` : '';
+}
+
+function testingTypeOptions(selected) {
+  return TESTING_COMPONENT_TYPES.map(type => `<option value="${x(type)}"${type === selected ? ' selected' : ''}>${x(type)}</option>`).join('');
+}
+
+function testingSectionOptions(selected) {
+  return TESTING_SECTION_OPTIONS.map(section => `<option value="${x(section)}"${section === selected ? ' selected' : ''}>${x(section)}</option>`).join('');
+}
+
+function testingSurfaceOptions(selected) {
+  return TESTING_SURFACE_OPTIONS.map(surface => `<option value="${x(surface)}"${surface === selected ? ' selected' : ''}>${x(surface)}</option>`).join('');
+}
+
+function testingStatusOptions(selected) {
+  return TESTING_STATUS_OPTIONS.map(status => `<option value="${x(status)}"${status === selected ? ' selected' : ''}>${x(status || 'Blank')}</option>`).join('');
+}
+
+function testingHoldOptions(selected) {
+  const value = String(selected || '').trim().toUpperCase();
+  return ['', 'YES', 'NO', 'POSSIBLE'].map(opt => `<option value="${x(opt)}"${opt === value ? ' selected' : ''}>${x(opt || 'Blank')}</option>`).join('');
+}
+
+function testingHref(value) {
+  const text = String(value || '').trim();
+  if (!text) return '';
+  if (/^https?:\/\//i.test(text)) return text;
+  if (/^www\./i.test(text)) return 'https://' + text;
+  return '';
+}
+
+function renderTestingScanRefreshBanner() {
+  if (!testingPlanNeedsRefresh()) return '';
+  return `
+    <div class="pm-rescan-banner testing-screen-only">
+      <div>
+        <strong>Rescan inspection and testing</strong>
+        <span>The consent, EA, or project parties changed after the last inspection/testing scan.</span>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="scanTestingPlan()" type="button" id="testingRescanBtn">Rescan</button>
+    </div>`;
+}
+
+function renderTestingComponent(component) {
+  const id = jsq(component.id);
+  const cls = component.included ? 'testing-component' : 'testing-component excluded';
+  return `
+    <div class="${cls}">
+      <div class="testing-component-head">
+        <label class="testing-component-title">
+          <input type="checkbox"${component.included ? ' checked' : ''} onchange="setTestingComponentField('${id}','included',this.checked,true)">
+          <span>
+            <strong>${x(component.label)}</strong>
+            <span>${x(component.section)}${component.surfaceType && component.surfaceType !== 'n/a' ? ' - ' + x(component.surfaceType) : ''}</span>
+          </span>
+        </label>
+        <div class="testing-actions">
+          <button class="testing-mini-btn" onclick="duplicateTestingComponentLocations('${id}')" type="button">Duplicate for other locations</button>
+          <button class="testing-delete" onclick="removeTestingComponent('${id}')" type="button">Delete</button>
+        </div>
+      </div>
+      <div class="testing-component-fields">
+        <div class="testing-field">
+          <label>Component</label>
+          <input class="testing-input" value="${xt(component.label)}" oninput="setTestingComponentField('${id}','label',this.value,false)" onchange="renderTestingPanel({preserveScroll:true})">
+        </div>
+        <div class="testing-field">
+          <label>Type</label>
+          <select class="testing-select" onchange="setTestingComponentField('${id}','type',this.value,true)">${testingTypeOptions(component.type)}</select>
+        </div>
+        <div class="testing-field">
+          <label>Section</label>
+          <select class="testing-select" onchange="setTestingComponentField('${id}','section',this.value,true)">${testingSectionOptions(component.section)}</select>
+        </div>
+        <div class="testing-field">
+          <label>Road Surface</label>
+          <select class="testing-select" onchange="setTestingComponentField('${id}','surfaceType',this.value,true)">${testingSurfaceOptions(component.surfaceType)}</select>
+        </div>
+        <div class="testing-field wide">
+          <label>Locations / Parts</label>
+          <textarea class="testing-textarea" placeholder="One per line, e.g. Road 001, Access 004, SW line 1" oninput="setTestingComponentLocations('${id}',this.value)">${xt(testingLocationsText(component.locations))}</textarea>
+        </div>
+        <div class="testing-field wide">
+          <label>User Review Prompt</label>
+          <textarea class="testing-textarea" oninput="setTestingComponentField('${id}','reviewQuestion',this.value,false)">${xt(component.reviewQuestion || 'Confirm whether this work package has multiple parts/locations and add each location above.')}</textarea>
+        </div>
+      </div>
+      ${component.reasoning ? `<div class="pm-cond-summary">${x(component.reasoning)}</div>` : ''}
+      ${testingSourceTags(component.sourceRefs)}
+    </div>`;
+}
+
+function renderTestingReview() {
+  const plan = testingPlanState();
+  if (!plan.components.length) {
+    const hints = testingKeywordHints();
+    const hintHtml = hints.length
+      ? hints.map(h => `<span class="pm-tag">${x(h.label)}: ${x(h.conditionNumbers.join(', '))}</span>`).join('')
+      : '<span class="pm-tag">No obvious construction keywords found yet</span>';
+    return `
+      <div class="testing-screen-only">
+        <div class="testing-section-title">
+          <div>
+            <h4>Review Scan Results</h4>
+            <p>Run a scan to identify construction components, then confirm locations or parts before building the register.</p>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="scanTestingPlan()" type="button" id="testingScanBtn">Scan Testing Requirements</button>
+        </div>
+        <div class="pm-empty" style="text-align:left">
+          <div class="testing-source-list">${hintHtml}</div>
+        </div>
+      </div>`;
+  }
+  return `
+    <div class="testing-screen-only">
+      <div class="testing-section-title">
+        <div>
+          <h4>Review Scan Results</h4>
+          <p>Edit the components and add each location/part before generating the table.</p>
+        </div>
+        <div class="testing-actions">
+          <button class="btn btn-outline btn-sm" onclick="addTestingComponent()" type="button">Add Component</button>
+          <button class="btn btn-primary btn-sm" onclick="buildTestingRowsFromScan()" type="button">Build Register</button>
+        </div>
+      </div>
+      <div class="testing-review-grid">${plan.components.map(renderTestingComponent).join('')}</div>
+    </div>`;
+}
+
+function testingSortedRows(rows) {
+  const bucketOrder = { cop: 0, additional: 1 };
+  return rows.map((row, idx) => ({ row, idx })).sort((a, b) => {
+    const bucketDiff = (bucketOrder[a.row.bucket] ?? 9) - (bucketOrder[b.row.bucket] ?? 9);
+    if (bucketDiff) return bucketDiff;
+    const orderDiff = (Number(a.row.order) || 0) - (Number(b.row.order) || 0);
+    if (orderDiff) return orderDiff;
+    return a.idx - b.idx;
+  }).map(item => item.row);
+}
+
+function testingBucketLabel(bucket) {
+  return TESTING_BUCKETS.find(b => b.key === bucket)?.label || 'COP REQUIRED';
+}
+
+function testingRowsSameExceptLocation(prev, row) {
+  if (!prev || !row) return false;
+  const fields = ['bucket', 'section', 'kind', 'componentId', 'componentLabel', 'description', 'requirements', 'acceptanceCriteria'];
+  const same = fields.every(field => String(prev[field] || '').trim().toLowerCase() === String(row[field] || '').trim().toLowerCase());
+  return same && String(prev.location || '').trim().toLowerCase() !== String(row.location || '').trim().toLowerCase();
+}
+
+function renderTestingRowTools(row, sameAsPrevious = false) {
+  const id = jsq(row.id);
+  const bucket = row.bucket === 'additional' ? 'additional' : 'cop';
+  const moveLabel = bucket === 'cop' ? 'Move to Additional' : 'Move to COP';
+  const moveBucket = bucket === 'cop' ? 'additional' : 'cop';
+  return `
+    <div class="testing-row-tools">
+      <div class="testing-row-tool-line">
+        <span class="testing-row-chip ${x(bucket)}">${x(testingBucketLabel(bucket))}</span>
+        ${sameAsPrevious ? '<span class="testing-repeat-badge">Same as above, new location</span>' : ''}
+      </div>
+      <div class="testing-row-tool-line">
+        <span class="testing-drag-chip">Drag</span>
+        <button class="testing-mini-btn" type="button" onclick="setTestingRowBucket('${id}','${moveBucket}')">${moveLabel}</button>
+      </div>
+    </div>`;
+}
+
+function testingShowHoldPointColumn() {
+  return testingPlanState().showHoldPointColumn !== false;
+}
+
+function renderTestingDisplayOptions() {
+  const checked = testingShowHoldPointColumn() ? ' checked' : '';
+  return `<label class="testing-option"><input type="checkbox"${checked} onchange="setTestingHoldPointColumnVisible(this.checked)">Show QLDC hold point column</label>`;
+}
+
+function renderTestingEditableRow(row, opts = {}) {
+  const id = jsq(row.id);
+  const href = testingHref(row.evidenceLink);
+  const showHoldPoint = opts.showHoldPoint !== false;
+  const printClass = row.printIncluded === false ? ' print-excluded' : ' print-included';
+  return `
+    <tr class="testing-register-row${printClass}${opts.sameAsPrevious ? ' repeat' : ''}" draggable="true" ondragstart="beginTestingRowDrag('${id}')" ondragover="event.preventDefault()" ondrop="dropTestingRow('${id}')">
+      <td>
+        <select class="testing-cell-input" onchange="setTestingRowField('${id}','section',this.value,true)">${testingSectionOptions(row.section)}</select>
+        <select class="testing-cell-input" onchange="setTestingRowField('${id}','kind',this.value,true)" style="margin-top:5px">
+          <option value="inspection"${row.kind === 'inspection' ? ' selected' : ''}>Inspection</option>
+          <option value="test"${row.kind === 'test' ? ' selected' : ''}>Testing</option>
+        </select>
+        <label class="testing-print-check"><input type="checkbox"${row.printIncluded !== false ? ' checked' : ''} onchange="setTestingRowPrintIncluded('${id}',this.checked)">PDF</label>
+        ${renderTestingRowTools(row, !!opts.sameAsPrevious)}
+      </td>
+      <td><textarea class="testing-cell-input" oninput="setTestingRowField('${id}','location',this.value,false)">${xt(row.location)}</textarea></td>
+      <td><textarea class="testing-cell-input" oninput="setTestingRowField('${id}','description',this.value,false)">${xt(row.description)}</textarea></td>
+      <td><textarea class="testing-cell-input" oninput="setTestingRowField('${id}','requirements',this.value,false)">${xt(row.requirements)}</textarea></td>
+      <td><textarea class="testing-cell-input" oninput="setTestingRowField('${id}','acceptanceCriteria',this.value,false)">${xt(row.acceptanceCriteria)}</textarea></td>
+      <td><textarea class="testing-cell-input" oninput="setTestingRowField('${id}','responsibility',this.value,false)">${xt(row.responsibility)}</textarea></td>
+      ${showHoldPoint ? `<td><select class="testing-cell-input" onchange="setTestingRowField('${id}','holdPoint',this.value,false)">${testingHoldOptions(row.holdPoint)}</select></td>` : ''}
+      <td><input class="testing-cell-input" value="${xt(row.date)}" oninput="setTestingRowField('${id}','date',this.value,false)"></td>
+      <td><select class="testing-cell-input" onchange="setTestingRowField('${id}','status',this.value,false)">${testingStatusOptions(row.status)}</select></td>
+      <td>
+        <textarea class="testing-cell-input" placeholder="Dropbox or evidence link" oninput="setTestingRowField('${id}','evidenceLink',this.value,false)">${xt(row.evidenceLink)}</textarea>
+        ${href ? `<a class="testing-link-preview" href="${xt(href)}" target="_blank" rel="noopener">Open link</a>` : ''}
+      </td>
+      <td><textarea class="testing-cell-input" oninput="setTestingRowField('${id}','notes',this.value,false)">${xt(row.notes)}</textarea></td>
+      <td><button class="testing-delete" onclick="deleteTestingRow('${id}')" type="button">Delete</button></td>
+    </tr>`;
+}
+
+function renderTestingPrintRow(row, opts = {}) {
+  const href = testingHref(row.evidenceLink);
+  const showHoldPoint = opts.showHoldPoint !== false;
+  return `
+    <tr>
+      <td>${x(row.description)}${opts.sameAsPrevious ? '<br><em>Same as above, new location</em>' : ''}</td>
+      <td>${x(row.location)}</td>
+      <td>${x(row.requirements)}</td>
+      <td>${x(row.acceptanceCriteria)}</td>
+      <td>${x(row.responsibility)}</td>
+      ${showHoldPoint ? `<td>${x(row.holdPoint)}</td>` : ''}
+      <td>${x(row.date)}</td>
+      <td>${x(row.status)}</td>
+      <td>${href ? `<a href="${xt(href)}">${x(row.evidenceLink || 'Open evidence')}</a>` : x(row.evidenceLink)}</td>
+      <td>${x(row.notes)}</td>
+    </tr>`;
+}
+
+function renderTestingRowsTable(rows, printable = false) {
+  const tableRows = printable ? rows.filter(row => row.printIncluded !== false) : rows;
+  const sorted = testingSortedRows(tableRows);
+  if (!sorted.length) return printable ? '<p>No inspection/testing rows selected for print.</p>' : '';
+  const showHoldPoint = testingShowHoldPointColumn();
+  const colSpan = printable ? (showHoldPoint ? 10 : 9) : (showHoldPoint ? 12 : 11);
+  const body = [];
+  TESTING_BUCKETS.forEach(bucketMeta => {
+    const bucketRows = sorted.filter(row => (row.bucket === 'additional' ? 'additional' : 'cop') === bucketMeta.key);
+    if (printable && !bucketRows.length) return;
+    if (!printable) body.push(`<tr class="testing-bucket-row"><td colspan="${colSpan}">${x(bucketMeta.label)}</td></tr>`);
+    if (!bucketRows.length) {
+      body.push(`<tr class="testing-kind-row"><td colspan="${colSpan}">No rows yet</td></tr>`);
+      return;
+    }
+    let lastSection = '';
+    let lastKind = '';
+    let previousDataRow = null;
+    bucketRows.forEach(row => {
+      if (row.section !== lastSection) {
+        body.push(`<tr class="testing-section-row"><td colspan="${colSpan}">${x(row.section)}</td></tr>`);
+        lastSection = row.section;
+        lastKind = '';
+      }
+      if (row.kind !== lastKind) {
+        body.push(`<tr class="testing-kind-row"><td colspan="${colSpan}">${row.kind === 'inspection' ? 'INSPECTIONS' : 'TESTING'}</td></tr>`);
+        lastKind = row.kind;
+      }
+      const sameAsPrevious = testingRowsSameExceptLocation(previousDataRow, row);
+      body.push(printable ? renderTestingPrintRow(row, { sameAsPrevious, showHoldPoint }) : renderTestingEditableRow(row, { sameAsPrevious, showHoldPoint }));
+      previousDataRow = row;
+    });
+  });
+  const headerCells = printable
+    ? ['Description', 'Location', 'Requirements', 'Acceptance Criteria', 'Responsibility']
+    : ['Item', 'Location', 'Description', 'Requirements', 'Acceptance Criteria', 'Responsibility'];
+  if (showHoldPoint) headerCells.push('QLDC Hold Point?');
+  headerCells.push('Date', 'Status', 'Evidence Link', 'Notes');
+  if (!printable) headerCells.push('');
+  const headers = `<tr>${headerCells.map(label => `<th>${x(label)}</th>`).join('')}</tr>`;
+  return `<table class="testing-table${showHoldPoint ? '' : ' hide-hold'}">${headers}${body.join('')}</table>`;
+}
+
+function renderTestingRegister() {
+  const plan = testingPlanState();
+  if (!plan.rows.length) {
+    return `
+      <div class="testing-screen-only">
+        <div class="testing-section-title">
+          <div>
+            <h4>Inspection and Testing Register</h4>
+            <p>No register rows have been created yet.</p>
+          </div>
+          <div class="testing-actions">
+            ${renderTestingDisplayOptions()}
+            <button class="btn btn-primary btn-sm" onclick="buildTestingRowsFromScan()" type="button"${plan.components.length ? '' : ' disabled'}>Build Register</button>
+            <button class="btn btn-outline btn-sm" onclick="addTestingRow('inspection')" type="button">Add Inspection</button>
+            <button class="btn btn-outline btn-sm" onclick="addTestingRow('test')" type="button">Add Test</button>
+            <button class="btn btn-outline btn-sm" onclick="addTestingRow('inspection','Complete')" type="button">Add Completed Inspection</button>
+            <button class="btn btn-outline btn-sm" onclick="addTestingRow('test','Complete')" type="button">Add Completed Test</button>
+          </div>
+        </div>
+        <div class="pm-empty">Review the scan results, add locations/parts, then build the register.</div>
+      </div>`;
+  }
+  return `
+    <div class="testing-screen-only testing-edit-register">
+      <div class="testing-section-title">
+        <div>
+          <h4>Inspection and Testing Register</h4>
+          <p>Paste Dropbox links as evidence becomes available. Links are preserved in the printable PDF output.</p>
+        </div>
+        <div class="testing-actions">
+          ${renderTestingDisplayOptions()}
+          <button class="btn btn-outline btn-sm" onclick="autoFillTestingResponsibilities()" type="button">Auto-fill Responsibilities</button>
+          <button class="btn btn-outline btn-sm" onclick="addTestingRow('inspection')" type="button">Add Inspection</button>
+          <button class="btn btn-outline btn-sm" onclick="addTestingRow('test')" type="button">Add Test</button>
+          <button class="btn btn-outline btn-sm" onclick="addTestingRow('inspection','Complete')" type="button">Add Completed Inspection</button>
+          <button class="btn btn-outline btn-sm" onclick="addTestingRow('test','Complete')" type="button">Add Completed Test</button>
+          <button class="btn btn-primary btn-sm" onclick="printTestingPlan()" type="button">Print / Save PDF</button>
+        </div>
+      </div>
+      <div class="testing-register-wrap">${renderTestingRowsTable(plan.rows, false)}</div>
+    </div>
+    ${renderTestingPrintRegister()}`;
+}
+
+function renderTestingPrintRegister() {
+  const plan = testingPlanState();
+  const details = data?.consentDetails || {};
+  const title = details.rmReference || 'Resource Consent';
+  const meta = [details.applicant, details.location].filter(Boolean).join(' - ');
+  return `
+    <div class="testing-print-register">
+      <h2>Inspection and Testing Plan - ${x(title)}</h2>
+      ${meta ? `<p>${x(meta)}</p>` : ''}
+      ${plan.scanSummary ? `<p>${x(plan.scanSummary)}</p>` : ''}
+      ${renderTestingRowsTable(plan.rows, true)}
+    </div>`;
+}
+
+function resizeTestingTextarea(el) {
+  if (!el || el.tagName !== 'TEXTAREA') return;
+  el.style.height = 'auto';
+  el.style.height = Math.max(el.scrollHeight + 2, 42) + 'px';
+}
+
+function resizeTestingTextareas(root = document) {
+  if (!root || typeof root.querySelectorAll !== 'function') return;
+  root.querySelectorAll('textarea.testing-cell-input, textarea.testing-textarea').forEach(resizeTestingTextarea);
+}
+
+function renderTestingPlan() {
+  const plan = testingPlanState();
+  const included = plan.components.filter(c => c.included).length;
+  const inspectionCount = plan.rows.filter(r => r.kind === 'inspection').length;
+  const testCount = plan.rows.filter(r => r.kind === 'test').length;
+  const statusText = plan.lastScan ? 'Last scan: ' + plan.lastScan : '';
+  return `
+    <div class="testing-panel">
+      <div class="testing-head testing-screen-only">
+        <div>
+          <h3>Inspection &amp; Testing Plan</h3>
+          <p>Scan the consent and Engineering Acceptance, review the likely constructed parts, then build the QLDC testing register.</p>
+        </div>
+        <div>
+          <div class="testing-stats">
+            <span class="testing-pill strong">${included}/${plan.components.length} component${plan.components.length !== 1 ? 's' : ''}</span>
+            <span class="testing-pill">${inspectionCount} inspection${inspectionCount !== 1 ? 's' : ''}</span>
+            <span class="testing-pill">${testCount} test${testCount !== 1 ? 's' : ''}</span>
+          </div>
+          <div class="testing-actions" style="margin-top:8px">
+            <button class="btn btn-outline btn-sm" onclick="scanTestingPlan()" type="button" id="testingRescanBtn">${plan.lastScan ? 'Rescan' : 'Scan Testing Requirements'}</button>
+            <button class="btn btn-outline btn-sm" onclick="printTestingPlan()" type="button"${plan.rows.length ? '' : ' disabled'}>Print / Save PDF</button>
+          </div>
+        </div>
+      </div>
+      <div class="testing-body">
+        <div class="testing-status testing-screen-only" id="testingStatus">${x(testingScanStatusText(statusText))}</div>
+        ${renderTestingScanRefreshBanner()}
+        ${plan.scanSummary ? `<div class="pm-cond-summary testing-screen-only">${x(plan.scanSummary)}</div>` : ''}
+        ${plan.notes.length ? `<div class="pm-empty testing-screen-only" style="text-align:left">${plan.notes.map(note => `<div>${x(note)}</div>`).join('')}</div>` : ''}
+        ${renderTestingReview()}
+        ${renderTestingRegister()}
+      </div>
+    </div>`;
+}
+
+function renderTestingPanel(opts = {}) {
+  if (!data) return;
+  ensurePmState();
+  const scrollY = opts.preserveScroll ? captureViewportScroll() : null;
+  const ref = data.consentDetails?.rmReference || 'Unknown consent';
+  const sub = document.getElementById('testingSub');
+  if (sub) sub.textContent = `${ref} - inspection and testing plan`;
+  const content = document.getElementById('testingContent');
+  if (content) {
+    content.innerHTML = renderTestingPlan();
+    resizeTestingTextareas(content);
+    setTimeout(() => resizeTestingTextareas(content), 0);
+  }
+  syncTestingScanUi();
+  restoreViewportScroll(scrollY);
+}
+
+function addTestingComponent() {
+  const plan = testingPlanState();
+  const component = normalizeTestingComponent({
+    id: testingNewId('tc'),
+    type: 'other',
+    section: 'OTHER',
+    label: 'New component',
+    included: true,
+    reviewQuestion: 'Confirm whether this work package has multiple parts/locations and add each location above.'
+  });
+  plan.components.push(component);
+  plan.activeComponentId = component.id;
+  autoSave();
+  renderTestingPanel({ preserveScroll: true });
+}
+
+function removeTestingComponent(id) {
+  const plan = testingPlanState();
+  plan.components = plan.components.filter(c => c.id !== id);
+  plan.suggestedRows = plan.suggestedRows.filter(r => r.componentId !== id);
+  autoSave();
+  renderTestingPanel({ preserveScroll: true });
+}
+
+function setTestingComponentField(id, field, value, rerender = false) {
+  const component = testingComponentById(id);
+  if (!component) return;
+  if (field === 'included') component.included = !!value;
+  else if (field === 'type') {
+    component.type = TESTING_COMPONENT_TYPES.includes(value) ? value : 'other';
+    component.section = testingSectionForType(component.type);
+  } else if (field === 'section') component.section = testingNormalizeSection(value, component.type);
+  else if (field === 'surfaceType') component.surfaceType = testingNormalizeSurface(value);
+  else if (field === 'label') component.label = String(value || '').trim();
+  else if (field === 'reviewQuestion') component.reviewQuestion = String(value || '');
+  else if (field === 'reasoning') component.reasoning = String(value || '');
+  if (rerender) {
+    autoSave();
+    renderTestingPanel({ preserveScroll: true });
+  } else {
+    autoSaveSoon();
+  }
+}
+
+function setTestingComponentLocations(id, value) {
+  const component = testingComponentById(id);
+  if (!component) return;
+  component.locations = testingStringArray(value);
+  autoSaveSoon();
+}
+
+function duplicateTestingComponentLocations(id) {
+  const component = testingComponentById(id);
+  if (!component) return;
+  const countRaw = prompt('How many other locations should this scan result be duplicated for?', '1');
+  if (countRaw == null) return;
+  const count = Math.max(0, Math.min(50, parseInt(countRaw, 10) || 0));
+  if (!count) return;
+  const existing = testingStringArray(component.locations);
+  const names = [];
+  for (let i = 1; i <= count; i++) {
+    const name = prompt('Location name ' + i + ' of ' + count, '');
+    if (name == null) return;
+    const clean = String(name || '').trim();
+    if (clean) names.push(clean);
+  }
+  component.locations = [...existing, ...names].filter((name, idx, arr) =>
+    arr.findIndex(v => v.toLowerCase() === name.toLowerCase()) === idx
+  );
+  autoSave();
+  if (testingPlanState().rows.length) {
+    const rebuild = confirm('Locations have been added. Rebuild the register from the reviewed scan results now? This replaces current register rows.');
+    if (rebuild) {
+      buildTestingRowsFromScan({ silent: true });
+      return;
+    }
+  }
+  renderTestingPanel({ preserveScroll: true });
+}
+
+function buildTestingRowsFromScan(opts = {}) {
+  const plan = testingPlanState();
+  if (plan.rows.length && !opts.silent) {
+    const ok = confirm('Replace the current inspection/testing register with a newly generated one from the reviewed components? Existing pasted links and notes in the register will be replaced.');
+    if (!ok) return;
+  }
+  const rows = testingExpandedRowsFromPlan();
+  testingPlanState().rows = rows;
+  autoSave();
+  renderTestingPanel({ preserveScroll: true });
+}
+
+function autoFillTestingResponsibilities() {
+  const plan = testingPlanState();
+  const components = new Map(plan.components.map(component => [component.id, component]));
+  const rows = plan.rows.map(row => {
+    const component = components.get(row.componentId) || plan.components.find(c => c.type === row.componentType || c.section === row.section) || {};
+    return {
+      ...row,
+      responsibility: testingResponsiblePartyFor(component, row)
+    };
+  });
+  testingPlanState().rows = rows;
+  autoSave();
+  renderTestingPanel({ preserveScroll: true });
+}
+
+function testingNextRowOrder(bucket = 'additional') {
+  const rows = testingPlanState().rows.filter(row => (row.bucket || 'cop') === bucket);
+  return rows.length ? Math.max(...rows.map(row => Number(row.order) || 0)) + 1 : 0;
+}
+
+function testingRenumberRows() {
+  const plan = testingPlanState();
+  TESTING_BUCKETS.forEach(bucket => {
+    testingSortedRows(plan.rows)
+      .filter(row => (row.bucket || 'cop') === bucket.key)
+      .forEach((row, idx) => { row.order = idx; });
+  });
+}
+
+function addTestingRow(kind = 'test', status = 'Planned') {
+  const plan = testingPlanState();
+  const firstComponent = plan.components.find(c => c.included) || plan.components[0] || null;
+  const row = normalizeTestingRow({
+    id: testingNewId('tr'),
+    kind,
+    section: firstComponent?.section || 'OTHER',
+    componentId: firstComponent?.id || '',
+    componentType: firstComponent?.type || 'other',
+    componentLabel: firstComponent?.label || '',
+    location: firstComponent?.locations?.[0] || '',
+    description: kind === 'inspection' ? 'Inspection' : 'Testing',
+    requirements: '',
+    acceptanceCriteria: '',
+    responsibility: testingResponsiblePartyFor(firstComponent || {}, { kind, description: kind === 'inspection' ? 'Inspection' : 'Testing' }),
+    holdPoint: '',
+    status: status || 'Planned',
+    bucket: 'additional',
+    order: testingNextRowOrder('additional'),
+    manual: true,
+    templateOnly: false
+  });
+  testingPlanState().rows.push(row);
+  autoSave();
+  renderTestingPanel({ preserveScroll: true });
+}
+
+function deleteTestingRow(id) {
+  const plan = testingPlanState();
+  plan.rows = plan.rows.filter(row => row.id !== id);
+  testingRenumberRows();
+  autoSave();
+  renderTestingPanel({ preserveScroll: true });
+}
+
+function setTestingHoldPointColumnVisible(visible) {
+  const plan = testingPlanState();
+  plan.showHoldPointColumn = !!visible;
+  autoSave();
+  renderTestingPanel({ preserveScroll: true });
+}
+
+function setTestingRowPrintIncluded(id, included) {
+  const row = testingRowById(id);
+  if (!row) return;
+  row.printIncluded = !!included;
+  autoSave();
+  renderTestingPanel({ preserveScroll: true });
+}
+
+function setTestingRowBucket(id, bucket) {
+  const row = testingRowById(id);
+  if (!row) return;
+  row.bucket = testingNormalizeBucket(bucket);
+  row.order = testingNextRowOrder(row.bucket);
+  testingRenumberRows();
+  autoSave();
+  renderTestingPanel({ preserveScroll: true });
+}
+
+function moveTestingRow(id, direction) {
+  const plan = testingPlanState();
+  const row = testingRowById(id);
+  if (!row) return;
+  const sorted = testingSortedRows(plan.rows).filter(item => (item.bucket || 'cop') === (row.bucket || 'cop'));
+  const idx = sorted.findIndex(item => item.id === id);
+  const nextIdx = idx + direction;
+  if (idx < 0 || nextIdx < 0 || nextIdx >= sorted.length) return;
+  const other = sorted[nextIdx];
+  const currentOrder = row.order;
+  row.order = other.order;
+  other.order = currentOrder;
+  testingRenumberRows();
+  autoSave();
+  renderTestingPanel({ preserveScroll: true });
+}
+
+function beginTestingRowDrag(id) {
+  testingDragRowId = id;
+}
+
+function dropTestingRow(targetId) {
+  const sourceId = testingDragRowId;
+  testingDragRowId = '';
+  if (!sourceId || sourceId === targetId) return;
+  const plan = testingPlanState();
+  const source = testingRowById(sourceId);
+  const target = testingRowById(targetId);
+  if (!source || !target) return;
+  const sorted = testingSortedRows(plan.rows).filter(row => row.id !== sourceId);
+  const targetIdx = sorted.findIndex(row => row.id === targetId);
+  if (targetIdx < 0) return;
+  source.bucket = target.bucket || 'cop';
+  sorted.splice(targetIdx, 0, source);
+  plan.rows = sorted;
+  testingRenumberRows();
+  autoSave();
+  renderTestingPanel({ preserveScroll: true });
+}
+
+function setTestingRowField(id, field, value, rerender = false) {
+  const row = testingRowById(id);
+  if (!row) return;
+  if (field === 'kind') row.kind = String(value || '').toLowerCase() === 'inspection' ? 'inspection' : 'test';
+  else if (field === 'section') row.section = testingNormalizeSection(value, row.componentType);
+  else if (Object.prototype.hasOwnProperty.call(row, field)) row[field] = String(value || '');
+  if (rerender) {
+    autoSave();
+    renderTestingPanel({ preserveScroll: true });
+  } else {
+    autoSaveSoon();
+  }
+}
+
+function printTestingPlan() {
+  const plan = testingPlanState();
+  if (!plan.rows.length) return;
+  document.body.classList.add('print-testing');
+  setTimeout(() => window.print(), 50);
+}
+
+if (typeof window !== 'undefined' && window.addEventListener) {
+  if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+    document.addEventListener('input', ev => {
+      const target = ev.target;
+      if (target && typeof target.matches === 'function' && target.matches('textarea.testing-cell-input, textarea.testing-textarea')) {
+        resizeTestingTextarea(target);
+      }
+    });
+  }
+  window.addEventListener('afterprint', () => {
+    document.body.classList.remove('print-testing');
+  });
 }
 
 function openProjectManagement() {
@@ -7633,11 +9078,13 @@ function renderResponsibilitiesPanel(opts = {}) {
 function renderProjectManagement(opts = {}) {
   renderProjectTeamPanel(opts);
   renderResponsibilitiesPanel(opts);
+  renderTestingPanel(opts);
 }
 
 function renderActiveProjectManagement(opts = {}) {
   if (conditionsTab === 'project') renderProjectTeamPanel(opts);
   else if (conditionsTab === 'responsibilities') renderResponsibilitiesPanel(opts);
+  else if (conditionsTab === 'testing') renderTestingPanel(opts);
   else renderProjectManagement(opts);
 }
 
@@ -8445,13 +9892,13 @@ function flattenSubdivisionConditions() {
   return out;
 }
 
-/* ── XML helper: escape for OOXML text nodes ── */
+/* -- XML helper: escape for OOXML text nodes -- */
 function escXml(str) {
   if (str == null) return '';
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
 }
 
-/* ── Try to fill a DOCX table cell that sits immediately after a cell containing labelText ── */
+/* -- Try to fill a DOCX table cell that sits immediately after a cell containing labelText -- */
 function fillCellAfterLabel(xml, labelText, value) {
   if (!value || !value.trim() || !labelText) return xml;
   const safeVal = escXml(value);
@@ -8504,7 +9951,7 @@ function fillNextCellInRow(rowXml, lcLabel, safeVal) {
   return rowXml.slice(0, fc.start) + newCell + rowXml.slice(fc.end);
 }
 
-/* ── Fill the second cell of the row IMMEDIATELY BELOW the row containing labelText ──
+/* -- Fill the second cell of the row IMMEDIATELY BELOW the row containing labelText --
    Used for "empty box below RM NO" (variation number) and "empty box below EA" (EA variation). */
 function fillSecondCellOfNextRow(xml, labelText, value) {
   if (!value || !value.trim()) return xml;
@@ -8561,7 +10008,7 @@ function fillSecondCellOfNextRow(xml, labelText, value) {
   return xml.slice(0, nextTrStart) + newRow + xml.slice(nextTrClose);
 }
 
-/* ── Find CONDITION No: blocks (condition slot + developer comments slot) from startFrom ── */
+/* -- Find CONDITION No: blocks (condition slot + developer comments slot) from startFrom -- */
 function findConditionBlocks(xml, startFrom) {
   const blocks     = [];
   let searchFrom   = startFrom || 0;
@@ -8619,7 +10066,7 @@ function findConditionBlocks(xml, startFrom) {
   return blocks;
 }
 
-/* ── Replace a paragraph's content with a plain text value (shared helper) ── */
+/* -- Replace a paragraph's content with a plain text value (shared helper) -- */
 function fillValueSlot(xml, pStart, pEnd, value) {
   if (!value) return xml;
   const safeVal  = escXml(value);
@@ -8635,12 +10082,12 @@ function fillValueSlot(xml, pStart, pEnd, value) {
   return xml.slice(0, pStart) + newPara + xml.slice(pEnd);
 }
 
-/* ── Replace a condition slot paragraph with "Condition X: text" ── */
+/* -- Replace a condition slot paragraph with "Condition X: text" -- */
 function fillConditionSlot(xml, pStart, pEnd, label, text) {
   return fillValueSlot(xml, pStart, pEnd, 'Condition ' + label + ': ' + text);
 }
 
-/* ── Generate a new 3-row condition table block matching the QLDC 224c format ── */
+/* -- Generate a new 3-row condition table block matching the QLDC 224c format -- */
 function makeConditionTable(label, text, note) {
   const combined = escXml('Condition ' + label + ': ' + text);
   const randId   = () => Math.floor(Math.random() * 0x7FFFFFFF).toString(16).toUpperCase().padStart(8, '0');
@@ -8700,7 +10147,7 @@ function makeConditionTable(label, text, note) {
 
 const QLDC_CHECKLIST_TEMPLATE_URL = 'https://www.qldc.govt.nz/services/resource-consents/subdividing-and-land-development/s223-s224-c-certificates-and-related-subdivision-requests/';
 
-/* ── Main: choose DOCX template → fill using fill-224c approach → download ── */
+/* -- Main: choose DOCX template -> fill using fill-224c approach -> download -- */
 function exportToChecklist() {
   if (!data) { alert('No consent loaded yet.'); return; }
   openChecklistTemplateChooser();
@@ -8783,16 +10230,16 @@ async function fillChecklistFromTemplateFile(file) {
     };
 
     try {
-      setStatus('Reading DOCX…', 'Reading checklist file…');
+      setStatus('Reading DOCX...', 'Reading checklist file...');
 
-      if (typeof JSZip === 'undefined') throw new Error('JSZip not loaded — check internet connection and reload.');
+      if (typeof JSZip === 'undefined') throw new Error('JSZip not loaded - check internet connection and reload.');
       const buf  = await file.arrayBuffer();
       const zip  = await JSZip.loadAsync(buf);
       let docXml = await zip.file('word/document.xml').async('string');
 
-      setStatus('Filling details…', 'Filling details section…');
+      setStatus('Filling details...', 'Filling details section...');
 
-      /* ── 1. Fill DETAILS table from consent data ── */
+      /* -- 1. Fill DETAILS table from consent data -- */
       const cd = data.consentDetails || {};
       const ea = data.eaData || null;
 
@@ -8810,7 +10257,7 @@ async function fillChecklistFromTemplateFile(file) {
         ['DATE APPLIED',              cd.dateApplied || cd.applicationDate              || ''],
         ['STAGE',                     cd.stage                                          || ''],
         ['NO. OF LOTS',               cd.numLots || cd.numberOfLots                    || ''],
-        /* EA reference — try "ORIGINAL EA" label first (as labelled in the QLDC template),
+        /* EA reference - try "ORIGINAL EA" label first (as labelled in the QLDC template),
            then fall back to other common label names */
         ['ORIGINAL EA',               ea?.eaReference                                   || ''],
         ['EA NO',                     ea?.eaReference                                   || ''],
@@ -8830,14 +10277,14 @@ async function fillChecklistFromTemplateFile(file) {
       }
 
       /* Fill EA variation in the empty box immediately below the EA reference row
-         (only if we have a pdfObjectUrl hint that a newer EA has been issued — future use) */
+         (only if we have a pdfObjectUrl hint that a newer EA has been issued - future use) */
 
-      setStatus('Filling conditions…', 'Filling condition slots…');
+      setStatus('Filling conditions...', 'Filling condition slots...');
 
-      /* ── 2. Fill CONDITION No: slots ──
+      /* -- 2. Fill CONDITION No: slots --
          The 224c DOCX has two condition sections:
-           a) ENGINEERING REVIEW AND ACCEPTANCE  ← EA conditions go here
-           b) SUBDIVISION CONSENT CONDITIONS     ← subdivision conditions go here
+           a) ENGINEERING REVIEW AND ACCEPTANCE  <- EA conditions go here
+           b) SUBDIVISION CONSENT CONDITIONS     <- subdivision conditions go here
          We gather ALL blocks from the start of the doc, split by the section boundary,
          then fill highest-position blocks first to keep string indices valid.  */
 
@@ -8853,7 +10300,7 @@ async function fillChecklistFromTemplateFile(file) {
       const eaBlocks     = allBlocks.filter(b => b.condSlot.pStart < subdivStart);
       const subdivBlocks = allBlocks.filter(b => b.condSlot.pStart >= subdivStart);
 
-      /* 2a — Fill subdivision blocks in reverse (highest position first) */
+      /* 2a - Fill subdivision blocks in reverse (highest position first) */
       const numSubdivFill = Math.min(subdivBlocks.length, subdivConds.length);
       for (let i = numSubdivFill - 1; i >= 0; i--) {
         const { condSlot, devSlot } = subdivBlocks[i];
@@ -8862,7 +10309,7 @@ async function fillChecklistFromTemplateFile(file) {
         docXml = fillConditionSlot(docXml, condSlot.pStart, condSlot.pEnd, label, text);
       }
 
-      /* 2b — Fill EA blocks in reverse (lower positions, safe after subdivision fills) */
+      /* 2b - Fill EA blocks in reverse (lower positions, safe after subdivision fills) */
       const numEAFill = Math.min(eaBlocks.length, eaCondList.length);
       for (let i = numEAFill - 1; i >= 0; i--) {
         const { condSlot } = eaBlocks[i];
@@ -8872,7 +10319,7 @@ async function fillChecklistFromTemplateFile(file) {
         docXml = fillConditionSlot(docXml, condSlot.pStart, condSlot.pEnd, label, text);
       }
 
-      /* 2c — Subdivision overflow: new tables before FINANCIAL MATTERS */
+      /* 2c - Subdivision overflow: new tables before FINANCIAL MATTERS */
       if (subdivConds.length > subdivBlocks.length) {
         const overflow     = subdivConds.slice(subdivBlocks.length);
         const newTablesXml = overflow.map(c => makeConditionTable(c.label, c.text, c.note)).join('\n');
@@ -8888,7 +10335,7 @@ async function fillChecklistFromTemplateFile(file) {
         }
       }
 
-      /* 2d — EA overflow: new tables before SUBDIVISION CONSENT CONDITIONS
+      /* 2d - EA overflow: new tables before SUBDIVISION CONSENT CONDITIONS
          (Do this AFTER subdivision overflow so position of subdivision marker is still valid) */
       if (eaCondList.length > eaBlocks.length) {
         const overflow     = eaCondList.slice(eaBlocks.length);
@@ -8904,9 +10351,9 @@ async function fillChecklistFromTemplateFile(file) {
         }
       }
 
-      setStatus('Building document…', 'Building filled document…');
+      setStatus('Building document...', 'Building filled document...');
 
-      /* ── 3. Repack and download ── */
+      /* -- 3. Repack and download -- */
       zip.file('word/document.xml', docXml);
       const blob = await zip.generateAsync({
         type: 'blob',
@@ -8922,8 +10369,8 @@ async function fillChecklistFromTemplateFile(file) {
       setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
 
       if (saveEl) {
-        saveEl.textContent = `✓ Exported as ${filename}`;
-        setTimeout(() => { if (saveEl.textContent.startsWith('✓')) saveEl.textContent = ''; }, 6000);
+        saveEl.textContent = `Exported as ${filename}`;
+        setTimeout(() => { if (saveEl.textContent.startsWith('Exported as')) saveEl.textContent = ''; }, 6000);
       }
     } catch (err) {
       alert('Export failed: ' + err.message);

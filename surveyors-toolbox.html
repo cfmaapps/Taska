@@ -9171,6 +9171,7 @@
       if (job.desc) params.set('jobName', job.desc);
       if (options.replace) params.set('replace', '1');
       params.set('tab', options.tab || 'gantt');
+      params.set('v', '20260629-01');
       const path = `rm-tool/resourceconsent-analyser.html?${params.toString()}`;
       return isLocalAppHost() ? path : `http://localhost:8080/${path}`;
     }

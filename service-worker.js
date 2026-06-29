@@ -1,4 +1,4 @@
-const TASKA_CACHE = 'cfma-taska-static-2026-06-23-04';
+const TASKA_CACHE = 'cfma-taska-static-2026-06-29-01';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -40,7 +40,7 @@ self.addEventListener('fetch', event => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  const isFreshFile = /(?:surveyors-toolbox|index)\.html$/.test(url.pathname)
+  const isFreshFile = /(?:surveyors-toolbox|index|resourceconsent-analyser)\.html$/.test(url.pathname)
     || /(?:cfma-public-config\.js|version\.json)$/.test(url.pathname)
     || url.pathname.endsWith('/');
 
